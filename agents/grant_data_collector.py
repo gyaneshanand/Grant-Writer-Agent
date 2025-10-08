@@ -41,7 +41,7 @@ def scrape_site(url):
     # Filter and fix relative URLs
     grant_links = []
     for l in links:
-        if any(x in l.lower() for x in ["grant", "apply", "fund", "fellowship", "opportunity", "scholarship", "award", "funding", "faq", "eligibility", "criteria", "how-to-apply", "guidelines", "about", "programs"]):
+        if any(x in l.lower() for x in ["grant", "apply", "fund", "fellowship", "opportunity", "scholarship", "award", "funding", "faq", "eligibility", "criteria", "how-to-apply", "guidelines", "about", "programs", "opportunities"]):
             original_link = l
             # Fix relative URLs
             if l.startswith('/'):
@@ -51,13 +51,23 @@ def scrape_site(url):
             grant_links.append(l)
             print(f"🎯 Found potential grant link: {original_link} -> {l}")
 
+    # remove duplicates
+    grant_links = list(set(grant_links))
+
+    # Restrict to max 20 links to avoid overload
+    # Smart selection to prioritize likely grant pages like "grants", "apply", "funding". Always include main URL.
+    prioritized_links = []
+    keywords = ["grant", "apply", "fund", "fellowship", "opportunity", "scholarship", "award", "funding"]
+    for kw in keywords:
+        for gl in grant_links:
+            if kw in gl.lower() and gl not in prioritized_links:
+                prioritized_links.append(gl)
+    grant_links = prioritized_links[:20]
+
     # Always include the main URL
     if url not in grant_links:
         grant_links.append(url)
         print(f"🎯 Added main URL to grant links: {url}")
-
-    # remove duplicates
-    grant_links = list(set(grant_links))
 
     print(f"✨ Total grant-related links found: {len(grant_links)}")
     # print the list of links

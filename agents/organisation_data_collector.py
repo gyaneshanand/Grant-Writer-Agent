@@ -55,6 +55,9 @@ def scrape_site(url):
     # remove duplicates
     org_links = list(set(org_links))
 
+    # Restrict to max 10 links to avoid overload
+    org_links = org_links[:10]
+
     print(f"✨ Total organization-related links found: {len(org_links)}")
     # print the list of links
     print("📋 Organization-related links:")
