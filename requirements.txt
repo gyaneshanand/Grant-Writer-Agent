@@ -1,0 +1,11 @@
+langchain==0.0.335
+openai==0.28.1
+pydantic==2.4.2
+requests==2.31.0
+beautifulsoup4==4.12.2
+trafilatura==1.6.4
+langsmith>=0.1.0
+langchain-community>=0.0.10
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-dotenv>=1.0.0
