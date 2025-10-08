@@ -15,7 +15,7 @@ source venv/bin/activate
 
 # Install/update requirements
 echo "Installing requirements..."
-pip install -r api_requirements.txt
+pip install -r requirements.txt
 
 # Check for environment variables
 if [ -z "$OPENAI_API_KEY" ]; then
