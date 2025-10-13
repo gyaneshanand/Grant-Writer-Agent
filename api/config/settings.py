@@ -10,6 +10,9 @@ class Settings(BaseSettings):
     # OpenAI Configuration
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
     
+    # Tavily Configuration
+    TAVILY_API_KEY: str = os.getenv("TAVILY_API_KEY", "")
+    
     # LangSmith Configuration
     LANGSMITH_TRACING: bool = os.getenv("LANGSMITH_TRACING", "false").lower() == "true"
     LANGSMITH_ENDPOINT: str = os.getenv("LANGSMITH_ENDPOINT", "https://api.smith.langchain.com")
@@ -25,5 +28,6 @@ class Settings(BaseSettings):
     
     class Config:
         env_file = ".env"
+        extra = "allow"  # Allow extra fields from .env file
 
 settings = Settings()

@@ -97,3 +97,16 @@ class ErrorResponse(BaseModel):
     message: str
     error_type: str
     details: Optional[str] = None
+
+# URL Finder Request/Response Models
+class URLFinderRequest(BaseModel):
+    organization_name: str
+    foundation_data: Optional[Dict[str, Any]] = None
+    model: Optional[str] = "gpt-4o-mini"
+
+class URLFinderResponse(BaseModel):
+    success: bool
+    url: Optional[str] = None
+    attempts: int
+    error: Optional[str] = None
+    organization_name: str

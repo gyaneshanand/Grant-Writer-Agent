@@ -2,10 +2,19 @@ from fastapi import APIRouter, HTTPException
 from typing import List
 from ..models.schemas import (
     GrantDataRequest, GrantDataResponse, 
-    OrganizationDataRequest, OrganizationDataResponse
+    OrganizationDataRequest, OrganizationDataResponse,
+    URLFinderRequest, URLFinderResponse
 )
 from ..services.grant_data_service import GrantDataService
 from ..services.organization_data_service import OrganizationDataService
+
+# Import the URL finder agent
+import sys
+from pathlib import Path
+# Add agents directory to path
+agents_dir = Path(__file__).parent.parent.parent / "agents"
+sys.path.insert(0, str(agents_dir))
+from organisation_url_finder_agent import find_organization_url
 
 router = APIRouter(prefix="/grant-data-collection", tags=["Data Collection"])
 
@@ -62,4 +71,38 @@ async def collect_organization_data(request: OrganizationDataRequest):
         raise HTTPException(
             status_code=500, 
             detail=f"Failed to collect organization data: {str(e)}"
+        )
+
+@router.post("/find-url", response_model=URLFinderResponse)
+async def find_organization_url_endpoint(request: URLFinderRequest):
+    """
+    Find official website URL for an organization using AI agent
+    
+    Args:
+        request: Contains organization name and optional foundation data
+        
+    Returns:
+        URLFinderResponse with found URL and metadata
+        
+    Raises:
+        HTTPException: If URL finding fails
+    """
+    try:
+        result = find_organization_url(
+            organization_name=request.organization_name,
+            foundation_data=request.foundation_data,
+            model=request.model
+        )
+        
+        return URLFinderResponse(
+            success=result["success"],
+            url=result.get("url"),
+            attempts=result["attempts"],
+            error=result.get("error"),
+            organization_name=request.organization_name
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Failed to find organization URL: {str(e)}"
         )
