@@ -39,7 +39,7 @@ PORT="${PORT:-8000}"
 # Rule of thumb: (2 x CPU cores) + 1
 # For 2 cores: 5 workers
 # For 4 cores: 9 workers
-WORKERS="${WORKERS:-4}"
+WORKERS="${WORKERS:-10}"
 
 # Create logs directory if it doesn't exist
 mkdir -p logs
