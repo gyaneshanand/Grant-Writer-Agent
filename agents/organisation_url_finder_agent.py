@@ -43,7 +43,7 @@ ANALYSIS CRITERIA:
 - Look for URLs that end with .org, .com, or similar domains
 - Prioritize results that clearly match the foundation name
 - Use validate_url tool to check if URLs contain foundation content
-- Avoid directory listing websites like foundationcenter.org, guidestar.org, charitynavigator.org, grantable.co, grantmakers.io, instrumentl.com, grantadvisor.org, intellispect.co, taxexemptworld.com
+- Avoid directory listing websites like foundationcenter.org, guidestar.org, charitynavigator.org, grantable.co, grantmakers.io, instrumentl.com, grantadvisor.org, intellispect.co, taxexemptworld.com, causeiq.com
 
 VALIDATION REQUIREMENTS:
 - Must be the organization's primary domain (not subdirectories)
