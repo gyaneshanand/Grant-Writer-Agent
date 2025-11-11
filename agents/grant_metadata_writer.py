@@ -59,17 +59,17 @@ class GrantMetadataWriter:
 
         Generate the following 6 fields:
 
-        1. **Opportunity Title** (exactly 70 characters): Clean title for grant opportunity; make it vague; include grant intent, grant amount that describes who the grant helps and specific causes. Do not mention grant sources. SEO friendly.
+        1. **Opportunity Title** (around 60 characters): Clean title for grant opportunity; make it vague; include grant intent, grant amount that describes who the grant helps and specific causes. Do not mention grant sources. SEO friendly. Make sure Opportunity Title is not more than 70 characters
 
-        2. **H1 Tag** (exactly 70 characters): Clean H1 tag for grant opportunity; make it vague; include grant intent, grant amount that describes who the grant helps and specific causes. Do not mention grant sources. SEO friendly.
+        2. **H1 Tag** (around 50 characters): Clean H1 tag for grant opportunity; make it vague; include grant intent, grant amount that describes who the grant helps and specific causes. Do not mention grant sources. SEO friendly. Make sure H1 Tag is not more than 60 characters.
 
-        3. **Meta Title** (exactly 70 characters): Clean Meta Title for grant opportunity; make it vague; include grant intent, grant amount that describes who the grant helps and specific causes. Do not mention grant sources. SEO friendly.
+        3. **Meta Title** (around 50 characters): Clean Meta Title for grant opportunity; make it vague; include grant intent, grant amount that describes who the grant helps and specific causes. Do not mention grant sources. SEO friendly. Make sure *Meta Title is not more than 60 characters.
 
-        4. **Meta Description** (exactly 70 characters): Clean Meta Description that is DIFFERENT from the Meta Title for grant opportunity; make it vague; include grant intent, grant amount that describes who the grant helps and specific causes. Do not mention grant sources. SEO friendly.
+        4. **Meta Description** (approximately 140 characters): Clean Meta Description that is DIFFERENT from the Meta Title for grant opportunity; make it vague; include grant intent, grant amount that describes who the grant helps and specific causes. Do not mention grant sources. SEO friendly. Make sure Meta Description is not more than 150 characters.
 
         5. **Opportunity Teaser** (approximately 500 words): Write a descriptive, engaging, comprehensive and easy to understand 500-word summary with description of grant opportunity. Make the response vague. Do NOT show icons. Do NOT show bullets. Do not include any content source URLs. Provide information such as grants for which states or regions, grants for nonprofits or businesses or individuals. Provide information to describe the intent of use for the funds. Show the dollar amount of the grant or grants. Write about the grant opportunity benefits, interests, identify if nonprofit organizations or small businesses or individuals are eligible and locations where available. Do not mention contact information or foundation name or grant name. Make description vague. Do not say it is a 'new grant' opportunity. Remember to EXCLUDE the foundation's name, grant's name or any specific program names, people's names, addresses, or URLs in the summary. No names. No addresses. No URLs. We do not want to reveal the foundation and grant identity to users.
 
-        6. **Opportunity Title for Subscriber** (approximately 120 characters): Clean title for grant opportunity; includes the Grant name, grant intent, grant amount that describes who the grant helps and specific causes. Do not mention grant source. SEO friendly.
+        6. **Opportunity Title for Subscriber** (approximately 140 characters): Clean title for grant opportunity; includes the Grant name, grant intent, grant amount that describes who the grant helps and specific causes. Do not mention grant source. SEO friendly. Make sure Opportunity Title for Subscriber is not more than 150 characters.
 
         Here is the grant data to use:
 
