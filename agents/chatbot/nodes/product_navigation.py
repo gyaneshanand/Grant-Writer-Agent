@@ -9,11 +9,12 @@ Handles questions about The Grant Portal platform:
 import logging
 from agents.chatbot.models.state import ChatbotState
 from agents.chatbot.services.llm import llm
-from agents.chatbot.config import PRICING_CONTEXT
+from agents.chatbot.services.vector_store import get_vector_store
+from agents.chatbot.config import PRICING_CONTEXT, chatbot_settings
+from agents.chatbot.utils.logging import log_node_execution, logger
 
-logger = logging.getLogger(__name__)
 
-
+@log_node_execution
 async def handle_product_navigation(state: ChatbotState) -> dict:
     """
     Handle product/platform questions.
@@ -36,6 +37,7 @@ async def handle_product_navigation(state: ChatbotState) -> dict:
     return await _handle_rag_question(state)
 
 
+@log_node_execution
 async def _handle_pricing_question(state: ChatbotState) -> dict:
     """Answer pricing questions using static context."""
 
@@ -66,11 +68,12 @@ Guidelines:
         }
 
 
+@log_node_execution
 async def _handle_rag_question(state: ChatbotState) -> dict:
     """Answer product questions using RAG from vector store."""
 
     try:
-        from agents.chatbot.services.vector_store import get_retriever, get_vector_store
+        # from agents.chatbot.services.vector_store import get_retriever, get_vector_store # Removed, now imported at top
 
         # Check if vector store is initialized
         vs = get_vector_store()
@@ -85,7 +88,7 @@ async def _handle_rag_question(state: ChatbotState) -> dict:
             }
 
         # Use RAG
-        retriever = get_retriever(k=4)
+        retriever = vs.get_retriever(k=4)
         docs = retriever.invoke(state["user_message"])
 
         if not docs:
@@ -105,6 +108,10 @@ async def _handle_rag_question(state: ChatbotState) -> dict:
             if source:
                 sources.add(source)
 
+        # Log retrieval for visibility
+        user_message = state["user_message"]
+        logger.info(f"📚 RAG Retrieval: Found {len(docs)} documents for query: '{user_message}'")
+        
         context = "\n\n".join(context_parts)
 
         prompt = f"""You are a helpful assistant for The Grant Portal.

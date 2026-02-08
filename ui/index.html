@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grant Writer Chatbot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar (Optional for future history features) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-robot"></i>
+                <h2>GrantBot</h2>
+            </div>
+            <div class="sidebar-content">
+                <p class="sidebar-info">Your AI assistant for finding and analyzing grants.</p>
+                <button id="new-chat-btn" class="secondary-btn"><i class="fa-solid fa-plus"></i> New Chat</button>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-area">
+            <header class="chat-header">
+                <h1>Grant Writer Assistant</h1>
+                <div class="status-indicator">
+                    <span class="status-dot"></span> Online
+                </div>
+            </header>
+
+            <div id="chat-messages" class="chat-messages">
+                <!-- Welcome Message -->
+                <div class="message assistant-message">
+                    <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                    <div class="message-content">
+                        <p>Hello! I'm your Grant Writer Assistant. I can help you find grants, analyze foundations, or answer questions about the platform. How can I help you today?</p>
+                        <div class="suggestion-chips">
+                            <button class="chip" onclick="setInput('Find grants for education in New York')">🎓 Education Grants</button>
+                            <button class="chip" onclick="setInput('Find grants for environmental protection')">🌱 Environment Grants</button>
+                            <button class="chip" onclick="setInput('How does the grant pipeline work?')">❓ Pipeline Help</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <textarea id="user-input" placeholder="Type your message here..." rows="1"></textarea>
+                    <button id="send-btn" disabled><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+                <div class="input-footer">
+                    <p>AI can make mistakes. Please verify important information.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

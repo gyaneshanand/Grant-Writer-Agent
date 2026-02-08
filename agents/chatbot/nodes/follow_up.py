@@ -9,10 +9,12 @@ import json
 import logging
 from agents.chatbot.models.state import ChatbotState
 from agents.chatbot.services.llm import llm
+from agents.chatbot.utils.logging import log_node_execution, logger
 
 logger = logging.getLogger(__name__)
 
 
+@log_node_execution
 async def detect_follow_up(state: ChatbotState) -> dict:
     """
     Determine if current message continues a prior search.

@@ -7,6 +7,7 @@ Routes user messages to the correct handler based on intent.
 import logging
 from agents.chatbot.models.state import ChatbotState
 from agents.chatbot.services.llm import llm
+from agents.chatbot.utils.logging import log_node_execution, logger
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +22,7 @@ VALID_QUERY_TYPES = {
 }
 
 
+@log_node_execution
 async def classify_query(state: ChatbotState) -> dict:
     """
     Classify user intent to route to correct handler.
@@ -60,7 +62,7 @@ Return ONLY the category name, nothing else."""
             )
             query_type = "other"
 
-        logger.info(f"Classified as: {query_type}")
+        logger.info(f"🧠 Classification Result: {query_type}")
         return {"query_type": query_type}
 
     except Exception as e:

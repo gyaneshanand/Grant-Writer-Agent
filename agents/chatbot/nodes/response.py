@@ -9,10 +9,12 @@ import json
 import logging
 from agents.chatbot.models.state import ChatbotState
 from agents.chatbot.services.llm import llm
+from agents.chatbot.utils.logging import log_node_execution
 
 logger = logging.getLogger(__name__)
 
 
+@log_node_execution
 async def format_grant_results(state: ChatbotState) -> dict:
     """
     Format search results into a conversational response.

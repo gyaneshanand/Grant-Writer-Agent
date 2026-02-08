@@ -21,6 +21,7 @@ import json
 import logging
 from agents.chatbot.models.state import ChatbotState
 from agents.chatbot.config import chatbot_settings
+from agents.chatbot.utils.logging import log_node_execution, logger
 
 logger = logging.getLogger(__name__)
 
@@ -104,6 +105,7 @@ async def load_conversation(state: ChatbotState) -> dict:
 # ── Save ───────────────────────────────────────────────────
 
 
+@log_node_execution
 async def save_conversation(state: ChatbotState) -> dict:
     """
     Final node: Persist user message + bot response to MySQL.

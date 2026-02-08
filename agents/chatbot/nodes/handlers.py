@@ -8,6 +8,7 @@ They handle intents where the response should be consistent.
 import random
 from agents.chatbot.models.state import ChatbotState
 from agents.chatbot.config import chatbot_settings
+from agents.chatbot.utils.logging import log_node_execution
 
 SUPPORT_EMAIL = chatbot_settings.support_email
 
@@ -15,6 +16,7 @@ SUPPORT_EMAIL = chatbot_settings.support_email
 # ── Greeting ───────────────────────────────────────────────
 
 
+@log_node_execution
 async def handle_greeting(state: ChatbotState) -> dict:
     """
     Welcome message. Randomized for variety.
@@ -43,6 +45,7 @@ async def handle_greeting(state: ChatbotState) -> dict:
 # ── Account Support ────────────────────────────────────────
 
 
+@log_node_execution
 async def handle_account_support(state: ChatbotState) -> dict:
     """Account issues — redirect to support email."""
 
@@ -60,6 +63,7 @@ async def handle_account_support(state: ChatbotState) -> dict:
 # ── Eligibility Assessment ─────────────────────────────────
 
 
+@log_node_execution
 async def handle_eligibility_assessment(state: ChatbotState) -> dict:
     """Eligibility questions — explain what we can/can't do."""
 
@@ -80,6 +84,7 @@ async def handle_eligibility_assessment(state: ChatbotState) -> dict:
 # ── Application Guidance ───────────────────────────────────
 
 
+@log_node_execution
 async def handle_application_guidance(state: ChatbotState) -> dict:
     """Application help — redirect to grant writers."""
 
@@ -100,6 +105,7 @@ async def handle_application_guidance(state: ChatbotState) -> dict:
 # ── Fallback ───────────────────────────────────────────────
 
 
+@log_node_execution
 async def handle_fallback(state: ChatbotState) -> dict:
     """Catch-all for unrecognized intents."""
 

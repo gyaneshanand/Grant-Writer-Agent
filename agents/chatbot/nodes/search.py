@@ -8,13 +8,13 @@ NOTE: This node requires DATABASE_URL to be configured.
 If database is not available, returns empty results with a message.
 """
 
-import logging
 from agents.chatbot.models.state import ChatbotState
 from agents.chatbot.config import chatbot_settings
+from agents.chatbot.services.database import ensure_database
+from agents.chatbot.utils.logging import log_node_execution, logger
 
-logger = logging.getLogger(__name__)
 
-
+@log_node_execution
 async def build_and_execute_search(state: ChatbotState) -> dict:
     """
     Build parameterized SQL from entity slugs and execute.
@@ -32,11 +32,7 @@ async def build_and_execute_search(state: ChatbotState) -> dict:
         }
 
     try:
-        from agents.chatbot.services.database import ensure_database
-        database = await ensure_database()
-
-        if database is None:
-            return {"search_results": [], "sql_query": None}
+        db = await ensure_database()
 
         entities = state.get("extracted_entities", {})
         conditions = ["g.status = 2"]  # status 2 = Active grants
@@ -102,7 +98,7 @@ async def build_and_execute_search(state: ChatbotState) -> dict:
         where_clause = " AND ".join(all_conditions)
 
         # ── Build final query ──────────────────────────────────
-        sql = f"""
+        query = f"""
             SELECT
                 g.id,
                 g.opportunity_title,
@@ -133,20 +129,21 @@ async def build_and_execute_search(state: ChatbotState) -> dict:
 
         params["limit"] = chatbot_settings.max_search_results
 
-        logger.info(f"Executing search with params: {params}")
-        logger.debug(f"SQL: {sql}")
+        # Log the generated SQL for visibility
+        logger.info(f"🔍 Generated SQL Query:\n{query}")
+        logger.debug(f"🔍 SQL Params: {params}")
 
-        rows = await database.fetch_all(sql, params)
-        results = []
-        for r in rows:
+        results = await db.fetch_all(query=query, values=params)
+        processed_results = []
+        for r in results:
             row = dict(r)
             # Convert datetime/date objects to strings for JSON
             if row.get("deadline_at"):
                 row["deadline_at"] = str(row["deadline_at"])
-            results.append(row)
+            processed_results.append(row)
 
-        logger.info(f"Search returned {len(results)} results")
-        return {"search_results": results, "sql_query": sql}
+        logger.info(f"Search returned {len(processed_results)} results")
+        return {"search_results": processed_results, "sql_query": query}
 
     except Exception as e:
         logger.error(f"Search query failed: {e}")

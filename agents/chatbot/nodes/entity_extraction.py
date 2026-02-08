@@ -16,8 +16,7 @@ from agents.chatbot.data.slugs import (
     VALID_LOCATION_SLUGS,
     VALID_ELIGIBILITY_SLUGS,
 )
-
-logger = logging.getLogger(__name__)
+from agents.chatbot.utils.logging import log_node_execution, logger
 
 
 class ExtractedEntities(BaseModel):
@@ -88,6 +87,7 @@ Return ONLY valid JSON, no markdown fences, no explanation:
 )
 
 
+@log_node_execution
 async def extract_and_resolve_entities(state: ChatbotState) -> dict:
     """
     Combined extraction + validation + merge node.
