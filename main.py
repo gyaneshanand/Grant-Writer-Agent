@@ -8,6 +8,7 @@ import os
 from api.controllers.data_collection_controller import router as data_collection_router
 from api.controllers.content_generation_controller import router as content_generation_router
 from api.controllers.pipeline_controller import router as pipeline_router
+from api.controllers.chatbot_controller import router as chatbot_router
 
 # Import LangSmith setup
 from api.config.langsmith_setup import setup_langsmith, log_langsmith_status
@@ -38,9 +39,23 @@ async def lifespan(app: FastAPI):
     else:
         logger.info("All required environment variables are set")
     
+    # Initialize chatbot database connection (optional)
+    try:
+        from agents.chatbot.services.database import startup_db
+        await startup_db()
+    except Exception as e:
+        logger.warning(f"Chatbot database not configured: {e}")
+    
     logger.info("Grant Writer API started successfully")
     yield
     logger.info("Grant Writer API shutting down...")
+    
+    # Cleanup chatbot database connection
+    try:
+        from agents.chatbot.services.database import shutdown_db
+        await shutdown_db()
+    except Exception:
+        pass
 
 # Create FastAPI app
 app = FastAPI(
@@ -55,6 +70,7 @@ app = FastAPI(
     * **Content Generation**: Create consolidated grant descriptions using AI
     * **Metadata Extraction**: Generate structured metadata for grant details
     * **Full Pipeline**: End-to-end processing from URLs to final content
+    * **AI Chatbot**: Conversational grant search and platform Q&A
     
     ## Pipeline Overview
     
@@ -82,6 +98,7 @@ app.add_middleware(
 app.include_router(data_collection_router, prefix="/api/v1")
 app.include_router(content_generation_router, prefix="/api/v1")
 app.include_router(pipeline_router, prefix="/api/v1")
+app.include_router(chatbot_router, prefix="/api/v1")
 
 @app.get("/", tags=["Health"])
 async def root():
@@ -93,6 +110,7 @@ async def root():
             "data_collection": "/api/v1/data-collection",
             "content_generation": "/api/v1/content-generation", 
             "pipeline": "/api/v1/pipeline",
+            "chatbot": "/api/v1/chatbot",
             "docs": "/docs"
         }
     }
@@ -109,7 +127,8 @@ async def health_check():
             "/api/v1/data-collection/organization",
             "/api/v1/content-generation/grant-description",
             "/api/v1/content-generation/metadata",
-            "/api/v1/pipeline/complete"
+            "/api/v1/pipeline/complete",
+            "/api/v1/chatbot/chat"
         ]
     }
 

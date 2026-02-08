@@ -74,3 +74,9 @@ htmlcov/
 *token*
 *.pem
 *.key
+
+# Allow ChromaDB data for chatbot
+!agents/chatbot/data/chroma_db/
+!agents/chatbot/data/chroma_db/*.sqlite3
+!agents/chatbot/data/chroma_db/**/*.bin
+!agents/chatbot/data/chroma_db/**/*.pickle
