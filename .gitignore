@@ -80,3 +80,4 @@ htmlcov/
 !agents/chatbot/data/chroma_db/*.sqlite3
 !agents/chatbot/data/chroma_db/**/*.bin
 !agents/chatbot/data/chroma_db/**/*.pickle
+!scripts/init_chatbot.sql
