@@ -71,3 +71,10 @@ class ChatRequest(BaseModel):
         default_factory=list,
         description="Full conversation history (stateless mode). Empty in stateful mode.",
     )
+
+    # ── User type for differentiated responses ─────────────
+    user_type: str = Field(
+        default="guest-user",
+        pattern="^(guest-user|unpaid-user|paid-user)$",
+        description="User subscription status for CTA differentiation",
+    )

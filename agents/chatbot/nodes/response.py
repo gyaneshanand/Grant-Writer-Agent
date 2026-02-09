@@ -1,8 +1,7 @@
 """
 Grant results formatting node.
 
-Converts raw SQL results into a conversational response.
-Uses LLM when there are results, templates when empty.
+Returns count + 2-sentence summary based on user_type.
 """
 
 import json
@@ -14,72 +13,79 @@ from agents.chatbot.utils.logging import log_node_execution
 logger = logging.getLogger(__name__)
 
 
+# CTA mapping by user type
+CTA_CONFIG = {
+    "guest-user": {
+        "type": "signup",
+        "text": "Click to Sign Up & View Full Report",
+    },
+    "unpaid-user": {
+        "type": "subscribe",
+        "text": "Subscribe to View Full List",
+    },
+    "paid-user": {
+        "type": "view_grants",
+        "text": "View Full List of {count} Grants",
+    },
+}
+
+
 @log_node_execution
 async def format_grant_results(state: ChatbotState) -> dict:
     """
-    Format search results into a conversational response.
+    Format search results into a count + 2-sentence summary.
 
-    Two paths:
-    1. Has results → LLM summarizes conversationally
-    2. No results  → Template suggests refinement (no LLM cost)
+    Response varies by user_type:
+    - guest-user: Summary + signup nudge
+    - unpaid-user: Summary + subscription nudge
+    - paid-user: Summary + view link
     """
 
+    total_grants = state.get("total_grants", 0)
     results = state.get("search_results", [])
     entities = state.get("extracted_entities", {})
+    user_type = state.get("user_type", "guest-user")
 
-    if not results:
+    if total_grants == 0:
         return {"response": _suggest_refinement(entities)}
 
     try:
-        # Prepare results summary for the prompt
-        results_summary = []
-        for r in results:
-            entry = {
-                "title": r.get("opportunity_title", "Untitled"),
-                "amount_range": _format_amount(r.get("amount_low"), r.get("amount_high")),
-                "deadline": r.get("deadline_at", "Not specified"),
-                "categories": r.get("interest_slugs", ""),
-                "locations": r.get("province_slugs", ""),
-                "eligibility": r.get("eligibility_slugs", ""),
-            }
-            results_summary.append(entry)
+        # Build context for LLM
+        sample_titles = [r.get("opportunity_title", "") for r in results[:5]]
+        sample_categories = set()
+        for r in results[:10]:
+            if r.get("interest_slugs"):
+                for slug in r["interest_slugs"].split(","):
+                    sample_categories.add(slug.replace("-", " ").strip())
 
-        prompt = f"""You are a friendly grant advisor for The Grant Portal.
-Present these {len(results)} grants in a helpful, conversational way.
+        prompt = f"""Generate a 2-sentence summary for grant search results.
 
-For each grant include:
-- Grant name (bold it)
-- Award range if available
-- Deadline if available
-- One sentence on why it matches their search
-
-User asked: "{state["user_message"]}"
-Their search filters: {json.dumps(entities)}
-
-Results:
-{json.dumps(results_summary, indent=2, default=str)}
+User searched: "{state["user_message"]}"
+Total grants found: {total_grants}
+Sample grant titles: {sample_titles}
+Sample categories: {list(sample_categories)[:5]}
 
 Guidelines:
-- Be concise but warm
-- Use a numbered list, not a table
-- If there are many results, briefly summarize the range
-- End with a helpful suggestion (e.g., "Want me to narrow these down?")
-- Don't mention SQL or technical details"""
+- First sentence: Confirm what was found (e.g., "I found {total_grants} grants for...")
+- Second sentence: Brief overview of what the grants cover
+- Be conversational and helpful
+- Do NOT list individual grants
+- Keep it under 50 words total"""
 
         result = await llm.ainvoke(prompt)
-        return {"response": result.content}
+        summary = result.content.strip()
+
+        # Add CTA nudge based on user_type
+        cta = CTA_CONFIG.get(user_type, CTA_CONFIG["guest-user"])
+
+        return {"response": summary}
 
     except Exception as e:
         logger.error(f"Response formatting failed: {e}")
-        # Fallback: simple list without LLM
-        lines = [f"I found {len(results)} grants:\n"]
-        for r in results[:5]:
-            title = r.get("opportunity_title", "Untitled")
-            lines.append(f"• **{title}**")
-            amount = _format_amount(r.get("amount_low"), r.get("amount_high"))
-            if amount:
-                lines.append(f"  {amount}")
-        return {"response": "\n".join(lines)}
+        # Fallback without LLM
+        return {
+            "response": f"I found {total_grants} grants matching your search criteria."
+        }
 
 
 def _format_amount(low, high) -> str:

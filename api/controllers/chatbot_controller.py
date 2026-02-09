@@ -12,7 +12,6 @@ from agents.chatbot.models.response import (
     ChatResponse,
     ConversationTurnResponse,
     ExtractedEntitiesResponse,
-    GrantResult,
 )
 from agents.chatbot.graph.main_graph import chatbot_graph
 from agents.chatbot.config import chatbot_settings
@@ -46,6 +45,7 @@ async def chat(request: ChatRequest):
         f"Chat request: mode={request.conversation_mode}, "
         f"session={request.session_id}, "
         f"user={request.user_id}, "
+        f"user_type={request.user_type}, "
         f"history_turns={len(request.conversation_history)}, "
         f"message='{request.message[:50]}...'"
     )
@@ -70,6 +70,7 @@ async def chat(request: ChatRequest):
             "user_message": request.message,
             "session_id": request.session_id,
             "user_id": request.user_id,
+            "user_type": request.user_type,
             "conversation_mode": request.conversation_mode,
             # In stateless: pre-populated from FE
             # In stateful: will be loaded by load_conversation node
@@ -81,6 +82,7 @@ async def chat(request: ChatRequest):
             "extracted_entities": None,
             "sql_query": None,
             "search_results": None,
+            "total_grants": None,
             "response": "",
         }
 
@@ -94,12 +96,13 @@ async def chat(request: ChatRequest):
                 **final_state["extracted_entities"]
             )
 
-        # ── Build search results response ──────────────────
-        results_resp = None
-        if final_state.get("search_results"):
-            results_resp = [
-                GrantResult(**r) for r in final_state["search_results"]
-            ]
+        # ── Determine CTA type based on user_type ───────────
+        user_type = request.user_type
+        cta_type = {
+            "guest-user": "signup",
+            "unpaid-user": "subscribe",
+            "paid-user": "view_grants",
+        }.get(user_type, "signup")
 
         # ── Build updated conversation history ─────────────
         # Append the current user + assistant turns to history
@@ -144,7 +147,9 @@ async def chat(request: ChatRequest):
             response=final_state["response"],
             query_type=final_state["query_type"] or "other",
             extracted_entities=entities_resp,
-            search_results=results_resp,
+            total_grants=final_state.get("total_grants"),
+            cta_type=cta_type if final_state.get("total_grants") else None,
+            user_type=user_type,
             is_follow_up=final_state.get("is_follow_up", False),
             session_id=request.session_id,
             conversation_history=updated_history,
@@ -152,10 +157,12 @@ async def chat(request: ChatRequest):
 
         logger.info(
             f"Response: query_type={response.query_type}, "
-            f"results={len(results_resp) if results_resp else 0}, "
+            f"total_grants={response.total_grants}, "
+            f"cta_type={response.cta_type}, "
             f"follow_up={response.is_follow_up}, "
             f"history_turns={len(updated_history)}"
         )
+
 
         return response
 

@@ -17,6 +17,7 @@ class ChatbotState(TypedDict):
     session_id: str
     user_id: Optional[int]
     conversation_mode: Literal["stateless", "stateful"]
+    user_type: Literal["guest-user", "unpaid-user", "paid-user"]
 
     # ── Filled by load_conversation ─────────────────────────
     # In stateless mode: populated from request body
@@ -36,6 +37,7 @@ class ChatbotState(TypedDict):
     # ── Filled by build_and_execute_search ──────────────────
     sql_query: Optional[str]
     search_results: Optional[list[dict]]
+    total_grants: Optional[int]
 
     # ── Filled by response formatters ───────────────────────
     response: str

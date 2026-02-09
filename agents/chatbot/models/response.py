@@ -46,7 +46,9 @@ class ChatResponse(BaseModel):
     - response              → render as the chat bubble
     - query_type            → drive UI mode (search results vs FAQ vs greeting)
     - extracted_entities    → render clickable filter chips
-    - search_results        → render grant cards
+    - total_grants          → grant count for display
+    - cta_type              → determine which CTA button to show
+    - user_type             → user subscription status
     - is_follow_up          → show "Refined from previous search" badge
     - session_id            → maintain session continuity
     - conversation_history  → FE stores this, sends back on next request (stateless mode)
@@ -55,7 +57,9 @@ class ChatResponse(BaseModel):
     response: str
     query_type: str
     extracted_entities: Optional[ExtractedEntitiesResponse] = None
-    search_results: Optional[list[GrantResult]] = None
+    total_grants: Optional[int] = None
+    cta_type: Optional[str] = None  # "signup" / "subscribe" / "view_grants"
+    user_type: str = "guest-user"
     is_follow_up: bool = False
     session_id: str
 

@@ -97,7 +97,7 @@ async def build_and_execute_search(state: ChatbotState) -> dict:
         all_conditions = conditions + exists_clauses
         where_clause = " AND ".join(all_conditions)
 
-        # ── Build final query ──────────────────────────────────
+        # ── Build final query (no LIMIT - get all matching grants) ──
         query = f"""
             SELECT
                 g.id,
@@ -124,10 +124,7 @@ async def build_and_execute_search(state: ChatbotState) -> dict:
             WHERE {where_clause}
             GROUP BY g.id
             ORDER BY g.deadline_at ASC
-            LIMIT :limit
         """
-
-        params["limit"] = chatbot_settings.max_search_results
 
         # Log the generated SQL for visibility
         logger.info(f"🔍 Generated SQL Query:\n{query}")
@@ -142,9 +139,14 @@ async def build_and_execute_search(state: ChatbotState) -> dict:
                 row["deadline_at"] = str(row["deadline_at"])
             processed_results.append(row)
 
-        logger.info(f"Search returned {len(processed_results)} results")
-        return {"search_results": processed_results, "sql_query": query}
+        total_grants = len(processed_results)
+        logger.info(f"Search returned {total_grants} grants")
+        return {
+            "search_results": processed_results,
+            "total_grants": total_grants,
+            "sql_query": query,
+        }
 
     except Exception as e:
         logger.error(f"Search query failed: {e}")
-        return {"search_results": [], "sql_query": None}
+        return {"search_results": [], "total_grants": 0, "sql_query": None}
