@@ -47,35 +47,57 @@ chatbot_settings = ChatbotSettings()
 # ────────────────────────────────────────────────────────────
 
 PRICING_CONTEXT = """
-The Grant Portal Pricing Plans:
+The Grant Portal Pricing Plans
 
-FREE PLAN ($0/month):
-- Browse grant directory (limited results)
-- Basic search filters (interest, location)
-- View grant summaries
-- Save up to 5 grants
+FREE PLAN : Grant Alert Newsletter ($0)
 
-STARTER PLAN ($29/month or $290/year):
-- Full grant directory access
-- Advanced search filters
-- Unlimited saved grants
-- Grant deadline reminders via email
-- Export grant lists (CSV)
+Receive daily grant alerts based on your profile (interests & locations)
+View basic summary overviews of grants
+Search grants by interest, location, eligibility
+No credit card required to sign up
 
-PRO PLAN ($79/month or $790/year):
-- Everything in Starter
-- AI-powered grant matching & recommendations
-- Priority access to new grants
-- Grant writing templates
-- Dedicated support
+WEEKLY PLAN : $14.99/week
 
-ENTERPRISE (Custom pricing):
-- Everything in Pro
-- Team collaboration features
-- Custom grant alerts
-- API access
-- Dedicated account manager
-- Contact sales@thegrantportal.com
+Full access to grant details, eligibilities & requirements
+Search all grants with advanced keyword search
+Unlimited grant searches
+Save grants as favorites
+Set calendar reminders
+Full access to IRS 990-PF private foundations directory
+Access archived grants & grant history
+Auto-renew subscription, cancel anytime
 
-All paid plans include a 14-day free trial. Cancel anytime.
+MONTHLY PLAN : $34.99/month
+
+Everything in Weekly plan
+Continue access on a monthly auto-renewing cycle
+Cancel at any time before renewal
+
+QUARTERLY PLAN : $79.99/quarter
+
+Everything in Monthly plan
+Billed every 3 months
+Cancel at any time before renewal
+
+YEARLY PLAN : $199.99/year
+
+Everything in Quarterly plan
+Best value for long-term subscribers
+Cancel any time before renewal
+
+Optional Add-On: Grant Writer Directory
+
+(Requires a paid subscription to The Grant Portal)
+Monthly: $19.99
+Quarterly: $39.99
+Yearly: $69.99
+
+Provides access to contact and work with professional grant writers via the Grant Writer Directory
+
+Additional Notes
+
+Free plan does not provide full grant details or application links — only summaries and alerts. Paid subscriptions are required for full access.
+Subscriptions are auto-renewing and can be cancelled at any time before the next billing cycle.
+
+All pricing is in USD.
 """

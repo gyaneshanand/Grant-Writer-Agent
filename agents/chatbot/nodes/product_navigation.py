@@ -27,7 +27,7 @@ async def handle_product_navigation(state: ChatbotState) -> dict:
     user_message = state["user_message"].lower()
 
     # Check if it's a pricing question
-    pricing_keywords = ["price", "pricing", "cost", "plan", "subscription", "pay", "fee", "free"]
+    pricing_keywords = ["price", "pricing", "cost", "plan", "subscription", "pay", "fee", "free", "weekly", "monthly", "quarterly", "yearly", "subscribe"]
     is_pricing_question = any(kw in user_message for kw in pricing_keywords)
 
     if is_pricing_question:
@@ -53,7 +53,8 @@ Guidelines:
 - Be concise and friendly
 - Highlight the plan that seems most relevant to their needs
 - Mention the free trial for paid plans
-- If they ask about Enterprise, encourage them to contact sales"""
+- Ask the users to visit the pricing page for full details https://www.thegrantportal.com/pricing-and-plans
+- Nudge them to subscribe to the paid plan"""
 
         result = await llm.ainvoke(prompt)
         return {"response": result.content}
