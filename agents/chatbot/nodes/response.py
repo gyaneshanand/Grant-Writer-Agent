@@ -37,7 +37,7 @@ async def format_grant_results(state: ChatbotState) -> dict:
 
     Response varies by user_type:
     - guest-user: Summary + signup nudge
-    - unpaid-user: Summary + subscription nudge
+    - unpaid-user: Summary + view link
     - paid-user: Summary + view link
     """
 
@@ -66,7 +66,7 @@ Sample grant titles: {sample_titles}
 Sample categories: {list(sample_categories)[:5]}
 
 Guidelines:
-- First sentence: Confirm what was found (e.g., "I found {total_grants} grants for...")
+- First sentence: Confirm what was found (e.g., "I found approximately {total_grants} grants for...")
 - Second sentence: Brief overview of what the grants cover
 - Be conversational and helpful
 - Do NOT list individual grants

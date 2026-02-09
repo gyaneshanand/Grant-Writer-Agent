@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +11,10 @@
     <link rel="stylesheet" href="style.css">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Markdown Parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
+
 <body>
     <div class="app-container">
         <!-- Sidebar (Optional for future history features) -->
@@ -39,11 +43,15 @@
                 <div class="message assistant-message">
                     <div class="avatar"><i class="fa-solid fa-robot"></i></div>
                     <div class="message-content">
-                        <p>Hello! I'm your Grant Writer Assistant. I can help you find grants, analyze foundations, or answer questions about the platform. How can I help you today?</p>
+                        <p>Hello! I'm your Grant Writer Assistant. I can help you find grants, analyze foundations, or
+                            answer questions about the platform. How can I help you today?</p>
                         <div class="suggestion-chips">
-                            <button class="chip" onclick="setInput('Find grants for education in New York')">🎓 Education Grants</button>
-                            <button class="chip" onclick="setInput('Find grants for environmental protection')">🌱 Environment Grants</button>
-                            <button class="chip" onclick="setInput('How does the grant pipeline work?')">❓ Pipeline Help</button>
+                            <button class="chip" onclick="setInput('Find grants for education in New York')">🎓
+                                Education Grants</button>
+                            <button class="chip" onclick="setInput('Find grants for environmental protection')">🌱
+                                Environment Grants</button>
+                            <button class="chip" onclick="setInput('How does the grant pipeline work?')">❓ Pipeline
+                                Help</button>
                         </div>
                     </div>
                 </div>
@@ -64,4 +72,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>

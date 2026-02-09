@@ -123,8 +123,8 @@ function addMessageToUI(role, text) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${role}-message`;
 
-    // Convert newlines to <br> for display
-    const formattedText = text.replace(/\n/g, '<br>');
+    // Parse Markdown
+    const formattedText = marked.parse(text);
 
     messageDiv.innerHTML = `
         <div class="avatar">

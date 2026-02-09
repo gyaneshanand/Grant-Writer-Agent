@@ -100,7 +100,7 @@ async def chat(request: ChatRequest):
         user_type = request.user_type
         cta_type = {
             "guest-user": "signup",
-            "unpaid-user": "subscribe",
+            "unpaid-user": "view_grants",
             "paid-user": "view_grants",
         }.get(user_type, "signup")
 

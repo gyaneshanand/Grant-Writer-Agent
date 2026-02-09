@@ -199,6 +199,79 @@ body {
     border-radius: var(--radius-xl) 0 var(--radius-xl) var(--radius-xl);
 }
 
+/* Markdown Styling within Messages */
+.message-content h1, 
+.message-content h2, 
+.message-content h3, 
+.message-content h4, 
+.message-content h5, 
+.message-content h6 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.message-content h1:first-child, 
+.message-content h2:first-child, 
+.message-content h3:first-child {
+    margin-top: 0;
+}
+
+.message-content p {
+    margin-bottom: 0.8rem;
+}
+
+.message-content p:last-child {
+    margin-bottom: 0;
+}
+
+.message-content ul, 
+.message-content ol {
+    margin-left: 1.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.message-content li {
+    margin-bottom: 0.25rem;
+}
+
+.message-content code {
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.message-content pre {
+    background-color: #2d3748;
+    color: #edf2f7;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+
+.message-content pre code {
+    background-color: transparent;
+    padding: 0;
+    color: inherit;
+}
+
+.message-content a {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+.user-message .message-content a {
+    color: white;
+}
+
+.user-message .message-content code {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
 /* Suggestion Chips */
 .suggestion-chips {
     display: flex;
