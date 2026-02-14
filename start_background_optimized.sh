@@ -5,8 +5,10 @@
 
 echo "Starting Grant Writer Agent API with multiple workers..."
 
-# Set Python path for cPanel
-PYTHON_BIN="/home/tgpdev/python3.11/bin/python3.11"
+# Set Python path for cPanel (Updated for custom build)
+PYTHON_BIN="$HOME/python_local/bin/python3"
+# Ensure custom libraries are found (libffi, sqlite3)
+export LD_LIBRARY_PATH="$HOME/python_local/lib:$LD_LIBRARY_PATH"
 
 # Get the directory where the script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -15,13 +17,14 @@ cd "$SCRIPT_DIR"
 # Check if Python exists
 if [ ! -f "$PYTHON_BIN" ]; then
     echo "Error: Python not found at $PYTHON_BIN"
+    echo "Please run setup_python.sh first!"
     exit 1
 fi
 
 # Check if virtual environment exists
 if [ ! -d "venv" ]; then
-    echo "Creating virtual environment..."
-    $PYTHON_BIN -m venv venv
+    echo "Error: venv not found. Please run setup_python.sh first!"
+    exit 1
 fi
 
 # Activate virtual environment
@@ -33,7 +36,7 @@ pip install -r requirements.txt
 
 # Set the host and port for cPanel
 HOST="${HOST:-0.0.0.0}"
-PORT="${PORT:-8000}"
+PORT="${PORT:-8001}"
 
 # Number of worker processes (adjust based on CPU cores)
 # Rule of thumb: (2 x CPU cores) + 1

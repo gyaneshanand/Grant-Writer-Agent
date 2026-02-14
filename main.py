@@ -111,7 +111,7 @@ async def root():
             "content_generation": "/api/v1/content-generation", 
             "pipeline": "/api/v1/pipeline",
             "chatbot": "/api/v1/chatbot",
-            "docs": "/docs"
+            "docs": "/docs"  
         }
     }
 

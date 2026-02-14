@@ -35,7 +35,7 @@ if [ -f "logs/server.pid" ]; then
     rm logs/server.pid
 else
     # Try to find and kill by port
-    PORT="${PORT:-8000}"
+    PORT="${PORT:-8001}"
     PID=$(lsof -ti:$PORT)
     
     if [ ! -z "$PID" ]; then

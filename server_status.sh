@@ -9,7 +9,7 @@ echo ""
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$SCRIPT_DIR"
 
-PORT="${PORT:-8000}"
+PORT="${PORT:-8001}"
 
 # Check if PID file exists
 if [ -f "logs/server.pid" ]; then
