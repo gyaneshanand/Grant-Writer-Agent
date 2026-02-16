@@ -40,9 +40,9 @@ async def classify_query(state: ChatbotState) -> dict:
         prompt = f"""Classify this user message into exactly ONE category.
 
 Categories:
-- greeting: Hello, hi, thanks, goodbye, how are you
+- greeting: Hello, hi, thanks, goodbye, how are you, what can you do for me 
 - grant_search: Looking for grants, funding, scholarships, foundations, or any query about finding/discovering specific grants
-- product_navigation: Questions about The Grant Portal platform itself — pricing, features, how to use it, plans, subscriptions
+- product_navigation: Questions about The Grant Portal platform itself — pricing, features, how to use it, plans, subscriptions, weekly, monthly, quarterly, yearly subscription etc
 - account_support: Login issues, password reset, billing problems, account deletion, profile updates
 - eligibility_assessment: "Am I eligible?", "Can my organization apply?", "Do I qualify?"
 - application_guidance: "How do I apply?", "What documents are needed?", "Help me with my application"
