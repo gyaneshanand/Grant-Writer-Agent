@@ -54,8 +54,10 @@ async def build_and_execute_search(state: ChatbotState) -> dict:
                     JOIN interests i_f ON gim_f.interest_id = i_f.id
                     WHERE gim_f.grant_info_id = g.id
                       AND i_f.slug IN ({', '.join(placeholders)})
+                      AND i_f.deleted_at IS NULL
                 )
             """)
+
 
         # ── Location filter (EXISTS subquery) ──────────────────
         if entities.get("location_slugs"):
@@ -72,8 +74,10 @@ async def build_and_execute_search(state: ChatbotState) -> dict:
                     JOIN provinces p_f ON glm_f.province_id = p_f.id
                     WHERE glm_f.grant_info_id = g.id
                       AND p_f.slug IN ({', '.join(placeholders)})
+                      AND p_f.deleted_at IS NULL
                 )
             """)
+
 
         # ── Eligibility filter (EXISTS subquery) ───────────────
         if entities.get("eligibility_criteria_slugs"):
@@ -90,8 +94,10 @@ async def build_and_execute_search(state: ChatbotState) -> dict:
                     JOIN eligibilties e_f ON gem_f.eligibilty_id = e_f.id
                     WHERE gem_f.grant_info_id = g.id
                       AND e_f.slug IN ({', '.join(placeholders)})
+                      AND e_f.deleted_at IS NULL
                 )
             """)
+
 
         # ── Combine conditions ─────────────────────────────────
         all_conditions = conditions + exists_clauses
@@ -112,16 +118,16 @@ async def build_and_execute_search(state: ChatbotState) -> dict:
             LEFT JOIN grants_info_eligibilty_map gem
                    ON g.id = gem.grant_info_id
             LEFT JOIN eligibilties e
-                   ON gem.eligibilty_id = e.id
+                   ON gem.eligibilty_id = e.id AND e.deleted_at IS NULL
             LEFT JOIN grants_info_interest_map gim
                    ON g.id = gim.grant_info_id
             LEFT JOIN interests i
-                   ON gim.interest_id = i.id
+                   ON gim.interest_id = i.id AND i.deleted_at IS NULL
             LEFT JOIN grants_info_locations_map glm
                    ON g.id = glm.grant_info_id
             LEFT JOIN provinces p
-                   ON glm.province_id = p.id
-            WHERE {where_clause}
+                   ON glm.province_id = p.id AND p.deleted_at IS NULL
+            WHERE {where_clause} AND g.deleted_at IS NULL
             GROUP BY g.id
             ORDER BY g.deadline_at ASC
         """
