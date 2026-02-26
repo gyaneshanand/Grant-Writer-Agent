@@ -60,7 +60,6 @@ WEEKLY PLAN : $14.99/week
 
 Full access to grant details, eligibilities & requirements
 Search all grants with advanced keyword search
-Unlimited grant searches
 Save grants as favorites
 Set calendar reminders
 Full access to IRS 990-PF private foundations directory
