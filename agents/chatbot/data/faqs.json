@@ -1,0 +1,1432 @@
+[
+  {
+    "id": 1,
+    "slug": "how-can-we-find-out",
+    "category": "account_login",
+    "question": "how can we find out login info",
+    "answer": "If you're trying to access your account, use the password reset feature on the Login Here page or use the Contact Us tab for assistance retrieving your login information. Or send an email directly to tech@promero.com",
+    "answer_raw": "If you're trying to access your account, use the password reset feature on the Login Here page or use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab for assistance retrieving your login information. Or send an email directly to <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 2,
+    "slug": "i-would-like-to-purchase",
+    "category": "subscription_pricing",
+    "question": "I would like to purchase a yearly subscription; I want to purchase a subscription",
+    "answer": "You can purchase any subscription directly through the website by selecting the Subscription on https://www.theg rantportal.com/pricing-and-plans",
+    "answer_raw": "You can purchase any subscription directly through the website by selecting the Subscription on <https://www.theg rantportal.com/pricing-and-plans>",
+    "links": [
+      {
+        "text": "pricing-and-plans",
+        "url": "https://www.theg rantportal.com/pricing-and-plans"
+      }
+    ],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 3,
+    "slug": "how-can-i-apply-for",
+    "category": "grant_application",
+    "question": "How can I apply for these grants outside of this website",
+    "answer": "To apply outside the website, follow the funder's instructions listed in each grant. In order to access the funding source's URL requires an active paid subscription.",
+    "answer_raw": "To apply outside the website, follow the funder's instructions listed in each grant. In order to access the funding source's URL requires an active paid subscription.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "application_guidance"
+  },
+  {
+    "id": 4,
+    "slug": "dear-sirmadam-as-an-seo",
+    "category": "spam_rejection",
+    "question": "Dear Sir/Madam, As an SEO Expert in Rankgrower.com No #1 Agency, I can offer services. . .",
+    "answer": "Please note that The Grant Portal does not accept unsolicited marketing or promotional messages.",
+    "answer_raw": "Please note that The Grant Portal does not accept unsolicited marketing or promotional messages.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "other"
+  },
+  {
+    "id": 5,
+    "slug": "i-would-like-to-talk",
+    "category": "contact_support",
+    "question": "I would like to talk with someone about a non-profit grant; I want a call tomorrow; Can I talk to a live agent?",
+    "answer": "The Grant Portal is a DIY (Do-It-Yourself) website that provides access to a large grant database, allowing users to search and explore grant opportunities independently. Please note that we do not offer telephone support.",
+    "answer_raw": "The Grant Portal is a DIY (Do-It-Yourself) website that provides access to a large grant database, allowing users to search and explore grant opportunities independently. Please note that we do not offer telephone support.",
+    "links": [],
+    "escalation_type": "live_agent",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "other"
+  },
+  {
+    "id": 6,
+    "slug": "how-do-i-apply-to",
+    "category": "subscription_pricing",
+    "question": "How do I apply to the grants on a free plan?",
+    "answer": "To apply for a grant using the application link, you will need to be a paid subscriber, as access to full grant details and application links is only available with a paid subscription.",
+    "answer_raw": "To apply for a grant using the application link, you will need to be a paid subscriber, as access to full grant details and application links is only available with a paid subscription.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 7,
+    "slug": "is-there-any-way-i",
+    "category": "grant_application",
+    "question": "Is there any way I can filter to only see grants for people eligible in one state?",
+    "answer": "Yes, you can filter grants by using the Search For Grants box;. By Location, By Interests, By Eligibilities.",
+    "answer_raw": "Yes, you can filter grants by using the Search For Grants box;. By Location, By Interests, By Eligibilities.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "eligibility_assessment"
+  },
+  {
+    "id": 8,
+    "slug": "do-you-scramble-grant-entries",
+    "category": "grant_search_usage",
+    "question": "Do you scramble grant entries?",
+    "answer": "Grant display is prioritized by most recently published grants show first. You can use the Sort By feature to organize grants by publish date, deadline date, alphabetical order, or grant amount.",
+    "answer_raw": "Grant display is prioritized by most recently published grants show first. You can use the Sort By feature to organize grants by publish date, deadline date, alphabetical order, or grant amount.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 9,
+    "slug": "is-there-a-method-to",
+    "category": "grant_search_usage",
+    "question": "is there a method to place these into a list instead? Also is there an exportable format into excel?",
+    "answer": "As a paid subscriber, you can designate any grant as your Favorite or Not Favorite. You can also choose to have grants sent directly to your email inbox.",
+    "answer_raw": "As a paid subscriber, you can designate any grant as your Favorite or Not Favorite. You can also choose to have grants sent directly to your email inbox.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 10,
+    "slug": "our-nonprofit-organization-has-been",
+    "category": "grant_application",
+    "question": "Our nonprofit organization has been in open for 1 year. Are we still good to apply?",
+    "answer": "Most grant providers accept organizations that have been established for at least one year, though some may have additional requirements.",
+    "answer_raw": "Most grant providers accept organizations that have been established for at least one year, though some may have additional requirements.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "eligibility_assessment"
+  },
+  {
+    "id": 11,
+    "slug": "why-am-i-paying-to",
+    "category": "grant_application",
+    "question": "Why am I paying to apply?",
+    "answer": "The subscription fee is required to access The Grant Portal's database of grant providers and the organization's web links. Typically, there is no fee to apply for a grant; however, application fees, if any, are determined solely by the grant provider.",
+    "answer_raw": "The subscription fee is required to access The Grant Portal's database of grant providers and the organization's web links. Typically, there is no fee to apply for a grant; however, application fees, if any, are determined solely by the grant provider.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "application_guidance"
+  },
+  {
+    "id": 12,
+    "slug": "i-want-to-cancel-my",
+    "category": "cancellation_refund",
+    "question": "I want to cancel my plan; cancel my subscription.",
+    "answer": "To cancel your plan, please follow the instructions in The Grant Portal's Terms of Service. Cancellations must be made through your My Account profile. You will receive a cancellation email. And any subscription fees already paid are non-refundable, as outlined in the Terms of Service.",
+    "answer_raw": "To cancel your plan, please follow the instructions in The Grant Portal's [Terms of Service](https://www.t hegrantportal.com/terms-service). Cancellations must be made through your My Account profile. You will receive a cancellation email. And any subscription fees already paid are non-refundable, as outlined in the [Terms of Service](https://www.t hegrantportal.com/terms-service).",
+    "links": [
+      {
+        "text": "Terms of Service",
+        "url": "https://www.t hegrantportal.com/terms-service"
+      },
+      {
+        "text": "Terms of Service",
+        "url": "https://www.t hegrantportal.com/terms-service"
+      }
+    ],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 13,
+    "slug": "is-there-a-way-to",
+    "category": "grant_search_usage",
+    "question": "is there a way to filter this portal by just topics?",
+    "answer": "Yes, use the Enter Keyword phrase into the search window",
+    "answer_raw": "Yes, use the Enter Keyword phrase into the search window",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 14,
+    "slug": "the-list-of-grant-writers",
+    "category": "grant_writer",
+    "question": "The list of grant writers do not always seem to have success behind them. What drives being a \\\"grant writer\\\" on this list of providers?",
+    "answer": "Grant Writers submit their experience and display it on their listing. It is your responsibility to vet them before agreeing to any services. The Grant Portal does not benefit from any agreement between a subscriber and Grant Writer. Note: some grant applications are simple and can be completed without a writer. Larger grants typically require a more extensive process — consider hiring a grant writer if you're not comfortable completing the application yourself.",
+    "answer_raw": "The Grant Writers submit their experiences and display them on the Grant Writer's listing. However, it is your responsibility to vet them before agreeing to any services. The Grant Portal does not benefit from any service agreement between a subscriber and Grant Writer.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "application_guidance"
+  },
+  {
+    "id": 15,
+    "slug": "hi-i-am-wanting-to",
+    "category": "general_info",
+    "question": "Hi I am wanting to learn more about grants if possible",
+    "answer": "The Grant Portal is a DIY (Do-It-Yourself) website that provides access to a large grant database, allowing users to search and explore grant opportunities independently. Please note that we do not offer telephone support.",
+    "answer_raw": "The Grant Portal is a DIY (Do-It-Yourself) website that provides access to a large grant database, allowing users to search and explore grant opportunities independently. Please note that we do not offer telephone support.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 16,
+    "slug": "can-you-recommend-the-best",
+    "category": "general_info",
+    "question": "Can you recommend the best grants for my small businesses?",
+    "answer": "The Grant Portal does not recommend grants. As a paid subscriber, you can search for grant and view grant details to determine if they are a good fit for you.",
+    "answer_raw": "The Grant Portal does not recommend grants. As a paid subscriber, you can search for grant and view grant details to determine if they are a good fit for you.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 17,
+    "slug": "i-cannot-afford-to-pay",
+    "category": "subscription_pricing",
+    "question": "I cannot afford to pay subscription fee to apply for grants.",
+    "answer": "The Grant Portal does not offer free trials.",
+    "answer_raw": "The Grant Portal does not offer free trials.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 18,
+    "slug": "i-want-a-refund-please",
+    "category": "cancellation_refund",
+    "question": "I want a refund. Please issue refund.",
+    "answer": "Per the Terms of Service agreed to and accepted at the time of creating your account and purchasing your subscription, there is a no-refund policy for any paid subscription fees.",
+    "answer_raw": "Per the [Terms of Service](https://www. thegrantportal.com/terms-service) agreed to and accepted at the time of creating your account and purchasing your subscription, there is a no-refund policy for any paid subscription fees.",
+    "links": [
+      {
+        "text": "Terms of Service",
+        "url": "https://www. thegrantportal.com/terms-service"
+      }
+    ],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 19,
+    "slug": "hi-i-just-set-up",
+    "category": "general_info",
+    "question": "Hi I just set up my profile and paid for a plan. But my account says that I am still using the free version. Please help!",
+    "answer": "For customer support, please use the Contact Us tab on the website or send an email directly to tech@promero.com. Our team will respond and assist you with your inquiry.",
+    "answer_raw": "For customer support, please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab on the website or send an email directly to <tech@promero.com>. Our team will respond and assist you with your inquiry.",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 20,
+    "slug": "how-much-does-it-cost",
+    "category": "subscription_pricing",
+    "question": "How much does it cost to get a subscription?",
+    "answer": "You can purchase any subscription directly through the website by selecting the Subscription on https://www.theg rantportal.com/pricing-and-plans",
+    "answer_raw": "You can purchase any subscription directly through the website by selecting the Subscription on <https://www.theg rantportal.com/pricing-and-plans>",
+    "links": [
+      {
+        "text": "pricing-and-plans",
+        "url": "https://www.theg rantportal.com/pricing-and-plans"
+      }
+    ],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 21,
+    "slug": "interested-in-getting-listed-on",
+    "category": "grant_writer",
+    "question": "Interested in getting listed on to grant writer directory",
+    "answer": "Grant Writers can list their service for free. Go to the drop down I am a Grant Writer. The is no fee to be listed.",
+    "answer_raw": "Grant Writers can list their service for free. Go to the drop down [I am a Grant Writer](https://www.thegrantport al.com/grant-writer-application). The is no fee to be listed.",
+    "links": [
+      {
+        "text": "I am a Grant Writer",
+        "url": "https://www.thegrantport al.com/grant-writer-application"
+      }
+    ],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "application_guidance"
+  },
+  {
+    "id": 22,
+    "slug": "i-have-not-received-my",
+    "category": "account_login",
+    "question": "I have not received my verification email",
+    "answer": "Check your junk/spam folder. If the email is not in your inbox, use Contact Us tab or send comments to tech@promero.com.",
+    "answer_raw": "Check your junk/spam folder. If the email is not in your inbox, use [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or send comments to <tech@promero.com>.",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 23,
+    "slug": "you-have-grants-on-here",
+    "category": "general_info",
+    "question": "You have grants on here that have expired",
+    "answer": "Please send the Grant ID to tech@promero.com so our service team can update the content.",
+    "answer_raw": "Please send the Grant ID to <tech@promero.com> so our service team can update the content.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 24,
+    "slug": "it-keeps-telling-me-i",
+    "category": "account_login",
+    "question": "It keeps telling me I have an account and that my email is already taken",
+    "answer": "You may be trying to 'Sign In' in the Create Your Account' box. Try 'Already a Subscriber? Login Here' box. If you need more help, Please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "You may be trying to 'Sign In' in the Create Your Account' box. Try 'Already a Subscriber? Login Here' box. If you need more help, Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 25,
+    "slug": "how-do-i-apply-for",
+    "category": "grant_application",
+    "question": "How do I apply for these grants?",
+    "answer": "In order to access grant details and the grant provider's link to their grants, you must subscribe. Visit https://www.theg rantportal.com/pricing-and-plans",
+    "answer_raw": "In order to access grant details and the grant provider's link to their grants, you must subscribe. Visit <https://www.theg rantportal.com/pricing-and-plans>",
+    "links": [
+      {
+        "text": "pricing-and-plans",
+        "url": "https://www.theg rantportal.com/pricing-and-plans"
+      }
+    ],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "application_guidance"
+  },
+  {
+    "id": 26,
+    "slug": "is-there-a-way-to-26",
+    "category": "grant_search_usage",
+    "question": "Is there a way to filter counties within a state filter; grants for my county?",
+    "answer": "Select Location=your state. Then use the Search Keyword and enter the county name.",
+    "answer_raw": "Select Location=your state. Then use the Search Keyword and enter the county name.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 27,
+    "slug": "i-was-charged-twice-please",
+    "category": "cancellation_refund",
+    "question": "I was charged twice. Please fix.",
+    "answer": "Please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 28,
+    "slug": "i-am-having-a-difficult",
+    "category": "general_info",
+    "question": "I am having a difficult time making a payment",
+    "answer": "Please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 29,
+    "slug": "do-you-have-special-membership",
+    "category": "subscription_pricing",
+    "question": "Do you have special membership rates for students? For veterans? Do you offer discounts to nonprofits?",
+    "answer": "The lowest subscription plan is Weekly. Visit https://www.theg rantportal.com/pricing-and-plans",
+    "answer_raw": "The lowest subscription plan is Weekly. Visit <https://www.theg rantportal.com/pricing-and-plans>",
+    "links": [
+      {
+        "text": "pricing-and-plans",
+        "url": "https://www.theg rantportal.com/pricing-and-plans"
+      }
+    ],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 30,
+    "slug": "i-cant-log-in-cant",
+    "category": "account_login",
+    "question": "I can't log in; Can't log in, help",
+    "answer": "Please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 31,
+    "slug": "sdfsd-hi-hello-good-afternoon",
+    "category": "general_info",
+    "question": "Sdfsd; Hi; Hello; Good Afternoon; Good morning",
+    "answer": "Hi. Please ask me a question again.",
+    "answer_raw": "Hi. Please ask me a question again.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 32,
+    "slug": "can-i-upgrade-my-subscription",
+    "category": "subscription_pricing",
+    "question": "Can I upgrade my subscription?",
+    "answer": "To change your subscription, you must first cancel your current plan through My Account Settings, then purchase the new plan. Fees paid towards previous subscriptions are not prorated or applied toward a new subscription. For help, use the Contact Us tab or email tech@promero.com.",
+    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 33,
+    "slug": "how-do-i-apply-for-33",
+    "category": "grant_application",
+    "question": "How do I apply for a grant?",
+    "answer": "Paid subscribers have access to the grant provider's website and their application link.",
+    "answer_raw": "Paid subscribers have access to the grant provider's website and their application link.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "application_guidance"
+  },
+  {
+    "id": 34,
+    "slug": "is-there-any-way-to",
+    "category": "grant_search_usage",
+    "question": "is there any way to keep track of those opportunities that we have investigated and have NOT been helpful to us?",
+    "answer": "Paid subscribers can use the Favorite (heart icon) or Non-Favorite (X) to track viewed grants.",
+    "answer_raw": "Paid subscribers can use the Favorite (heart icon) or Non-Favorite (X) to track viewed grants.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 35,
+    "slug": "how-much-do-the-grant",
+    "category": "grant_writer",
+    "question": "how much do the grant writers charge for their service?",
+    "answer": "Each Grant Writer sets their own pay rate. Please contact the Grant Writer to determine rates.",
+    "answer_raw": "Each Grant Writer sets their own pay rate. Please contact the Grant Writer to determine rates.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "application_guidance"
+  },
+  {
+    "id": 36,
+    "slug": "grant-view-is-blurred-please",
+    "category": "technical_issues",
+    "question": "Grant view is blurred. Please fix",
+    "answer": "The grant details are exposed to paid subscribers. Visit https://www.theg rantportal.com/pricing-and-plans",
+    "answer_raw": "The grant details are exposed to paid subscribers. Visit <https://www.theg rantportal.com/pricing-and-plans>",
+    "links": [
+      {
+        "text": "pricing-and-plans",
+        "url": "https://www.theg rantportal.com/pricing-and-plans"
+      }
+    ],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 37,
+    "slug": "please-i-need-your-help",
+    "category": "general_info",
+    "question": "please i need your help",
+    "answer": "I can help you find grants. Please ask me.",
+    "answer_raw": "I can help you find grants. Please ask me.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 38,
+    "slug": "how-can-i-search-for",
+    "category": "grant_search_usage",
+    "question": "How can I search for a particular funder by name?",
+    "answer": "Paid subscribers can search foundations by name, location, EIN number. Visit https:// www.thegrantportal.com/irs-990-pr ivate-foundations/profile-search",
+    "answer_raw": "Paid subscribers can search foundations by name, location, EIN number. Visit <https:// www.thegrantportal.com/irs-990-pr ivate-foundations/profile-search>",
+    "links": [
+      {
+        "text": "profile-search",
+        "url": "https:// www.thegrantportal.com/irs-990-pr ivate-foundations/profile-search"
+      }
+    ],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 39,
+    "slug": "can-i-see-a-sample",
+    "category": "grant_search_usage",
+    "question": "Can I see a sample grant?",
+    "answer": "Yes, click on the 'View Full Grant Detail Page. View Sample' banner on the home page, grants for nonprofits, grants for small business and grants for individual banner.",
+    "answer_raw": "Yes, click on the 'View Full Grant Detail Page. View Sample' banner on the home page, grants for nonprofits, grants for small business and grants for individual banner.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 40,
+    "slug": "i-want-to-talk-to",
+    "category": "contact_support",
+    "question": "I want to talk to a live agent; Agent please; Agent; Live Agent",
+    "answer": "Click on: CHAT ",
+    "answer_raw": "Click on: [CHAT ](https://salesiq.zohopublic.com/ signaturesupport.ls?widgetcode=si q8e324aba7b84c6764d851f3973034cd5 4ea893bb9ea9b933373c1dc1a61e3e47)",
+    "links": [
+      {
+        "text": "CHAT ",
+        "url": "https://salesiq.zohopublic.com/ signaturesupport.ls?widgetcode=si q8e324aba7b84c6764d851f3973034cd5 4ea893bb9ea9b933373c1dc1a61e3e47"
+      }
+    ],
+    "escalation_type": "live_agent",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "other"
+  },
+  {
+    "id": 41,
+    "slug": "i-signed-up-and-have",
+    "category": "general_info",
+    "question": "I signed up and have not received an email. Please help.",
+    "answer": "Check your junk/spam folder. If the email is not in your inbox, use Contact Us tab or send comments to tech@promero.com.",
+    "answer_raw": "Check your junk/spam folder. If the email is not in your inbox, use [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or send comments to <tech@promero.com>.",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 42,
+    "slug": "i-cant-reset-my-password",
+    "category": "account_login",
+    "question": "I can't reset my password, help?",
+    "answer": "Please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 43,
+    "slug": "how-do-i-change-my",
+    "category": "account_login",
+    "question": "How do i change my login email?",
+    "answer": "Please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 44,
+    "slug": "delete-my-account",
+    "category": "account_login",
+    "question": "Delete my account",
+    "answer": "Please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 45,
+    "slug": "what-is-the-free-account",
+    "category": "subscription_pricing",
+    "question": "What is the Free Account?",
+    "answer": "Create your account and update the profile for your location and grant interest. You will receive the Free Newsletter with grants that fit your profile. In order to view grant details, you will need to subscribe. Visit https://www.theg rantportal.com/pricing-and-plans",
+    "answer_raw": "Create your account and update the profile for your location and grant interest. You will receive the Free Newsletter with grants that fit your profile. In order to view grant details, you will need to subscribe. Visit <https://www.theg rantportal.com/pricing-and-plans>",
+    "links": [
+      {
+        "text": "pricing-and-plans",
+        "url": "https://www.theg rantportal.com/pricing-and-plans"
+      }
+    ],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 46,
+    "slug": "are-there-recurring-fees-for",
+    "category": "general_info",
+    "question": "Are there recurring fees for this service?",
+    "answer": "All paid subscriptions are auto-renew. You can cancel your subscription at any time prior to the renewal date and avoid future charges. Any fees past due at the time of cancellation remain due and payable. Check Terms of Service",
+    "answer_raw": "All paid subscriptions are auto-renew. You can cancel your subscription at any time prior to the renewal date and avoid future charges. Any fees past due at the time of cancellation remain due and payable. Check [Terms of Service](https://www. thegrantportal.com/terms-service)",
+    "links": [
+      {
+        "text": "Terms of Service",
+        "url": "https://www. thegrantportal.com/terms-service"
+      }
+    ],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 47,
+    "slug": "i-still-get-an-error",
+    "category": "technical_issues",
+    "question": "I still get an error message trying to login to TGP",
+    "answer": "Please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 48,
+    "slug": "i-have-questions-about-terms",
+    "category": "general_info",
+    "question": "I have questions about Terms and Conditions.",
+    "answer": "Please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "other"
+  },
+  {
+    "id": 49,
+    "slug": "i-have-question-about-privacy",
+    "category": "general_info",
+    "question": "I have question about Privacy Policy",
+    "answer": "Please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "other"
+  },
+  {
+    "id": 50,
+    "slug": "what-does-deadline-ongoing-mean",
+    "category": "grant_search_usage",
+    "question": "What does 'Deadline Ongoing' mean?",
+    "answer": "Means that the grant provider awards grants on an ongoing basis. Check the grant provider for details.",
+    "answer_raw": "Means that the grant provider awards grants on an ongoing basis. Check the grant provider for details.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 51,
+    "slug": "what-does-funding-mount-open",
+    "category": "grant_search_usage",
+    "question": "What does 'Funding Mount: Open' mean?",
+    "answer": "Means that the grant provider does not preset dollar amounts and awards various dollar amounts for grants. Check the grant provider for details.",
+    "answer_raw": "Means that the grant provider does not preset dollar amounts and awards various dollar amounts for grants. Check the grant provider for details.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 52,
+    "slug": "how-often-to-you-update",
+    "category": "general_info",
+    "question": "How often to you update grants?",
+    "answer": "Grants are updated daily.",
+    "answer_raw": "Grants are updated daily.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 53,
+    "slug": "cancel-button-is-not-there",
+    "category": "cancellation_refund",
+    "question": "Cancel button is not there. Cancel Subscription. How to cancel subscription. Cancel my account.",
+    "answer": "Log into your account. Select 'My Account Settings' in the drop-down menu. Select 'Subscription Level'. Select 'Manage My Account'. Select 'Cancel'. Check your inbox for cancellation confirmation. Or please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "Log into your account. Select 'My Account Settings' in the drop-down menu. Select 'Subscription Level'. Select 'Manage My Account'. Select 'Cancel'. Check your inbox for cancellation confirmation. Or please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 54,
+    "slug": "tgp-says-my-email-is",
+    "category": "account_login",
+    "question": "TGP says my email is already taken?",
+    "answer": "You may be trying to 'Sign In' in the Create Your Account' box. Try 'Already a Subscriber? Login Here' box. If you need more help, Please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "You may be trying to 'Sign In' in the Create Your Account' box. Try 'Already a Subscriber? Login Here' box. If you need more help, Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 55,
+    "slug": "how-do-i-unsubscribe-from",
+    "category": "cancellation_refund",
+    "question": "How do I unsubscribe from emails?",
+    "answer": "Open an email and scroll to the bottom of the email and hit \"Unsubscribe\"",
+    "answer_raw": "Open an email and scroll to the bottom of the email and hit \"Unsubscribe\"",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 56,
+    "slug": "how-do-i-apply-for-56",
+    "category": "grant_application",
+    "question": "How do I apply for a grant?",
+    "answer": "Paid subscribers have access to the grant details and the grant provider's website and application link. On their website, you will be able to find the information to apply.",
+    "answer_raw": "Paid subscribers have access to the grant details and the grant provider's website and application link. On their website, you will be able to find the information to apply.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "application_guidance"
+  },
+  {
+    "id": 57,
+    "slug": "do-you-have-an-affiliate",
+    "category": "general_info",
+    "question": "Do you have an affiliate plan?",
+    "answer": "Not at this time. Sorry.",
+    "answer_raw": "Not at this time. Sorry.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 58,
+    "slug": "i-thought-i-had-a",
+    "category": "subscription_pricing",
+    "question": "I thought I had a paid subscription but it does not show. Help",
+    "answer": "Please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 59,
+    "slug": "i-need-to-access-my",
+    "category": "general_info",
+    "question": "I need to access my invoice",
+    "answer": "Log into My Account, Management My account and then you can view invoices.",
+    "answer_raw": "Log into My Account, Management My account and then you can view invoices.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 60,
+    "slug": "how-do-i-unsubscribe-from-60",
+    "category": "cancellation_refund",
+    "question": "How do I unsubscribe from the newsletter. Stop sending emails.",
+    "answer": "Open any emailed newsletter and scroll to the bottom and click 'Unsubscribe'",
+    "answer_raw": "Open any emailed newsletter and scroll to the bottom and click 'Unsubscribe'",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 61,
+    "slug": "who-can-i-speak-with",
+    "category": "contact_support",
+    "question": "Who can I speak with in regard to marketing?",
+    "answer": "Click the 'Contact Us' tab on the website and submit your inquiry.",
+    "answer_raw": "Click the '[Contact Us'](https://w ww.thegrantportal.com/contact-us) tab on the website and submit your inquiry.",
+    "links": [
+      {
+        "text": "Contact Us'",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "contact_form",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "other"
+  },
+  {
+    "id": 62,
+    "slug": "can-you-apply-without-subscribing",
+    "category": "grant_application",
+    "question": "can you apply without subscribing?",
+    "answer": "In order to view grant details and access the grant provider's website, you must be a paid subscriber.",
+    "answer_raw": "In order to view grant details and access the grant provider's website, you must be a paid subscriber.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "application_guidance"
+  },
+  {
+    "id": 63,
+    "slug": "i-paid-for-a-subscription",
+    "category": "subscription_pricing",
+    "question": "I paid for a subscription and can't access. What is going on? I am having trouble logging in.",
+    "answer": "Please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 64,
+    "slug": "i-paid-for-a-subscription-64",
+    "category": "subscription_pricing",
+    "question": "I paid for a subscription. Can I view grants in all states?",
+    "answer": "Paid active subscribers can view grants in all 50 US states, US territories, Canadian provinces, and international listings — across all interests, eligibilities, and private foundations.",
+    "answer_raw": "Paid active subscribers can view grants in all states, interests, eligibilities and private foundations.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 65,
+    "slug": "do-you-offer-an-api",
+    "category": "general_info",
+    "question": "Do you offer an API to download grants?",
+    "answer": "The Grant Portal does not offer an API.",
+    "answer_raw": "The Grant Portal does not offer an API.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 66,
+    "slug": "how-does-your-site-work",
+    "category": "general_info",
+    "question": "How does your site work?",
+    "answer": "The Grant Portal is the largest online catalog of grants currently accepting applications. Search for grants by Location, Interest, and Eligibility. As a free member, you can view general grant overviews and receive the weekly newsletter. Paid subscribers get full grant details, application links, keyword search, favorites, and access to 133,000+ private foundations in the IRS 990 PF directory. Also, feel free to ask me and I will try to help in your search.",
+    "answer_raw": "You can use the Search For Grants box so search for grants by location, Interest and Eligibility. Also, ask me and I will try to help in your search.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 67,
+    "slug": "how-do-i-find-the",
+    "category": "grant_application",
+    "question": "how do i find the grants that I'm eligible for?",
+    "answer": "The Grant Portal is a DIY (Do-It-Yourself) database. Search for grants that may fit your situation. In order to view grant details, you'll need to subscribe.",
+    "answer_raw": "The Grant Portal is a DIY (Do-It-Yourself) database. Search for grants that may fit your situation. In order to view grant details, you'll need to subscribe.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "eligibility_assessment"
+  },
+  {
+    "id": 68,
+    "slug": "is-there-a-free-trial",
+    "category": "subscription_pricing",
+    "question": "Is there a free trial to view grant details?",
+    "answer": "In order to view grant details, you must subscribe. Visit https://www.theg rantportal.com/pricing-and-plans",
+    "answer_raw": "In order to view grant details, you must subscribe. Visit <https://www.theg rantportal.com/pricing-and-plans>",
+    "links": [
+      {
+        "text": "pricing-and-plans",
+        "url": "https://www.theg rantportal.com/pricing-and-plans"
+      }
+    ],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 69,
+    "slug": "i-would-like-to-delete",
+    "category": "technical_issues",
+    "question": "i would like to delete my account but it is not working",
+    "answer": "Please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 70,
+    "slug": "hi-i-dont-have-an",
+    "category": "account_login",
+    "question": "hi i don't have an inbox",
+    "answer": "You must have an email and associated inbox to subscribe to The Grant Portal",
+    "answer_raw": "You must have an email and associated inbox to subscribe to The Grant Portal",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 71,
+    "slug": "please-cancel-my-subscription-here",
+    "category": "cancellation_refund",
+    "question": "please cancel my subscription. Here is my email {EMAIL}",
+    "answer": "I can not cancel your subscription. Log into your account. Select 'My Account Settings' in the drop-down menu. Select 'Subscription Level'. Select 'Manage My Account'. Select 'Cancel'. Check your inbox for cancellation confirmation. Or please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "I can not cancel your subscription. Log into your account. Select 'My Account Settings' in the drop-down menu. Select 'Subscription Level'. Select 'Manage My Account'. Select 'Cancel'. Check your inbox for cancellation confirmation. Or please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 72,
+    "slug": "do-you-have-a-referral",
+    "category": "general_info",
+    "question": "do you have a referral program yet",
+    "answer": "No referral program. We are working a referral program expected for YE 2026.",
+    "answer_raw": "No referral program. We are working a referral program expected for YE 2026.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 73,
+    "slug": "i-have-a-paid-plan",
+    "category": "grant_writer",
+    "question": "I have a paid plan but it won't allow me to contact grant writer",
+    "answer": "The Grant Writer directory is an add-subscription available only to active paid subscribers.",
+    "answer_raw": "The Grant Writer directory is an add-subscription available only to active paid subscribers.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "application_guidance"
+  },
+  {
+    "id": 74,
+    "slug": "when-i-try-to-login",
+    "category": "account_login",
+    "question": "When I try to login it says it does not recognize the email",
+    "answer": "Please check your spam/junk folder. If you received a verification email, please check 'Verify Emai'. Or please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "Please check your spam/junk folder. If you received a verification email, please check 'Verify Emai'. Or please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 75,
+    "slug": "how-can-i-get-a",
+    "category": "general_info",
+    "question": "How can I get a receipt?",
+    "answer": "Log into My Account, Management My account and then you can view invoices and payments.",
+    "answer_raw": "Log into My Account, Management My account and then you can view invoices and payments.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 76,
+    "slug": "are-there-any-guarantees-for",
+    "category": "grant_application",
+    "question": "Are there any guarantees for getting grants?",
+    "answer": "The Grant Portal is a database of grants. The Grant Portal is not the grant provider. There are no guarantees to be awarded any funds as the decision is solely the grant providers.",
+    "answer_raw": "The Grant Portal is a database of grants. The Grant Portal is not the grant provider. There are no guarantees to be awarded any funds as the decision is solely the grant providers.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "eligibility_assessment"
+  },
+  {
+    "id": 77,
+    "slug": "please-give-me-a-return",
+    "category": "contact_support",
+    "question": "Please give me a return call @ (number)",
+    "answer": "The Grant Portal is a DIY (Do-It-Yourself) website. We provide support via the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "The Grant Portal is a DIY (Do-It-Yourself) website. We provide support via the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "other"
+  },
+  {
+    "id": 78,
+    "slug": "how-do-i-update-my",
+    "category": "account_login",
+    "question": "How do I update my password?",
+    "answer": "Select 'Forgot Password' on the 'Login Here' box.",
+    "answer_raw": "Select 'Forgot Password' on the 'Login Here' box.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 79,
+    "slug": "is-the-grant-writer-directory",
+    "category": "grant_writer",
+    "question": "Is the Grant Writer directory a different subscription?",
+    "answer": "The Grant Writer directory is an add-on available to active paid subscribers.",
+    "answer_raw": "The Grant Writer directory is an add-on available to active paid subscribers.",
+    "links": [],
+    "escalation_type": "none",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "product_navigation"
+  },
+  {
+    "id": 80,
+    "slug": "im-getting-a-sever-error",
+    "category": "technical_issues",
+    "question": "I'm getting a sever error. Please fix.",
+    "answer": "Please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "links": [
+      {
+        "text": "Contact Us",
+        "url": "https://w ww.thegrantportal.com/contact-us"
+      }
+    ],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 81,
+    "slug": "im-getting-a-404-error",
+    "category": "technical_issues",
+    "question": "I'm getting a 404 error.",
+    "answer": "Please use the Contact Us tab or email us at tech@promero.com",
+    "answer_raw": "Please use the Contact Us tab or email us at <tech@promero.com>",
+    "links": [],
+    "escalation_type": "email",
+    "alternate_phrasings": [],
+    "keywords": [],
+    "intent": "account_support"
+  },
+  {
+    "id": 82,
+    "slug": "not-receiving-newsletter",
+    "category": "account_login",
+    "intent": "account_support",
+    "question": "Why am I not receiving The Grant Portal Newsletter?",
+    "answer": "You should receive newsletters three times each week. If you're not receiving them, check your spam folder. For Gmail accounts, open the email in spam and select 'Report Not Spam'. If the issue persists, contact tech@promero.com.",
+    "links": [],
+    "escalation_type": "email"
+  },
+  {
+    "id": 83,
+    "slug": "add-list-grant-to-portal",
+    "category": "general_info",
+    "intent": "other",
+    "question": "How do I add or list a grant to The Grant Portal?",
+    "answer": "You can list a grant by visiting the 'I am a Grant Provider' page on our website. Once your listing has been verified and approved by our team, it will be added to the site.",
+    "links": [
+      {
+        "text": "I am a Grant Provider",
+        "url": "https://www.thegrantportal.com/i-am-a-grant-provider"
+      }
+    ],
+    "escalation_type": "none"
+  },
+  {
+    "id": 84,
+    "slug": "join-email-list",
+    "category": "account_login",
+    "intent": "account_support",
+    "question": "How can I be added to your email list?",
+    "answer": "Sign up for free on the website to receive our weekly grant newsletter. Check your spam folder if you don't receive emails within 7 days of signing up.",
+    "links": [
+      {
+        "text": "Sign Up",
+        "url": "https://www.thegrantportal.com/login"
+      }
+    ],
+    "escalation_type": "none"
+  },
+  {
+    "id": 85,
+    "slug": "irs-990-pf-data-source",
+    "category": "general_info",
+    "intent": "product_navigation",
+    "question": "Where does the IRS 990 PF data come from?",
+    "answer": "The IRS started publishing private foundation tax returns in machine-readable format in 2016. The Grant Portal retrieves this data and makes it available to paid subscribers. The dataset only contains electronically filed returns. The Grant Portal does not edit or control any content provided by the IRS.",
+    "links": [],
+    "escalation_type": "none"
+  },
+  {
+    "id": 86,
+    "slug": "irs-990-pf-who-must-file",
+    "category": "general_info",
+    "intent": "product_navigation",
+    "question": "What organizations are required to electronically file the 990 PF?",
+    "answer": "For tax years beginning on or after July 2, 2019, the Taxpayer First Act requires exempt organizations to file returns electronically. Organizations must file electronically for tax years beginning in 2021 and later.",
+    "links": [],
+    "escalation_type": "none"
+  },
+  {
+    "id": 87,
+    "slug": "irs-990-pf-search-tool-value",
+    "category": "general_info",
+    "intent": "product_navigation",
+    "question": "What is the value of The Grant Portal's IRS 990 PF search tool?",
+    "answer": "The Grant Portal's search engine makes the IRS 990 PF dataset a powerful research and prospecting tool. Use Profile Search to find a foundation's profile, and Grants Search to explore which foundations have donated to similar organizations in the past.",
+    "links": [
+      {
+        "text": "Profile Search",
+        "url": "https://www.thegrantportal.com/irs-990-private-foundations/profile-search"
+      }
+    ],
+    "escalation_type": "none"
+  },
+  {
+    "id": 88,
+    "slug": "irs-990-pf-update-frequency",
+    "category": "general_info",
+    "intent": "product_navigation",
+    "question": "How often is the IRS 990 PF data updated? Who controls the frequency?",
+    "answer": "The IRS controls the frequency of updates. Updates for the previous year are typically made available in the fall of the subsequent year.",
+    "links": [],
+    "escalation_type": "none"
+  },
+  {
+    "id": 89,
+    "slug": "irs-990-pf-content-control",
+    "category": "general_info",
+    "intent": "product_navigation",
+    "question": "Who controls the content of the IRS 990 PF data? Can profiles be edited or removed?",
+    "answer": "Foundations control the content — information appears exactly as entered on their tax return. Only the IRS can edit, remove, or update 990 PF information. Note that grantee names may contain misspellings or variations, as there is no IRS requirement to use actual legal names.",
+    "links": [],
+    "escalation_type": "none"
+  },
+  {
+    "id": 90,
+    "slug": "irs-990-pf-cant-find-foundation",
+    "category": "general_info",
+    "intent": "product_navigation",
+    "question": "Why can't I find a foundation in the IRS 990 PF directory?",
+    "answer": "The foundation likely did not file their taxes electronically or did not file Form 990 PF. The dataset only contains electronically filed returns.",
+    "links": [],
+    "escalation_type": "none"
+  },
+  {
+    "id": 91,
+    "slug": "irs-990-pf-data-changes",
+    "category": "general_info",
+    "intent": "product_navigation",
+    "question": "Do you make any changes or exclude any data from the IRS 990 PF?",
+    "answer": "No. All IRS 990 PF data on The Grant Portal is presented exactly as found in the tax filings.",
+    "links": [],
+    "escalation_type": "none"
+  },
+  {
+    "id": 92,
+    "slug": "weekly-subscription-clarification",
+    "category": "subscription_pricing",
+    "intent": "product_navigation",
+    "question": "Does a weekly subscription expire after one week?",
+    "answer": "No. A weekly subscription auto-renews every week and continues indefinitely until you cancel. It does not expire after one week. All subscriptions are set to auto-renew for uninterrupted access.",
+    "links": [
+      {
+        "text": "Pricing and Plans",
+        "url": "https://www.thegrantportal.com/pricing-and-plans"
+      }
+    ],
+    "escalation_type": "none"
+  },
+  {
+    "id": 93,
+    "slug": "refund-policy-detailed",
+    "category": "cancellation_refund",
+    "intent": "account_support",
+    "question": "What is the full refund policy? Can I get a partial refund?",
+    "answer": "All subscription fees are non-refundable once access is granted. This includes: no prorated refunds for unused time, no refunds after a renewal payment is processed, and no refunds for partial use or failure to use the service. See the Terms of Service for full details.",
+    "links": [
+      {
+        "text": "Terms of Service",
+        "url": "https://www.thegrantportal.com/terms-service"
+      }
+    ],
+    "escalation_type": "none"
+  },
+  {
+    "id": 94,
+    "slug": "cancel-mid-billing-cycle",
+    "category": "cancellation_refund",
+    "intent": "account_support",
+    "question": "What happens if I cancel mid-billing cycle? Do I lose access immediately?",
+    "answer": "No, cancellations are effective at the end of your current billing cycle. You retain full access until then. No prorated refunds are issued for the remaining time.",
+    "links": [
+      {
+        "text": "Terms of Service",
+        "url": "https://www.thegrantportal.com/terms-service"
+      }
+    ],
+    "escalation_type": "none"
+  },
+  {
+    "id": 95,
+    "slug": "search-by-recipient-type",
+    "category": "grant_search_usage",
+    "intent": "product_navigation",
+    "question": "Can I search for grants based on my recipient type or organization type?",
+    "answer": "Yes. The Grant Portal offers separate sections for Grants for Nonprofits, Grants for Small Businesses, and Grants for Individuals. Select your type, then use the Location and Category filters to narrow your results.",
+    "links": [
+      {
+        "text": "Grants for Nonprofits",
+        "url": "https://www.thegrantportal.com/grants-for-nonprofits"
+      },
+      {
+        "text": "Grants for Small Business",
+        "url": "https://www.thegrantportal.com/grants-for-small-business"
+      },
+      {
+        "text": "Grants for Individuals",
+        "url": "https://www.thegrantportal.com/grants-for-individuals"
+      }
+    ],
+    "escalation_type": "none"
+  }
+]

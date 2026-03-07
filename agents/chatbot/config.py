@@ -28,7 +28,7 @@ class ChatbotSettings(BaseSettings):
     app_env: str = "development"
     max_conversation_history: int = 10
     max_search_results: int = 10
-    support_email: str = "support@thegrantportal.com"
+    support_email: str = "tech@promero.com"
 
     class Config:
         env_file = ".env"

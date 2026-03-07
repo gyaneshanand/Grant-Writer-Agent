@@ -47,6 +47,66 @@ class ChromaVectorStore(VectorStoreProvider):
         """Check if the vector store has been populated."""
         return os.path.exists(self.persist_directory) and os.listdir(self.persist_directory)
 
+    def similarity_search_with_score(
+        self, query: str, k: int = 5, filter: dict = None
+    ) -> list[tuple]:
+        """
+        Search with relevance scores and optional metadata filters.
+
+        Returns list of (Document, score) tuples.
+        Lower score = better match (Chroma uses L2 distance by default).
+        """
+        vs = self._ensure_initialized()
+        kwargs = {"k": k}
+        if filter:
+            kwargs["filter"] = filter
+        return vs.similarity_search_with_score(query, **kwargs)
+
+    def search_faqs(
+        self, query: str, intent: str, top_k: int = 5
+    ) -> list[dict]:
+        """
+        Search FAQ documents filtered by intent.
+
+        Used by account_support, eligibility_assessment,
+        and application_guidance handlers.
+        """
+        results = self.similarity_search_with_score(
+            query,
+            k=top_k,
+            filter={
+                "$and": [
+                    {"source_type": "faq"},
+                    {"intent": intent},
+                ]
+            },
+        )
+        return [
+            {
+                "content": doc.page_content,
+                "metadata": doc.metadata,
+                "score": score,
+            }
+            for doc, score in results
+        ]
+
+    def search_all(self, query: str, top_k: int = 5) -> list[dict]:
+        """
+        Broad search across all documents (FAQ + website).
+
+        Used by product_navigation and fallback handlers
+        where the question could match any source type.
+        """
+        results = self.similarity_search_with_score(query, k=top_k)
+        return [
+            {
+                "content": doc.page_content,
+                "metadata": doc.metadata,
+                "score": score,
+            }
+            for doc, score in results
+        ]
+
 
 class PineconeVectorStore(VectorStoreProvider):
     """Pinecone vector store implementation (for future use)."""

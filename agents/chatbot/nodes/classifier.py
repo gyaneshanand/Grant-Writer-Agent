@@ -43,10 +43,32 @@ Categories:
 - greeting: Hello, hi, thanks, goodbye, how are you, what can you do for me 
 - grant_search: Looking for grants, funding, scholarships, foundations, or any query about finding/discovering specific grants
 - product_navigation: Questions about The Grant Portal platform itself — pricing, features, how to use it, plans, subscriptions, weekly, monthly, quarterly, yearly subscription etc
-- account_support: Login issues, password reset, billing problems, account deletion, profile updates
-- eligibility_assessment: "Am I eligible?", "Can my organization apply?", "Do I qualify?"
-- application_guidance: "How do I apply?", "What documents are needed?", "Help me with my application"
+- account_support: Login issues, password reset, billing problems, account deletion, profile updates, cancellations, refunds, email verification
+- eligibility_assessment: "Am I eligible?", "Can my organization apply?", "Do I qualify?", filtering grants by eligibility
+- application_guidance: "How do I apply?", "What documents are needed?", "Help me with my application", grant writer questions
 - other: Anything that doesn't fit the above categories
+
+Examples:
+- "cancel my subscription" → account_support
+- "I was charged twice" → account_support
+- "I can't log in" → account_support
+- "I can't reset my password" → account_support
+- "delete my account" → account_support
+- "I want a refund" → account_support
+- "how do I apply for a grant?" → application_guidance
+- "can you apply without subscribing?" → application_guidance
+- "how much do grant writers charge?" → application_guidance
+- "how to get listed as a grant writer" → application_guidance
+- "our nonprofit is 1 year old, can we apply?" → eligibility_assessment
+- "how do I find grants I'm eligible for?" → eligibility_assessment
+- "are there guarantees for getting grants?" → eligibility_assessment
+- "how does your site work?" → product_navigation
+- "what does deadline ongoing mean?" → product_navigation
+- "do you offer an API?" → product_navigation
+- "can I export to excel?" → product_navigation
+- "how often do you update grants?" → product_navigation
+- "grants for education in California" → grant_search
+- "nonprofit grants in Texas for veterans" → grant_search
 
 User message: "{state["user_message"]}"
 
