@@ -780,8 +780,8 @@
     "slug": "what-does-deadline-ongoing-mean",
     "category": "grant_search_usage",
     "question": "What does 'Deadline Ongoing' mean?",
-    "answer": "Means that the grant provider awards grants on an ongoing basis. Check the grant provider for details.",
-    "answer_raw": "Means that the grant provider awards grants on an ongoing basis. Check the grant provider for details.",
+    "answer": "If the Deadline shows 'Ongoing', this means the grant provider accepts grant applications or letters of inquiry at different times throughout the year and awards grants annually. It is important to check the grant provider's website for specific application deadlines. Government grants have expiration dates. Most private foundations award grants on a yearly basis. All deadlines set by the grant provider are subject to change without notice.",
+    "answer_raw": "If the Deadline shows 'Ongoing', this means the grant provider accepts grant applications or letters of inquiry at different times throughout the year and awards grants annually. It is important to check the grant provider's website for specific application deadlines. Government grants have expiration dates. Most private foundations award grants on a yearly basis. All deadlines set by the grant provider are subject to change without notice.",
     "links": [],
     "escalation_type": "none",
     "alternate_phrasings": [],
@@ -790,11 +790,11 @@
   },
   {
     "id": 51,
-    "slug": "what-does-funding-mount-open",
+    "slug": "what-does-funding-amount-open",
     "category": "grant_search_usage",
-    "question": "What does 'Funding Mount: Open' mean?",
-    "answer": "Means that the grant provider does not preset dollar amounts and awards various dollar amounts for grants. Check the grant provider for details.",
-    "answer_raw": "Means that the grant provider does not preset dollar amounts and awards various dollar amounts for grants. Check the grant provider for details.",
+    "question": "What does 'Funding Amount: Open' mean?",
+    "answer": "If the Grant Funding Amount shows 'Open', this means the grant provider will typically provide guidance of the amounts awarded in the past, however does not set a limit on the request amount for funding. The grant provider looks at each applicant on a case-by-case basis.",
+    "answer_raw": "If the Grant Funding Amount shows 'Open', this means the grant provider will typically provide guidance of the amounts awarded in the past, however does not set a limit on the request amount for funding. The grant provider looks at each applicant on a case-by-case basis.",
     "links": [],
     "escalation_type": "none",
     "alternate_phrasings": [],
@@ -1427,6 +1427,66 @@
         "url": "https://www.thegrantportal.com/grants-for-individuals"
       }
     ],
+    "escalation_type": "none"
+  },
+  {
+    "id": 96,
+    "slug": "is-the-grant-portal-a-grant-provider",
+    "category": "general_info",
+    "intent": "product_navigation",
+    "question": "Do you provide grants? Is The Grant Portal a grant provider? Does The Grant Portal give out grants?",
+    "answer": "No. The Grant Portal is not a grant provider. It is the largest online catalog of grants currently accepting applications. We strive to be the one-stop source for reputable, reliable, and up-to-date grant search information.",
+    "answer_raw": "No. The Grant Portal is not a grant provider. It is the largest online catalog of grants currently accepting applications. We strive to be the one-stop source for reputable, reliable, and up-to-date grant search information.",
+    "links": [],
+    "escalation_type": "none"
+  },
+  {
+    "id": 97,
+    "slug": "how-does-tgp-search-engine-work",
+    "category": "general_info",
+    "intent": "product_navigation",
+    "question": "How does The Grant Portal find grants? What kind of search engine does The Grant Portal use?",
+    "answer": "The Grant Portal developed a proprietary grant searching engine. We strive to be the one-stop source for reputable, reliable, and up-to-date grant search information.",
+    "answer_raw": "The Grant Portal developed a proprietary grant searching engine. We strive to be the one-stop source for reputable, reliable, and up-to-date grant search information.",
+    "links": [],
+    "escalation_type": "none"
+  },
+  {
+    "id": 98,
+    "slug": "is-tgp-free-or-subscription",
+    "category": "subscription_pricing",
+    "intent": "product_navigation",
+    "question": "Is The Grant Portal free? Do I need to pay to view grant details?",
+    "answer": "The Grant Portal is a subscription-based website. Only paid subscribers to the website can view the grant details. Anyone can create an account and select grant categories of interest for free.",
+    "answer_raw": "The Grant Portal is a subscription-based website. Only paid subscribers to the website can view the grant details. Anyone can create an account and select grant categories of interest for free. Visit [Pricing and Plans](https://www.thegrantportal.com/pricing-and-plans) for subscription options.",
+    "links": [
+      {
+        "text": "Pricing and Plans",
+        "url": "https://www.thegrantportal.com/pricing-and-plans"
+      }
+    ],
+    "escalation_type": "none"
+  },
+  {
+    "id": 99,
+    "slug": "can-anyone-create-an-account",
+    "category": "account_login",
+    "intent": "account_support",
+    "question": "Can anyone create an account on The Grant Portal? Do I need to pay to sign up?",
+    "answer": "Anyone can create an account on The Grant Portal for free and select grant categories of interest. A paid subscription is required to view full grant details and access application links.",
+    "answer_raw": "Anyone can create an account on The Grant Portal for free and select grant categories of interest. A paid subscription is required to view full grant details and access application links.",
+    "links": [],
+    "escalation_type": "none"
+  },
+  {
+    "id": 100,
+    "slug": "does-tgp-send-email-alerts",
+    "category": "general_info",
+    "intent": "product_navigation",
+    "question": "Does The Grant Portal send email alerts? How do I receive grant notifications?",
+    "answer": "Yes, The Grant Portal sends alerts to email. Create your account and select grant categories of interest to receive email alerts about grants that match your profile.",
+    "answer_raw": "Yes, The Grant Portal sends alerts to email. Create your account and select grant categories of interest to receive email alerts about grants that match your profile.",
+    "links": [],
     "escalation_type": "none"
   }
 ]

@@ -66,8 +66,7 @@ Sample grant titles: {sample_titles}
 Sample categories: {list(sample_categories)[:5]}
 
 Guidelines:
-- First sentence: Confirm what was found (e.g., "I found approximately {total_grants} grants for...")
-- Second sentence: Brief overview of what the grants cover
+- Confirm what was found (e.g., "I found approximately {total_grants} grants for...")
 - Be conversational and helpful
 - Do NOT list individual grants
 - Keep it under 50 words total"""

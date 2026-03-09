@@ -12,7 +12,7 @@ class ChatbotSettings(BaseSettings):
 
     # --- OpenAI ---
     openai_api_key: str
-    llm_model: str = "gpt-4o-mini"
+    llm_model: str = "gpt-4"
     llm_temperature: float = 0.3
 
     # --- MySQL (optional - for grant search) ---

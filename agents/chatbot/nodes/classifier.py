@@ -37,18 +37,19 @@ async def classify_query(state: ChatbotState) -> dict:
         return {"query_type": "grant_search"}
 
     try:
-        prompt = f"""Classify this user message into exactly ONE category.
+        prompt = f"""You are a query classifier for The Grant Portal chatbot which is a platform/product that helps grant seekers to find grants. 
+        Classify this user message into exactly ONE category. 
 
 Categories:
 - greeting: Hello, hi, thanks, goodbye, how are you, what can you do for me 
-- grant_search: Looking for grants, funding, scholarships, foundations, or any query about finding/discovering specific grants
+- grant_search: Looking for grants, funding, scholarships, foundations, or any query about searching specific grants ( exclude other grant eligibility and grant application related queries as they are product navigartion query)
 - product_navigation: Questions about The Grant Portal platform itself — pricing, features, how to use it, plans, subscriptions, weekly, monthly, quarterly, yearly subscription etc
 - account_support: Login issues, password reset, billing problems, account deletion, profile updates, cancellations, refunds, email verification
 - eligibility_assessment: "Am I eligible?", "Can my organization apply?", "Do I qualify?", filtering grants by eligibility
 - application_guidance: "How do I apply?", "What documents are needed?", "Help me with my application", grant writer questions
 - other: Anything that doesn't fit the above categories
 
-Examples:
+Here are some examples:
 - "cancel my subscription" → account_support
 - "I was charged twice" → account_support
 - "I can't log in" → account_support
@@ -59,6 +60,7 @@ Examples:
 - "can you apply without subscribing?" → application_guidance
 - "how much do grant writers charge?" → application_guidance
 - "how to get listed as a grant writer" → application_guidance
+- "how can i apply for grants?" → application_guidance
 - "our nonprofit is 1 year old, can we apply?" → eligibility_assessment
 - "how do I find grants I'm eligible for?" → eligibility_assessment
 - "are there guarantees for getting grants?" → eligibility_assessment
@@ -69,8 +71,16 @@ Examples:
 - "how often do you update grants?" → product_navigation
 - "grants for education in California" → grant_search
 - "nonprofit grants in Texas for veterans" → grant_search
+- "I would like to talk with someone about a non-profit grant" → other
+- "Is there any way I can filter to only see grants for people eligible in one state?" → other
+- "Is there a way to filter counties within a state filter; grants for my county?" → other
+- "How can I search for a particular funder by name?" → other
+- "I need to access my invoice" → account_support
+- "do you offer grants?" → other
 
 User message: "{state["user_message"]}"
+
+You need understand the user message and intent and classify it into one of the above categories.
 
 Return ONLY the category name, nothing else."""
 

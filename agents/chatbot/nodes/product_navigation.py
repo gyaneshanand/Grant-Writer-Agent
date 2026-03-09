@@ -60,7 +60,6 @@ User question: "{state["user_message"]}"
 
 Guidelines:
 - Be concise and friendly
-- Highlight the plan that seems most relevant to their needs
 - Ask the users to visit the pricing page for full details https://www.thegrantportal.com/pricing-and-plans
 - Nudge them to subscribe to the paid plan
 - Keep it brief and concise (under 50 words)
