@@ -5,11 +5,11 @@
     "category": "account_login",
     "question": "how can we find out login info",
     "answer": "If you're trying to access your account, use the password reset feature on the Login Here page or use the Contact Us tab for assistance retrieving your login information. Or send an email directly to tech@promero.com",
-    "answer_raw": "If you're trying to access your account, use the password reset feature on the Login Here page or use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab for assistance retrieving your login information. Or send an email directly to <tech@promero.com>",
+    "answer_raw": "If you're trying to access your account, use the password reset feature on the Login Here page or use the [Contact Us](https://www.thegrantportal.com/contact-us) tab for assistance retrieving your login information. Or send an email directly to <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -22,12 +22,12 @@
     "slug": "i-would-like-to-purchase",
     "category": "subscription_pricing",
     "question": "I would like to purchase a yearly subscription; I want to purchase a subscription",
-    "answer": "You can purchase any subscription directly through the website by selecting the Subscription on https://www.theg rantportal.com/pricing-and-plans",
-    "answer_raw": "You can purchase any subscription directly through the website by selecting the Subscription on <https://www.theg rantportal.com/pricing-and-plans>",
+    "answer": "You can purchase any subscription directly through the website by selecting the Subscription on https://www.thegrantportal.com/pricing-and-plans",
+    "answer_raw": "You can purchase any subscription directly through the website by selecting the Subscription on <https://www.thegrantportal.com/pricing-and-plans>",
     "links": [
       {
         "text": "pricing-and-plans",
-        "url": "https://www.theg rantportal.com/pricing-and-plans"
+        "url": "https://www.thegrantportal.com/pricing-and-plans"
       }
     ],
     "escalation_type": "none",
@@ -158,15 +158,15 @@
     "category": "cancellation_refund",
     "question": "I want to cancel my plan; cancel my subscription.",
     "answer": "To cancel your plan, please follow the instructions in The Grant Portal's Terms of Service. Cancellations must be made through your My Account profile. You will receive a cancellation email. And any subscription fees already paid are non-refundable, as outlined in the Terms of Service.",
-    "answer_raw": "To cancel your plan, please follow the instructions in The Grant Portal's [Terms of Service](https://www.t hegrantportal.com/terms-service). Cancellations must be made through your My Account profile. You will receive a cancellation email. And any subscription fees already paid are non-refundable, as outlined in the [Terms of Service](https://www.t hegrantportal.com/terms-service).",
+    "answer_raw": "To cancel your plan, please follow the instructions in The Grant Portal's [Terms of Service](https://www.thegrantportal.com/terms-service). Cancellations must be made through your My Account profile. You will receive a cancellation email. And any subscription fees already paid are non-refundable, as outlined in the [Terms of Service](https://www.thegrantportal.com/terms-service).",
     "links": [
       {
         "text": "Terms of Service",
-        "url": "https://www.t hegrantportal.com/terms-service"
+        "url": "https://www.thegrantportal.com/terms-service"
       },
       {
         "text": "Terms of Service",
-        "url": "https://www.t hegrantportal.com/terms-service"
+        "url": "https://www.thegrantportal.com/terms-service"
       }
     ],
     "escalation_type": "none",
@@ -245,11 +245,11 @@
     "category": "cancellation_refund",
     "question": "I want a refund. Please issue refund.",
     "answer": "Per the Terms of Service agreed to and accepted at the time of creating your account and purchasing your subscription, there is a no-refund policy for any paid subscription fees.",
-    "answer_raw": "Per the [Terms of Service](https://www. thegrantportal.com/terms-service) agreed to and accepted at the time of creating your account and purchasing your subscription, there is a no-refund policy for any paid subscription fees.",
+    "answer_raw": "Per the [Terms of Service](https://www.thegrantportal.com/terms-service) agreed to and accepted at the time of creating your account and purchasing your subscription, there is a no-refund policy for any paid subscription fees.",
     "links": [
       {
         "text": "Terms of Service",
-        "url": "https://www. thegrantportal.com/terms-service"
+        "url": "https://www.thegrantportal.com/terms-service"
       }
     ],
     "escalation_type": "none",
@@ -263,11 +263,11 @@
     "category": "general_info",
     "question": "Hi I just set up my profile and paid for a plan. But my account says that I am still using the free version. Please help!",
     "answer": "For customer support, please use the Contact Us tab on the website or send an email directly to tech@promero.com. Our team will respond and assist you with your inquiry.",
-    "answer_raw": "For customer support, please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab on the website or send an email directly to <tech@promero.com>. Our team will respond and assist you with your inquiry.",
+    "answer_raw": "For customer support, please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab on the website or send an email directly to <tech@promero.com>. Our team will respond and assist you with your inquiry.",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -280,12 +280,12 @@
     "slug": "how-much-does-it-cost",
     "category": "subscription_pricing",
     "question": "How much does it cost to get a subscription?",
-    "answer": "You can purchase any subscription directly through the website by selecting the Subscription on https://www.theg rantportal.com/pricing-and-plans",
-    "answer_raw": "You can purchase any subscription directly through the website by selecting the Subscription on <https://www.theg rantportal.com/pricing-and-plans>",
+    "answer": "You can purchase any subscription directly through the website by selecting the Subscription on https://www.thegrantportal.com/pricing-and-plans",
+    "answer_raw": "You can purchase any subscription directly through the website by selecting the Subscription on <https://www.thegrantportal.com/pricing-and-plans>",
     "links": [
       {
         "text": "pricing-and-plans",
-        "url": "https://www.theg rantportal.com/pricing-and-plans"
+        "url": "https://www.thegrantportal.com/pricing-and-plans"
       }
     ],
     "escalation_type": "none",
@@ -299,11 +299,11 @@
     "category": "grant_writer",
     "question": "Interested in getting listed on to grant writer directory",
     "answer": "Grant Writers can list their service for free. Go to the drop down I am a Grant Writer. The is no fee to be listed.",
-    "answer_raw": "Grant Writers can list their service for free. Go to the drop down [I am a Grant Writer](https://www.thegrantport al.com/grant-writer-application). The is no fee to be listed.",
+    "answer_raw": "Grant Writers can list their service for free. Go to the drop down [I am a Grant Writer](https://www.thegrantportal.com/grant-writer-application). The is no fee to be listed.",
     "links": [
       {
         "text": "I am a Grant Writer",
-        "url": "https://www.thegrantport al.com/grant-writer-application"
+        "url": "https://www.thegrantportal.com/grant-writer-application"
       }
     ],
     "escalation_type": "none",
@@ -317,11 +317,11 @@
     "category": "account_login",
     "question": "I have not received my verification email",
     "answer": "Check your junk/spam folder. If the email is not in your inbox, use Contact Us tab or send comments to tech@promero.com.",
-    "answer_raw": "Check your junk/spam folder. If the email is not in your inbox, use [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or send comments to <tech@promero.com>.",
+    "answer_raw": "Check your junk/spam folder. If the email is not in your inbox, use [Contact Us](https://www.thegrantportal.com/contact-us) tab or send comments to <tech@promero.com>.",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -348,11 +348,11 @@
     "category": "account_login",
     "question": "It keeps telling me I have an account and that my email is already taken",
     "answer": "You may be trying to 'Sign In' in the Create Your Account' box. Try 'Already a Subscriber? Login Here' box. If you need more help, Please use the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "You may be trying to 'Sign In' in the Create Your Account' box. Try 'Already a Subscriber? Login Here' box. If you need more help, Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "You may be trying to 'Sign In' in the Create Your Account' box. Try 'Already a Subscriber? Login Here' box. If you need more help, Please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -365,12 +365,12 @@
     "slug": "how-do-i-apply-for",
     "category": "grant_application",
     "question": "How do I apply for these grants?",
-    "answer": "In order to access grant details and the grant provider's link to their grants, you must subscribe. Visit https://www.theg rantportal.com/pricing-and-plans",
-    "answer_raw": "In order to access grant details and the grant provider's link to their grants, you must subscribe. Visit <https://www.theg rantportal.com/pricing-and-plans>",
+    "answer": "In order to access grant details and the grant provider's link to their grants, you must subscribe. Visit https://www.thegrantportal.com/pricing-and-plans",
+    "answer_raw": "In order to access grant details and the grant provider's link to their grants, you must subscribe. Visit <https://www.thegrantportal.com/pricing-and-plans>",
     "links": [
       {
         "text": "pricing-and-plans",
-        "url": "https://www.theg rantportal.com/pricing-and-plans"
+        "url": "https://www.thegrantportal.com/pricing-and-plans"
       }
     ],
     "escalation_type": "none",
@@ -397,11 +397,11 @@
     "category": "cancellation_refund",
     "question": "I was charged twice. Please fix.",
     "answer": "Please use the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "Please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -415,11 +415,11 @@
     "category": "general_info",
     "question": "I am having a difficult time making a payment",
     "answer": "Please use the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "Please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -432,12 +432,12 @@
     "slug": "do-you-have-special-membership",
     "category": "subscription_pricing",
     "question": "Do you have special membership rates for students? For veterans? Do you offer discounts to nonprofits?",
-    "answer": "The lowest subscription plan is Weekly. Visit https://www.theg rantportal.com/pricing-and-plans",
-    "answer_raw": "The lowest subscription plan is Weekly. Visit <https://www.theg rantportal.com/pricing-and-plans>",
+    "answer": "The lowest subscription plan is Weekly. Visit https://www.thegrantportal.com/pricing-and-plans",
+    "answer_raw": "The lowest subscription plan is Weekly. Visit <https://www.thegrantportal.com/pricing-and-plans>",
     "links": [
       {
         "text": "pricing-and-plans",
-        "url": "https://www.theg rantportal.com/pricing-and-plans"
+        "url": "https://www.thegrantportal.com/pricing-and-plans"
       }
     ],
     "escalation_type": "none",
@@ -451,11 +451,11 @@
     "category": "account_login",
     "question": "I can't log in; Can't log in, help",
     "answer": "Please use the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "Please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -482,11 +482,11 @@
     "category": "subscription_pricing",
     "question": "Can I upgrade my subscription?",
     "answer": "To change your subscription, you must first cancel your current plan through My Account Settings, then purchase the new plan. Fees paid towards previous subscriptions are not prorated or applied toward a new subscription. For help, use the Contact Us tab or email tech@promero.com.",
-    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "Please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -538,12 +538,12 @@
     "slug": "grant-view-is-blurred-please",
     "category": "technical_issues",
     "question": "Grant view is blurred. Please fix",
-    "answer": "The grant details are exposed to paid subscribers. Visit https://www.theg rantportal.com/pricing-and-plans",
-    "answer_raw": "The grant details are exposed to paid subscribers. Visit <https://www.theg rantportal.com/pricing-and-plans>",
+    "answer": "The grant details are exposed to paid subscribers. Visit https://www.thegrantportal.com/pricing-and-plans",
+    "answer_raw": "The grant details are exposed to paid subscribers. Visit <https://www.thegrantportal.com/pricing-and-plans>",
     "links": [
       {
         "text": "pricing-and-plans",
-        "url": "https://www.theg rantportal.com/pricing-and-plans"
+        "url": "https://www.thegrantportal.com/pricing-and-plans"
       }
     ],
     "escalation_type": "none",
@@ -569,12 +569,12 @@
     "slug": "how-can-i-search-for",
     "category": "grant_search_usage",
     "question": "How can I search for a particular funder by name?",
-    "answer": "Paid subscribers can search foundations by name, location, EIN number. Visit https:// www.thegrantportal.com/irs-990-pr ivate-foundations/profile-search",
-    "answer_raw": "Paid subscribers can search foundations by name, location, EIN number. Visit <https:// www.thegrantportal.com/irs-990-pr ivate-foundations/profile-search>",
+    "answer": "Paid subscribers can search foundations by name, location, EIN number. Visit https://www.thegrantportal.com/irs-990-private-foundations/profile-search",
+    "answer_raw": "Paid subscribers can search foundations by name, location, EIN number. Visit <https://www.thegrantportal.com/irs-990-private-foundations/profile-search>",
     "links": [
       {
         "text": "profile-search",
-        "url": "https:// www.thegrantportal.com/irs-990-pr ivate-foundations/profile-search"
+        "url": "https://www.thegrantportal.com/irs-990-private-foundations/profile-search"
       }
     ],
     "escalation_type": "none",
@@ -601,11 +601,11 @@
     "category": "contact_support",
     "question": "I want to talk to a live agent; Agent please; Agent; Live Agent",
     "answer": "Click on: CHAT ",
-    "answer_raw": "Click on: [CHAT ](https://salesiq.zohopublic.com/ signaturesupport.ls?widgetcode=si q8e324aba7b84c6764d851f3973034cd5 4ea893bb9ea9b933373c1dc1a61e3e47)",
+    "answer_raw": "Click on: [CHAT ](https://salesiq.zohopublic.com/signaturesupport.ls?widgetcode=siq8e324aba7b84c6764d851f3973034cd54ea893bb9ea9b933373c1dc1a61e3e47)",
     "links": [
       {
         "text": "CHAT ",
-        "url": "https://salesiq.zohopublic.com/ signaturesupport.ls?widgetcode=si q8e324aba7b84c6764d851f3973034cd5 4ea893bb9ea9b933373c1dc1a61e3e47"
+        "url": "https://salesiq.zohopublic.com/signaturesupport.ls?widgetcode=siq8e324aba7b84c6764d851f3973034cd54ea893bb9ea9b933373c1dc1a61e3e47"
       }
     ],
     "escalation_type": "live_agent",
@@ -619,11 +619,11 @@
     "category": "general_info",
     "question": "I signed up and have not received an email. Please help.",
     "answer": "Check your junk/spam folder. If the email is not in your inbox, use Contact Us tab or send comments to tech@promero.com.",
-    "answer_raw": "Check your junk/spam folder. If the email is not in your inbox, use [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or send comments to <tech@promero.com>.",
+    "answer_raw": "Check your junk/spam folder. If the email is not in your inbox, use [Contact Us](https://www.thegrantportal.com/contact-us) tab or send comments to <tech@promero.com>.",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -637,11 +637,11 @@
     "category": "account_login",
     "question": "I can't reset my password, help?",
     "answer": "Please use the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "Please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -655,11 +655,11 @@
     "category": "account_login",
     "question": "How do i change my login email?",
     "answer": "Please use the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "Please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -673,11 +673,11 @@
     "category": "account_login",
     "question": "Delete my account",
     "answer": "Please use the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "Please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -690,12 +690,12 @@
     "slug": "what-is-the-free-account",
     "category": "subscription_pricing",
     "question": "What is the Free Account?",
-    "answer": "Create your account and update the profile for your location and grant interest. You will receive the Free Newsletter with grants that fit your profile. In order to view grant details, you will need to subscribe. Visit https://www.theg rantportal.com/pricing-and-plans",
-    "answer_raw": "Create your account and update the profile for your location and grant interest. You will receive the Free Newsletter with grants that fit your profile. In order to view grant details, you will need to subscribe. Visit <https://www.theg rantportal.com/pricing-and-plans>",
+    "answer": "Create your account and update the profile for your location and grant interest. You will receive the Free Newsletter with grants that fit your profile. In order to view grant details, you will need to subscribe. Visit https://www.thegrantportal.com/pricing-and-plans",
+    "answer_raw": "Create your account and update the profile for your location and grant interest. You will receive the Free Newsletter with grants that fit your profile. In order to view grant details, you will need to subscribe. Visit <https://www.thegrantportal.com/pricing-and-plans>",
     "links": [
       {
         "text": "pricing-and-plans",
-        "url": "https://www.theg rantportal.com/pricing-and-plans"
+        "url": "https://www.thegrantportal.com/pricing-and-plans"
       }
     ],
     "escalation_type": "none",
@@ -709,11 +709,11 @@
     "category": "general_info",
     "question": "Are there recurring fees for this service?",
     "answer": "All paid subscriptions are auto-renew. You can cancel your subscription at any time prior to the renewal date and avoid future charges. Any fees past due at the time of cancellation remain due and payable. Check Terms of Service",
-    "answer_raw": "All paid subscriptions are auto-renew. You can cancel your subscription at any time prior to the renewal date and avoid future charges. Any fees past due at the time of cancellation remain due and payable. Check [Terms of Service](https://www. thegrantportal.com/terms-service)",
+    "answer_raw": "All paid subscriptions are auto-renew. You can cancel your subscription at any time prior to the renewal date and avoid future charges. Any fees past due at the time of cancellation remain due and payable. Check [Terms of Service](https://www.thegrantportal.com/terms-service)",
     "links": [
       {
         "text": "Terms of Service",
-        "url": "https://www. thegrantportal.com/terms-service"
+        "url": "https://www.thegrantportal.com/terms-service"
       }
     ],
     "escalation_type": "none",
@@ -727,11 +727,11 @@
     "category": "technical_issues",
     "question": "I still get an error message trying to login to TGP",
     "answer": "Please use the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "Please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -745,11 +745,11 @@
     "category": "general_info",
     "question": "I have questions about Terms and Conditions.",
     "answer": "Please use the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "Please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -763,11 +763,11 @@
     "category": "general_info",
     "question": "I have question about Privacy Policy",
     "answer": "Please use the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "Please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -820,11 +820,11 @@
     "category": "cancellation_refund",
     "question": "Cancel button is not there. Cancel Subscription. How to cancel subscription. Cancel my account.",
     "answer": "Log into your account. Select 'My Account Settings' in the drop-down menu. Select 'Subscription Level'. Select 'Manage My Account'. Select 'Cancel'. Check your inbox for cancellation confirmation. Or please use the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "Log into your account. Select 'My Account Settings' in the drop-down menu. Select 'Subscription Level'. Select 'Manage My Account'. Select 'Cancel'. Check your inbox for cancellation confirmation. Or please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "Log into your account. Select 'My Account Settings' in the drop-down menu. Select 'Subscription Level'. Select 'Manage My Account'. Select 'Cancel'. Check your inbox for cancellation confirmation. Or please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -838,11 +838,11 @@
     "category": "account_login",
     "question": "TGP says my email is already taken?",
     "answer": "You may be trying to 'Sign In' in the Create Your Account' box. Try 'Already a Subscriber? Login Here' box. If you need more help, Please use the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "You may be trying to 'Sign In' in the Create Your Account' box. Try 'Already a Subscriber? Login Here' box. If you need more help, Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "You may be trying to 'Sign In' in the Create Your Account' box. Try 'Already a Subscriber? Login Here' box. If you need more help, Please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -895,11 +895,11 @@
     "category": "subscription_pricing",
     "question": "I thought I had a paid subscription but it does not show. Help",
     "answer": "Please use the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "Please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -939,11 +939,11 @@
     "category": "contact_support",
     "question": "Who can I speak with in regard to marketing?",
     "answer": "Click the 'Contact Us' tab on the website and submit your inquiry.",
-    "answer_raw": "Click the '[Contact Us'](https://w ww.thegrantportal.com/contact-us) tab on the website and submit your inquiry.",
+    "answer_raw": "Click the '[Contact Us'](https://www.thegrantportal.com/contact-us) tab on the website and submit your inquiry.",
     "links": [
       {
         "text": "Contact Us'",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "contact_form",
@@ -970,11 +970,11 @@
     "category": "subscription_pricing",
     "question": "I paid for a subscription and can't access. What is going on? I am having trouble logging in.",
     "answer": "Please use the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "Please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -1039,12 +1039,12 @@
     "slug": "is-there-a-free-trial",
     "category": "subscription_pricing",
     "question": "Is there a free trial to view grant details?",
-    "answer": "In order to view grant details, you must subscribe. Visit https://www.theg rantportal.com/pricing-and-plans",
-    "answer_raw": "In order to view grant details, you must subscribe. Visit <https://www.theg rantportal.com/pricing-and-plans>",
+    "answer": "In order to view grant details, you must subscribe. Visit https://www.thegrantportal.com/pricing-and-plans",
+    "answer_raw": "In order to view grant details, you must subscribe. Visit <https://www.thegrantportal.com/pricing-and-plans>",
     "links": [
       {
         "text": "pricing-and-plans",
-        "url": "https://www.theg rantportal.com/pricing-and-plans"
+        "url": "https://www.thegrantportal.com/pricing-and-plans"
       }
     ],
     "escalation_type": "none",
@@ -1058,11 +1058,11 @@
     "category": "technical_issues",
     "question": "i would like to delete my account but it is not working",
     "answer": "Please use the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "Please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -1089,11 +1089,11 @@
     "category": "cancellation_refund",
     "question": "please cancel my subscription. Here is my email {EMAIL}",
     "answer": "I can not cancel your subscription. Log into your account. Select 'My Account Settings' in the drop-down menu. Select 'Subscription Level'. Select 'Manage My Account'. Select 'Cancel'. Check your inbox for cancellation confirmation. Or please use the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "I can not cancel your subscription. Log into your account. Select 'My Account Settings' in the drop-down menu. Select 'Subscription Level'. Select 'Manage My Account'. Select 'Cancel'. Check your inbox for cancellation confirmation. Or please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "I can not cancel your subscription. Log into your account. Select 'My Account Settings' in the drop-down menu. Select 'Subscription Level'. Select 'Manage My Account'. Select 'Cancel'. Check your inbox for cancellation confirmation. Or please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -1133,11 +1133,11 @@
     "category": "account_login",
     "question": "When I try to login it says it does not recognize the email",
     "answer": "Please check your spam/junk folder. If you received a verification email, please check 'Verify Emai'. Or please use the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "Please check your spam/junk folder. If you received a verification email, please check 'Verify Emai'. Or please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "Please check your spam/junk folder. If you received a verification email, please check 'Verify Emai'. Or please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -1177,11 +1177,11 @@
     "category": "contact_support",
     "question": "Please give me a return call @ (number)",
     "answer": "The Grant Portal is a DIY (Do-It-Yourself) website. We provide support via the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "The Grant Portal is a DIY (Do-It-Yourself) website. We provide support via the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "The Grant Portal is a DIY (Do-It-Yourself) website. We provide support via the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",
@@ -1221,11 +1221,11 @@
     "category": "technical_issues",
     "question": "I'm getting a sever error. Please fix.",
     "answer": "Please use the Contact Us tab or email us at tech@promero.com",
-    "answer_raw": "Please use the [Contact Us](https://w ww.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
+    "answer_raw": "Please use the [Contact Us](https://www.thegrantportal.com/contact-us) tab or email us at <tech@promero.com>",
     "links": [
       {
         "text": "Contact Us",
-        "url": "https://w ww.thegrantportal.com/contact-us"
+        "url": "https://www.thegrantportal.com/contact-us"
       }
     ],
     "escalation_type": "email",

@@ -46,7 +46,7 @@ RULES FOR WEBSITE SOURCES:
 GENERAL RULES:
 - If the context does not contain a satisfactory answer, respond with exactly: NO_FAQ_MATCH
 - Do NOT make up information. Do NOT answer from general knowledge.
-- Be concise and conversational.
+- Be concise and conversational. Answer should be less than 40 words.
 - Support email: {support_email}
 
 ══ CONTEXT ══
