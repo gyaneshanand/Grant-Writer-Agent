@@ -1,322 +1,272 @@
-# Grant Writer Agent API
+# The Grant Portal — AI Agent Suite
 
-A comprehensive AI-powered FastAPI application for automating grant discovery, analysis, and content generation. This system helps organizations find and apply for grants by collecting data from foundation websites, analyzing organizations, generating compelling grant content, and creating SEO-optimized metadata.
+A modular, AI-powered backend for **The Grant Portal (TGP)** — combining an intelligent chatbot, a grant writing pipeline, and specialised data-collection agents into a single FastAPI application.
 
-## 🌟 Features
+---
 
-### 4-Step Grant Processing Pipeline
+## ✨ Highlights
 
-1. **Grant Data Collection** - Extracts grant information from foundation URLs
-2. **Organization Analysis** - Analyzes your organization's profile and mission
-3. **Content Generation** - Creates compelling, tailored grant applications
-4. **Metadata Generation** - Generates SEO-optimized metadata for grant opportunities
+| Capability | Description |
+|---|---|
+| **Smart Chatbot** | LangGraph state-machine with intent classification, FAQ RAG (ChromaDB), real-time SQL grant search, entity extraction, and conversation memory |
+| **Grant Writer Pipeline** | 4-step pipeline — scrape → analyse → generate → enrich metadata |
+| **Organisation Analyser** | Profiles organisations from their website to personalise grant applications |
+| **Metadata Generator** | Produces SEO-optimised, structured JSON metadata for every grant |
 
-### Key Capabilities
+---
 
-- ✅ Automated web scraping and data extraction
-- ✅ AI-powered content analysis using GPT-4o-mini
-- ✅ Structured JSON output with comprehensive grant details
-- ✅ RESTful API with 4 specialized endpoints
-- ✅ LangSmith integration for monitoring and tracing
-- ✅ Environment-based configuration (no hardcoded API keys!)
-- ✅ Comprehensive error handling and logging
+## 🤖 Chatbot Architecture
 
-## 📋 Prerequisites
+The chatbot is built on **LangGraph** and routes every user message through an intent-classification layer powered by OpenAI GPT, then dispatches to specialised handler nodes:
 
-- Python 3.12+
-- OpenAI API key
-- (Optional) LangSmith API key for monitoring
-
-## 🚀 Quick Start
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/yourusername/Grant-Writer-Agent.git
-cd Grant-Writer-Agent
+```
+detect_follow_up → classify_query → [route] → handler → save_conversation → END
 ```
 
-### 2. Create Virtual Environment
+### Intent Routes
 
-```bash
-python -m venv venv
-source venv/bin/activate  # On macOS/Linux
-# or
-venv\Scripts\activate  # On Windows
-```
+| Intent | Handler | What It Does |
+|---|---|---|
+| `greeting` | Static handler | Welcomes the user |
+| `grant_search` | Entity Extraction → SQL Search → Response Formatter | Extracts interests, locations & eligibility from natural language, runs parameterised SQL against the TGP MySQL database, and formats results |
+| `product_navigation` | FAQ RAG + LLM | Answers questions about TGP pricing, plans, features using ChromaDB vector search over curated FAQs |
+| `account_support` | FAQ RAG + LLM | Handles login, billing, password, cancellation queries |
+| `eligibility_assessment` | FAQ RAG + LLM | Answers "Am I eligible?" style questions |
+| `application_guidance` | FAQ RAG + LLM | Guides users on how to apply, required documents, grant writer directory |
+| `other` | Fallback handler | Graceful fallback for out-of-scope queries |
 
-### 3. Install Dependencies
+### Key Chatbot Components
 
-```bash
-pip install -r requirements.txt
-```
+- **FAQ RAG** — 95+ curated Q&A pairs ingested into ChromaDB; semantic search + LLM re-ranking for precise answers
+- **SQL Grant Search** — Async MySQL queries against the live TGP database with multi-dimensional filtering (interest, location, eligibility)
+- **Entity Extraction** — LLM-powered extraction of grant search entities (interests, locations, eligibility criteria) with slug resolution
+- **Follow-up Detection** — Detects conversational follow-ups and carries context forward
+- **Conversation History** — Persists chat history to MySQL for multi-turn context
 
-### 4. Environment Configuration
+---
 
-Copy the example environment file and add your API keys:
+## 🔧 Grant Writer Pipeline
 
-```bash
-cp .env.example .env
-```
+A 4-step AI pipeline for automated grant content generation:
 
-Edit `.env` and add your credentials:
+1. **Grant Data Collection** (`grant_data_collector.py`) — Scrapes foundation websites using Trafilatura & BeautifulSoup to extract grant details
+2. **Organisation Analysis** (`organisation_data_collector.py`) — Profiles the applicant organisation from its website
+3. **Content Generation** (`grant_writer.py`) — Generates compelling, tailored grant application narratives using GPT
+4. **Metadata Generation** (`grant_metadata_writer.py`) — Extracts structured metadata (deadlines, amounts, eligibility, contact info) as JSON
 
-```env
-# Required
-OPENAI_API_KEY=your-openai-api-key-here
+### Additional Agents
 
-# Optional - LangSmith monitoring
-LANGSMITH_TRACING=true
-LANGSMITH_API_KEY=your-langsmith-api-key-here
-LANGSMITH_PROJECT=grant-writer-agent
-```
+- **Organisation URL Finder** (`organisation_url_finder_agent.py`) — Discovers and validates organisation URLs for downstream analysis
 
-### 5. Run the Application
-
-```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-The API will be available at `http://localhost:8000`
-
-API documentation: `http://localhost:8000/docs`
-
-## 📚 API Endpoints
-
-### 1. Grant Data Collection
-**POST** `/api/collect/grant-data`
-
-Extracts grant information from a foundation URL.
-
-```json
-{
-  "grant_url": "https://foundation.org/grants"
-}
-```
-
-### 2. Organization Data Collection
-**POST** `/api/collect/organization-data`
-
-Analyzes organization information from their website.
-
-```json
-{
-  "organization_url": "https://yourorg.org"
-}
-```
-
-### 3. Grant Content Generation
-**POST** `/api/generate/grant-content`
-
-Generates tailored grant application content.
-
-```json
-{
-  "grant_data": {...},
-  "organization_data": {...}
-}
-```
-
-### 4. Metadata Generation
-**POST** `/api/generate/metadata`
-
-Creates SEO-optimized metadata for grant opportunities.
-
-```json
-{
-  "grant_description": "Full grant description text..."
-}
-```
-
-### 5. Complete Pipeline
-**POST** `/api/pipeline/process`
-
-Runs the complete 4-step pipeline in one call.
-
-```json
-{
-  "grant_url": "https://foundation.org/grants",
-  "organization_url": "https://yourorg.org"
-}
-```
+---
 
 ## 🏗️ Project Structure
 
 ```
 Grant-Writer-Agent/
-├── agents/                          # Core agent modules
-│   ├── grant_data_collector.py     # Web scraping & grant extraction
-│   ├── organisation_data_collector.py  # Organization analysis
-│   ├── grant_writer.py             # Content generation
-│   └── grant_metadata_writer.py    # Metadata generation
-├── api/                             # FastAPI application
+├── main.py                                  # FastAPI entry point & lifespan
+├── requirements.txt                         # Python dependencies
+├── .env.example                             # Environment variable template
+│
+├── agents/                                  # All AI agents
+│   ├── chatbot/                             # ── Chatbot Agent ──
+│   │   ├── config.py                        #    Settings (model, DB, vector store)
+│   │   ├── ingest.py                        #    Document ingestion for RAG
+│   │   ├── ingest_faqs.py                   #    FAQ ingestion into ChromaDB
+│   │   ├── graph/
+│   │   │   └── main_graph.py                #    LangGraph state machine
+│   │   ├── models/
+│   │   │   ├── state.py                     #    Graph state schema
+│   │   │   ├── request.py                   #    API request models
+│   │   │   └── response.py                  #    API response models
+│   │   ├── nodes/
+│   │   │   ├── classifier.py                #    Intent classification
+│   │   │   ├── follow_up.py                 #    Follow-up detection
+│   │   │   ├── entity_extraction.py         #    Entity extraction & slug resolution
+│   │   │   ├── search.py                    #    SQL grant search
+│   │   │   ├── faq_rag.py                   #    FAQ RAG retrieval
+│   │   │   ├── handlers.py                  #    Intent handlers
+│   │   │   ├── product_navigation.py        #    Product/pricing handler
+│   │   │   ├── response.py                  #    Response formatter
+│   │   │   └── conversation.py              #    Conversation persistence
+│   │   ├── services/
+│   │   │   ├── llm.py                       #    OpenAI LLM client
+│   │   │   ├── database.py                  #    Async MySQL connection
+│   │   │   └── vector_store.py              #    ChromaDB / Pinecone store
+│   │   └── data/
+│   │       └── faqs.json                    #    Curated FAQ dataset
+│   │
+│   ├── grant_writer.py                      # ── Grant Writer Agent ──
+│   ├── grant_data_collector.py              # ── Grant Data Collector ──
+│   ├── grant_metadata_writer.py             # ── Metadata Writer Agent ──
+│   ├── organisation_data_collector.py       # ── Org Data Collector ──
+│   └── organisation_url_finder_agent.py     # ── Org URL Finder Agent ──
+│
+├── api/                                     # FastAPI layer
 │   ├── config/
-│   │   ├── settings.py             # Configuration management
-│   │   └── langsmith_setup.py      # LangSmith integration
-│   ├── controllers/                 # API route handlers
-│   │   ├── data_collection_controller.py
-│   │   ├── content_generation_controller.py
-│   │   └── pipeline_controller.py
-│   ├── services/                    # Business logic layer
-│   │   ├── grant_data_service.py
-│   │   ├── organization_data_service.py
-│   │   ├── grant_writer_service.py
-│   │   └── metadata_writer_service.py
+│   │   ├── settings.py                      #    App settings
+│   │   └── langsmith_setup.py               #    LangSmith tracing setup
+│   ├── controllers/
+│   │   ├── chatbot_controller.py            #    /api/v1/chatbot/*
+│   │   ├── data_collection_controller.py    #    /api/v1/data-collection/*
+│   │   ├── content_generation_controller.py #    /api/v1/content-generation/*
+│   │   └── pipeline_controller.py           #    /api/v1/pipeline/*
+│   ├── services/                            #    Business logic layer
 │   └── models/
-│       └── schemas.py              # Pydantic models
-├── logs/                            # Application logs
-├── main.py                          # FastAPI application entry
-├── requirements.txt                 # Python dependencies
-├── .env.example                     # Example environment variables
-├── .gitignore                       # Git ignore rules
-└── README.md                        # This file
+│       └── schemas.py                       #    Pydantic schemas
+│
+├── ui/                                      # Frontend assets
+├── docs/                                    # Documentation
+├── scripts/                                 # Utility scripts
+└── logs/                                    # Application logs
 ```
-
-## 🔧 Configuration
-
-### Environment Variables
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `OPENAI_API_KEY` | Yes | - | OpenAI API key for GPT models |
-| `LANGSMITH_TRACING` | No | `false` | Enable LangSmith tracing |
-| `LANGSMITH_API_KEY` | No | - | LangSmith API key |
-| `LANGSMITH_PROJECT` | No | `grant-writer-agent` | LangSmith project name |
-| `APP_HOST` | No | `0.0.0.0` | API host address |
-| `APP_PORT` | No | `8000` | API port |
-| `APP_ENV` | No | `development` | Application environment |
-| `APP_DEBUG` | No | `true` | Enable debug mode |
-| `APP_RELOAD` | No | `true` | Enable auto-reload |
-
-## 🧪 Usage Examples
-
-### Example 1: Collect Grant Data
-
-```python
-import requests
-
-response = requests.post(
-    "http://localhost:8000/api/collect/grant-data",
-    json={"grant_url": "https://foundation.org/grants"}
-)
-
-grant_data = response.json()
-print(grant_data)
-```
-
-### Example 2: Run Complete Pipeline
-
-```python
-import requests
-
-response = requests.post(
-    "http://localhost:8000/api/pipeline/process",
-    json={
-        "grant_url": "https://foundation.org/grants",
-        "organization_url": "https://yourorg.org"
-    }
-)
-
-result = response.json()
-print("Grant Data:", result["grant_data"])
-print("Organization Data:", result["organization_data"])
-print("Generated Content:", result["grant_content"])
-print("Metadata:", result["metadata"])
-```
-
-## 📊 Grant Data Schema
-
-    ```json
-    ## 📊 Grant Data Schema
-
-The system extracts comprehensive grant information in structured JSON format:
-
-```json
-{
-  "grant_name": "Grant title",
-  "funding_priorities": "Funding priorities and interests",
-  "grant_type": "Type of grant",
-  "eligibility_requirements": "Eligibility criteria",
-  "geographic_focus": "Geographic focus areas",
-  "funding_amount": "Funding amount range",
-  "proposal_deadline": "Application deadline",
-  "recurrence": "Grant recurrence (Annual, Rolling, etc.)",
-  "contact_info": {
-    "email": "Contact email",
-    "phone": "Contact phone",
-    "address": "Contact address"
-  },
-  "organization_info": "Organization background",
-  "grant_summary": "Comprehensive grant summary",
-  "grant_url": "Source URL"
-}
-```
-
-## 🔍 Monitoring with LangSmith
-
-The application includes built-in LangSmith integration for monitoring:
-
-- Track all LLM calls and their performance
-- Debug issues with detailed traces
-- Monitor token usage and costs
-- Analyze application performance
-
-Enable by setting `LANGSMITH_TRACING=true` in your `.env` file.
-
-## 🛡️ Security Best Practices
-
-- ✅ Never commit `.env` files to git
-- ✅ All API keys loaded from environment variables
-- ✅ `.gitignore` configured to exclude sensitive files
-- ✅ Use `.env.example` for documentation only
-- ✅ Rotate API keys regularly
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 🐛 Troubleshooting
-
-### Issue: "OPENAI_API_KEY not found"
-**Solution:** Ensure you've created a `.env` file with your OpenAI API key.
-
-### Issue: LangChain deprecation warnings
-**Solution:** The project uses `langchain-community` for chat models. Ensure all dependencies are installed: `pip install -r requirements.txt`
-
-### Issue: Pydantic validation errors
-**Solution:** Check that your `.env` file matches the structure in `.env.example`
-
-### Issue: Import errors on startup
-**Solution:** Make sure you're in the virtual environment and all dependencies are installed.
-
-## 📧 Support
-
-For issues, questions, or contributions, please open an issue on GitHub.
-
-## 🙏 Acknowledgments
-
-- Built with [FastAPI](https://fastapi.tiangolo.com/)
-- Powered by [LangChain](https://langchain.com/)
-- AI models from [OpenAI](https://openai.com/)
-- Monitoring by [LangSmith](https://smith.langchain.com/)
 
 ---
 
-**Made with ❤️ for the grant writing community**
-    ```
+## 📚 API Endpoints
 
-Step 5. Filtering Active Grants:
+### Chatbot
 
-Detect “open”, “currently accepting applications”, or future deadlines.
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/v1/chatbot/chat` | Send a message and receive an AI-powered response |
 
-Discard pages mentioning “closed”, “past deadline”, “archived”.
+### Grant Data Collection
 
-Step 6. Output:
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/v1/data-collection/grants` | Extract grant data from a foundation URL |
+| `POST` | `/api/v1/data-collection/organization` | Analyse an organisation's website |
 
-Return structured JSON or write into a database (Postgres/Elastic).
+### Content Generation
 
-Optionally push results to your grant catalog system.
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/v1/content-generation/grant-description` | Generate a consolidated grant description |
+| `POST` | `/api/v1/content-generation/metadata` | Extract structured metadata from grant text |
+
+### Full Pipeline
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/v1/pipeline/complete` | Run the end-to-end 4-step grant pipeline |
+
+### Health
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/` | Quick health check |
+| `GET` | `/health` | Detailed health & configuration status |
+
+> Interactive API docs are available at `/docs` (Swagger UI) and `/redoc` (ReDoc).
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Python 3.12+
+- OpenAI API key
+- *(Optional)* MySQL database for live grant search
+- *(Optional)* LangSmith API key for tracing
+
+### Setup
+
+```bash
+# Clone
+git clone https://github.com/gyaneshanand/Grant-Writer-Agent.git
+cd Grant-Writer-Agent
+
+# Virtual environment
+python -m venv venv
+source venv/bin/activate      # macOS / Linux
+# venv\Scripts\activate       # Windows
+
+# Dependencies
+pip install -r requirements.txt
+
+# Environment
+cp .env.example .env
+# Edit .env with your API keys
+```
+
+### Run
+
+```bash
+python main.py
+# or
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+The API will be available at `http://localhost:8000` — docs at `http://localhost:8000/docs`.
+
+---
+
+## ⚙️ Configuration
+
+All configuration is managed via environment variables (`.env`).
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `OPENAI_API_KEY` | **Yes** | — | OpenAI API key |
+| `DATABASE_URL` | No | — | MySQL connection string for grant search |
+| `VECTOR_STORE_PROVIDER` | No | `chroma` | `chroma` or `pinecone` |
+| `CHROMA_PATH` | No | `agents/chatbot/data/chroma_db` | Path to ChromaDB store |
+| `LANGSMITH_TRACING` | No | `false` | Enable LangSmith tracing |
+| `LANGSMITH_API_KEY` | No | — | LangSmith API key |
+| `LANGSMITH_PROJECT` | No | `grant-writer-agent` | LangSmith project name |
+| `APP_ENV` | No | `development` | Environment |
+| `APP_HOST` | No | `0.0.0.0` | Server host |
+| `APP_PORT` | No | `8000` | Server port |
+| `MAX_CONVERSATION_HISTORY` | No | `10` | Chat history turns retained |
+| `MAX_SEARCH_RESULTS` | No | `10` | Max grants returned per search |
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | FastAPI, Uvicorn |
+| AI / LLM | OpenAI GPT, LangChain, LangGraph |
+| Vector Store | ChromaDB (default), Pinecone (optional) |
+| Database | MySQL (async via `aiomysql` + `databases`) |
+| Web Scraping | Trafilatura, BeautifulSoup, Requests |
+| Monitoring | LangSmith |
+| Validation | Pydantic v2 |
+
+---
+
+## 🔍 Monitoring
+
+Built-in **LangSmith** integration provides:
+
+- Full trace visibility for every LLM call
+- Token usage and cost tracking
+- Latency profiling per node
+- Debug-level inspection of prompts and completions
+
+Enable by setting `LANGSMITH_TRACING=true` in `.env`.
+
+---
+
+## 🛡️ Security
+
+- All API keys loaded from environment variables — never hardcoded
+- `.gitignore` configured to exclude `.env`, `venv/`, logs, and data stores
+- CORS middleware configurable for production
+
+---
+
+## 🙏 Acknowledgements
+
+- [FastAPI](https://fastapi.tiangolo.com/) — Web framework
+- [LangChain](https://langchain.com/) & [LangGraph](https://langchain-ai.github.io/langgraph/) — AI orchestration
+- [OpenAI](https://openai.com/) — Language models
+- [ChromaDB](https://www.trychroma.com/) — Vector database
+- [LangSmith](https://smith.langchain.com/) — Observability
+
+---
+
+**Built for [The Grant Portal](https://thegrantportal.com)**
