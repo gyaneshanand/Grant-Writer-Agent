@@ -178,9 +178,9 @@
     "id": 13,
     "slug": "is-there-a-way-to",
     "category": "grant_search_usage",
-    "question": "is there a way to filter this portal by just topics?",
-    "answer": "Yes, use the Enter Keyword phrase into the search window",
-    "answer_raw": "Yes, use the Enter Keyword phrase into the search window",
+    "question": "Is there a way to filter this portal by just topics?",
+    "answer": "You can search for grants by Interests, Locations and Eligibilities in the Search For Grants box. You can enter a Keyword. Or just ask me.",
+    "answer_raw": "You can search for grants by Interests, Locations and Eligibilities in the Search For Grants box. You can enter a Keyword. Or just ask me.",
     "links": [],
     "escalation_type": "none",
     "alternate_phrasings": [],
@@ -243,7 +243,7 @@
     "id": 18,
     "slug": "i-want-a-refund-please",
     "category": "cancellation_refund",
-    "question": "I want a refund. Please issue refund.",
+    "question": "How do I get a refund? I want a refund. Please issue refund.",
     "answer": "Per the Terms of Service agreed to and accepted at the time of creating your account and purchasing your subscription, there is a no-refund policy for any paid subscription fees.",
     "answer_raw": "Per the [Terms of Service](https://www.thegrantportal.com/terms-service) agreed to and accepted at the time of creating your account and purchasing your subscription, there is a no-refund policy for any paid subscription fees.",
     "links": [
@@ -431,9 +431,9 @@
     "id": 29,
     "slug": "do-you-have-special-membership",
     "category": "subscription_pricing",
-    "question": "Do you have special membership rates for students? For veterans? Do you offer discounts to nonprofits?",
-    "answer": "The lowest subscription plan is Weekly. Visit https://www.thegrantportal.com/pricing-and-plans",
-    "answer_raw": "The lowest subscription plan is Weekly. Visit <https://www.thegrantportal.com/pricing-and-plans>",
+    "question": "Do you have special membership rates for students? For veterans? Do you offer discounts to nonprofits? Can I get any discount? Is there anyway I can get discount?",
+    "answer": "No, we do not offer discounts for nonprofits. For detailed information on our pricing and plans visit https://www.thegrantportal.com/pricing-and-plans",
+    "answer_raw": "No, we do not offer discounts for nonprofits. For detailed information on our pricing and plans visit <https://www.thegrantportal.com/pricing-and-plans>",
     "links": [
       {
         "text": "pricing-and-plans",
@@ -1383,6 +1383,7 @@
     "intent": "account_support",
     "question": "What is the full refund policy? Can I get a partial refund?",
     "answer": "All subscription fees are non-refundable once access is granted. This includes: no prorated refunds for unused time, no refunds after a renewal payment is processed, and no refunds for partial use or failure to use the service. See the Terms of Service for full details.",
+    "answer_raw": "All subscription fees are non-refundable once access is granted. This includes: no prorated refunds for unused time, no refunds after a renewal payment is processed, and no refunds for partial use or failure to use the service. See the [Terms of Service](https://www.thegrantportal.com/terms-service) for full details.",
     "links": [
       {
         "text": "Terms of Service",
@@ -1486,6 +1487,83 @@
     "question": "Does The Grant Portal send email alerts? How do I receive grant notifications?",
     "answer": "Yes, The Grant Portal sends alerts to email. Create your account and select grant categories of interest to receive email alerts about grants that match your profile.",
     "answer_raw": "Yes, The Grant Portal sends alerts to email. Create your account and select grant categories of interest to receive email alerts about grants that match your profile.",
+    "links": [],
+    "escalation_type": "none"
+  },
+  {
+    "id": 101,
+    "slug": "i-want-a-grant-writer",
+    "category": "grant_writer",
+    "intent": "application_guidance",
+    "question": "I want a grant writer. I need a grant writer. How do I find a grant writer?",
+    "answer": "You can find a grant writer in our Grant Writer directory. However, please note that this directory is only available to active paid subscribers. Once you've subscribed, you will need to purchase the Grant Writer Directory add-on subscription. Then you can contact grant writers directly to discuss their rates and services.",
+    "answer_raw": "You can find a grant writer in our Grant Writer directory. However, please note that this directory is only available to active paid subscribers. Once you've subscribed, you will need to purchase the Grant Writer Directory add-on subscription. Then you can contact grant writers directly to discuss their rates and services.",
+    "links": [],
+    "escalation_type": "none"
+  },
+  {
+    "id": 102,
+    "slug": "how-often-new-grants-added",
+    "category": "general_info",
+    "intent": "product_navigation",
+    "question": "How often are new grants added to the site?",
+    "answer": "New grants are added to the site daily.",
+    "answer_raw": "New grants are added to the site daily.",
+    "links": [],
+    "escalation_type": "none"
+  },
+  {
+    "id": 103,
+    "slug": "can-i-leave-a-review",
+    "category": "general_info",
+    "intent": "other",
+    "question": "Can I leave a review?",
+    "answer": "No, we do not have an option to leave a review on the site.",
+    "answer_raw": "No, we do not have an option to leave a review on the site.",
+    "links": [],
+    "escalation_type": "none"
+  },
+  {
+    "id": 104,
+    "slug": "filter-grants-government-agencies",
+    "category": "grant_search_usage",
+    "intent": "product_navigation",
+    "question": "Is there a way to filter grants from government agencies? Can I search for government grants only?",
+    "answer": "No, but you can try typing the government agency name in the keyword search.",
+    "answer_raw": "No, but you can try typing the government agency name in the keyword search.",
+    "links": [],
+    "escalation_type": "none"
+  },
+  {
+    "id": 105,
+    "slug": "why-do-i-need-to-pay",
+    "category": "subscription_pricing",
+    "intent": "product_navigation",
+    "question": "Why do I need to pay? Why is there a fee?",
+    "answer": "The subscription provides full access to the large catalog of grants. The fee supports the ongoing work required to keep the database current. Subscriptions are The Grant Portal's only source of revenue.",
+    "answer_raw": "The subscription provides full access to the large catalog of grants. The fee supports the ongoing work required to keep the database current. Subscriptions are The Grant Portal's only source of revenue.",
+    "links": [],
+    "escalation_type": "none"
+  },
+  {
+    "id": 106,
+    "slug": "new-nonprofit-looking-for-grant-writer",
+    "category": "grant_writer",
+    "intent": "application_guidance",
+    "question": "Hello, we are a new 501c organization and I'm looking for a grant writer. Not sure how your program works but want any info possible.",
+    "answer": "You can find a grant writer in our Grant Writer directory. Please note that this directory is only available to active paid subscribers. Once you've subscribed, you will need to purchase the Grant Writer Directory add-on subscription. Then you can contact grant writers directly to discuss their rates and services.",
+    "answer_raw": "You can find a grant writer in our Grant Writer directory. Please note that this directory is only available to active paid subscribers. Once you've subscribed, you will need to purchase the Grant Writer Directory add-on subscription. Then you can contact grant writers directly to discuss their rates and services.",
+    "links": [],
+    "escalation_type": "none"
+  },
+  {
+    "id": 107,
+    "slug": "how-do-i-sign-up",
+    "category": "account_login",
+    "intent": "product_navigation",
+    "question": "How do I sign up? How do I create an account?",
+    "answer": "To create an account, click the 'Sign Up' button in the top right of the page and follow the directions. There you can create your profile, select grant interests and location. You'll receive The Grant Alert Newsletter every week.",
+    "answer_raw": "To create an account, click the 'Sign Up' button in the top right of the page and follow the directions. There you can create your profile, select grant interests and location. You'll receive The Grant Alert Newsletter every week.",
     "links": [],
     "escalation_type": "none"
   }

@@ -67,9 +67,9 @@ Sample categories: {list(sample_categories)[:5]}
 
 Guidelines:
 - Confirm what was found (e.g., "I found approximately {total_grants} grants for...")
-- Be conversational and helpful
+- Do not mention the sample titles or categories
 - Do NOT list individual grants
-- Keep it under 50 words total"""
+- Response should be 1 sentence and under 30 words total"""
 
         result = await llm.ainvoke(prompt)
         summary = result.content.strip()
