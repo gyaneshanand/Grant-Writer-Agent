@@ -35,7 +35,7 @@ class ChromaVectorStore(VectorStoreProvider):
             from langchain_chroma import Chroma
             self._vector_store = Chroma(
                 persist_directory=self.persist_directory,
-                embedding_function=OpenAIEmbeddings(),
+                embedding_function=OpenAIEmbeddings(model="text-embedding-3-small"),
             )
         return self._vector_store
 
@@ -126,7 +126,7 @@ class PineconeVectorStore(VectorStoreProvider):
 
             self._vector_store = LangchainPinecone(
                 index=index,
-                embedding=OpenAIEmbeddings(),
+                embedding=OpenAIEmbeddings(model="text-embedding-3-small"),
                 text_key="text",
             )
         return self._vector_store

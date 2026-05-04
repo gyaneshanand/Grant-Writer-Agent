@@ -88,7 +88,7 @@ def ingest(filepath: str = None, clear_existing: bool = False):
     faqs = load_faqs(filepath)
     logger.info(f"Loaded {len(faqs)} FAQs from {filepath or DEFAULT_FAQ_PATH}")
 
-    embeddings = OpenAIEmbeddings()
+    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
     vectorstore = Chroma(
         persist_directory=chatbot_settings.chroma_path,

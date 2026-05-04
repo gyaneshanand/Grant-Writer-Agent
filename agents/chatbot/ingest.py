@@ -100,7 +100,7 @@ def ingest():
     print("\n✂️  Splitting documents...")
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,
-        chunk_overlap=200,
+        chunk_overlap=100,
         add_start_index=True,
     )
     chunks = text_splitter.split_documents(documents)
@@ -114,7 +114,7 @@ def ingest():
     print("\n💾 Saving to ChromaDB...")
     Chroma.from_documents(
         documents=chunks,
-        embedding=OpenAIEmbeddings(),
+        embedding=OpenAIEmbeddings(model="text-embedding-3-small"),
         persist_directory=chroma_path,
     )
 
