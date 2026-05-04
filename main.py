@@ -9,6 +9,7 @@ from api.controllers.data_collection_controller import router as data_collection
 from api.controllers.content_generation_controller import router as content_generation_router
 from api.controllers.pipeline_controller import router as pipeline_router
 from api.controllers.chatbot_controller import router as chatbot_router
+from api.controllers.grant_writer_v2_controller import router as grant_writer_v2_router
 
 # Import LangSmith setup
 from api.config.langsmith_setup import setup_langsmith, log_langsmith_status
@@ -99,6 +100,7 @@ app.include_router(data_collection_router, prefix="/api/v1")
 app.include_router(content_generation_router, prefix="/api/v1")
 app.include_router(pipeline_router, prefix="/api/v1")
 app.include_router(chatbot_router, prefix="/api/v1")
+app.include_router(grant_writer_v2_router, prefix="/api/v1")
 
 @app.get("/", tags=["Health"])
 async def root():

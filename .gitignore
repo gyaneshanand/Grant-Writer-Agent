@@ -57,6 +57,7 @@ htmlcov/
 
 # Project specific
 *.sql
+agents/grant_writer_v2/.cache/
 *.db
 *.sqlite
 *.sqlite3

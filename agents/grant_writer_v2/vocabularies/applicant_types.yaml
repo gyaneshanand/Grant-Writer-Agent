@@ -1,0 +1,41 @@
+# Controlled vocabulary for eligible applicant types.
+
+applicant_types:
+  - id: nonprofit_501c3
+    label: 501(c)(3) Nonprofit
+  - id: nonprofit_other
+    label: Other Nonprofit
+  - id: individual
+    label: Individual
+  - id: student
+    label: Student
+  - id: researcher
+    label: Researcher / Academic
+  - id: artist
+    label: Artist / Creative
+  - id: small_business
+    label: Small Business
+  - id: social_enterprise
+    label: Social Enterprise
+  - id: government
+    label: Government Agency
+  - id: school_k12
+    label: K-12 School or District
+  - id: college_university
+    label: College or University
+  - id: community_organization
+    label: Community Organization
+  - id: faith_based
+    label: Faith-Based Organization
+  - id: tribal
+    label: Tribal Nation / Indigenous Organization
+  - id: hospital_health
+    label: Hospital / Healthcare Organization
+  - id: library
+    label: Library
+  - id: foundation
+    label: Foundation (re-granting)
+  - id: collaboration
+    label: Collaboration / Consortium
+  - id: other
+    label: Other

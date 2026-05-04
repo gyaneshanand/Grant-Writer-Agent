@@ -1,0 +1,35 @@
+# Geography codes used in eligible_geographies / filter_geography_* fields.
+# Stored as ISO 3166-1 alpha-2 (countries) and ISO 3166-2 (US states).
+
+# Geographic scope buckets for filter_geography_scope
+scope_buckets:
+  - id: local
+    label: Local (city/county)
+  - id: state
+    label: State-Wide
+  - id: regional
+    label: Regional (multi-state)
+  - id: national
+    label: National (US)
+  - id: international
+    label: International
+
+# In-scope countries (for Rule 6 geography_valid)
+in_scope_countries:
+  - US   # United States
+  - CA   # Canada
+  - PR   # Puerto Rico (US territory)
+  - GU   # Guam (US territory)
+  - VI   # US Virgin Islands
+  - AS   # American Samoa
+  - MP   # Northern Mariana Islands
+  - INTL # International / Worldwide (treated as in-scope if US/CA are included)
+
+# US State codes (ISO 3166-2:US without the "US-" prefix)
+us_states:
+  - AL - AK - AZ - AR - CA - CO - CT - DE - FL - GA
+  - HI - ID - IL - IN - IA - KS - KY - LA - ME - MD
+  - MA - MI - MN - MS - MO - MT - NE - NV - NH - NJ
+  - NM - NY - NC - ND - OH - OK - OR - PA - RI - SC
+  - SD - TN - TX - UT - VT - VA - WA - WV - WI - WY
+  - DC - PR - GU - VI - AS - MP

@@ -1,0 +1,117 @@
+# Domains that should never be selected as a foundation's official website.
+# Used by Layer 1 blocklist.py to filter SerpAPI candidates.
+
+categories:
+  foundation_directories:
+    description: Aggregator / directory sites that list foundations
+    domains:
+      - guidestar.org
+      - candid.org
+      - charitynavigator.org
+      - causeiq.com
+      - grantwatch.com
+      - grantforward.com
+      - instrumentl.com
+      - foundant.com
+      - foundationlist.org
+      - grantstation.com
+      - philanthropy.com
+      - foundationcenter.org
+      - fconline.foundationcenter.org
+      - nonprofitready.org
+      - grantsgov.us
+      - usaspending.gov
+      - grants.gov
+      - propublica.org
+      - give.org
+      - greatnonprofits.org
+      - nonprofit.explore.org
+      - nptrust.org
+      - boardsource.org
+      - charitywatch.org
+      - efile990.org
+      - grantable.co
+      - taxexemptworld.com
+      - hinchilla.com
+      - zoominfo.com
+      - theshareway.com
+      - kindora.co
+      - impala.digital
+      - grantedai.com
+      - mapquest.com
+      - grantseeker.io
+      - foundationsearch.com
+      - grantsforus.io
+      - fundsforngos.org
+      - grantmakers.io
+      - granthubonline.com
+      - grantselect.com
+      - grantsiren.com
+      - insidephilanthropy.com
+      - historicfunding.com
+      - opengrants.io
+      - grantgopher.com
+      - thegrantscape.com
+      - catholicfundingguide.com
+      - zeffy.com
+      - grantfinder.com
+      - helloalice.com
+      - scholarships.com
+      - nativeforward.org
+      - usgrants.org
+
+  social_media:
+    description: Social media platforms
+    domains:
+      - facebook.com
+      - twitter.com
+      - x.com
+      - linkedin.com
+      - instagram.com
+      - youtube.com
+      - tiktok.com
+
+  news_media:
+    description: News outlets (not official sites)
+    domains:
+      - nytimes.com
+      - washingtonpost.com
+      - wsj.com
+      - forbes.com
+      - bizjournals.com
+      - prnewswire.com
+      - businesswire.com
+      - globenewswire.com
+
+  government_registries:
+    description: IRS / government databases
+    domains:
+      - irs.gov
+      - sec.gov
+      - usa.gov
+      - whitepages.com
+      - yellowpages.com
+
+  legal_filing:
+    description: Legal filing and corporate registry sites
+    domains:
+      - opencorporates.com
+      - dnb.com
+      - bloomberg.com
+      - reuters.com
+
+  wiki:
+    description: User-edited wikis
+    domains:
+      - wikipedia.org
+      - wikimedia.org
+      - en.wikipedia.org
+
+  job_boards:
+    description: Job listing sites
+    domains:
+      - indeed.com
+      - glassdoor.com
+      - idealist.org
+      - workforgood.co.uk
+      - linkedin.com  # also social, already blocked

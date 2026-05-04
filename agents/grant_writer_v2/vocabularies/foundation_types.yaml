@@ -1,0 +1,29 @@
+# Controlled vocabulary for foundation / org types.
+
+foundation_types:
+  - id: private_non_operating
+    label: Private Non-Operating Foundation
+    description: Primarily makes grants to other organizations; does not run its own programs
+  - id: private_operating
+    label: Private Operating Foundation
+    description: Conducts its own programs; may also make grants
+  - id: family_foundation
+    label: Family Foundation
+    description: Funded by and often governed by a family
+  - id: community_foundation
+    label: Community Foundation
+    description: Serves a geographic community; often hosts donor-advised funds
+  - id: corporate_foundation
+    label: Corporate Foundation
+    description: Established and funded by a corporation
+  - id: public_charity
+    label: Public Charity (501c3)
+    description: Broad public support; may include hospitals, universities, nonprofits
+  - id: donor_advised_fund_sponsor
+    label: Donor-Advised Fund Sponsor
+    description: Hosts DAFs; may also run direct grant programs
+  - id: government_foundation
+    label: Government-Affiliated Foundation
+    description: Established by or closely affiliated with a government entity
+  - id: unknown
+    label: Unknown / Not Specified

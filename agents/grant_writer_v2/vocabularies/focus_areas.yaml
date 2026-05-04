@@ -1,0 +1,86 @@
+# Controlled vocabulary for grant program focus areas.
+# LLM outputs must map to one of these ids; unrecognized values trigger needs_review.
+
+focus_areas:
+  - id: arts_culture
+    label: Arts & Culture
+  - id: civil_rights
+    label: Civil Rights & Social Justice
+  - id: community_development
+    label: Community Development
+  - id: disability
+    label: Disability Services
+  - id: disaster_relief
+    label: Disaster Relief & Recovery
+  - id: early_childhood
+    label: Early Childhood Development
+  - id: economic_development
+    label: Economic Development
+  - id: education_k12
+    label: K-12 Education
+  - id: education_higher
+    label: Higher Education
+  - id: education_general
+    label: Education (General)
+  - id: environment
+    label: Environment & Conservation
+  - id: food_security
+    label: Food Security & Hunger
+  - id: health_general
+    label: Health (General)
+  - id: health_mental
+    label: Mental Health
+  - id: health_public
+    label: Public Health
+  - id: housing
+    label: Housing & Homelessness
+  - id: human_services
+    label: Human Services
+  - id: immigration
+    label: Immigration & Refugees
+  - id: indigenous
+    label: Indigenous Communities
+  - id: international
+    label: International Development
+  - id: journalism_media
+    label: Journalism & Media
+  - id: lgbtq
+    label: LGBTQ+ Issues
+  - id: legal_aid
+    label: Legal Aid & Justice
+  - id: literacy
+    label: Literacy & Adult Education
+  - id: philanthropy
+    label: Philanthropy & Nonprofit Capacity
+  - id: public_policy
+    label: Public Policy & Advocacy
+  - id: racial_equity
+    label: Racial Equity & Inclusion
+  - id: religion_faith
+    label: Religion & Faith-Based
+  - id: research_science
+    label: Research & Science
+  - id: rural_development
+    label: Rural Development
+  - id: seniors
+    label: Seniors & Aging
+  - id: social_entrepreneurship
+    label: Social Entrepreneurship
+  - id: stem
+    label: STEM Education
+  - id: substance_abuse
+    label: Substance Abuse & Recovery
+  - id: technology_innovation
+    label: Technology & Innovation
+  - id: veterans
+    label: Veterans & Military Families
+  - id: violence_prevention
+    label: Violence Prevention
+  - id: women_girls
+    label: Women & Girls
+  - id: workforce_development
+    label: Workforce Development
+  - id: youth_development
+    label: Youth Development
+  - id: other
+    label: Other

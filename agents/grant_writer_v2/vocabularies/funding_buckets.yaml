@@ -1,0 +1,28 @@
+# Funding range buckets used for filter_funding_range field.
+# Assigned deterministically from grant_amount_min_usd / grant_amount_max_usd.
+
+funding_buckets:
+  - id: lt_5k
+    label: Under $5,000
+    max_usd: 4999
+  - id: 5k_25k
+    label: $5,000 – $25,000
+    min_usd: 5000
+    max_usd: 25000
+  - id: 25k_100k
+    label: $25,000 – $100,000
+    min_usd: 25001
+    max_usd: 100000
+  - id: 100k_500k
+    label: $100,000 – $500,000
+    min_usd: 100001
+    max_usd: 500000
+  - id: 500k_1m
+    label: $500,000 – $1,000,000
+    min_usd: 500001
+    max_usd: 1000000
+  - id: gt_1m
+    label: Over $1,000,000
+    min_usd: 1000001
+  - id: unspecified
+    label: Amount Not Specified

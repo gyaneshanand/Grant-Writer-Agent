@@ -1,0 +1,25 @@
+# Controlled vocabulary for grant deadline types.
+
+deadline_types:
+  - id: rolling
+    label: Rolling / Ongoing (no fixed deadline)
+  - id: annual
+    label: Annual
+  - id: biannual
+    label: Twice a Year
+  - id: quarterly
+    label: Quarterly
+  - id: monthly
+    label: Monthly
+  - id: biennial
+    label: Biennial (every 2 years)
+  - id: one_time
+    label: One-Time (non-recurring)
+  - id: letter_of_inquiry
+    label: Letter of Inquiry Deadline
+  - id: full_proposal
+    label: Full Proposal Deadline
+  - id: by_invitation
+    label: By Invitation (no public deadline)
+  - id: not_specified
+    label: Not Specified

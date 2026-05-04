@@ -1,0 +1,23 @@
+# Controlled vocabulary for how applicants submit grant applications.
+
+application_methods:
+  - id: online_portal
+    label: Online Portal / Grant Management System
+  - id: email
+    label: Email Submission
+  - id: postal_mail
+    label: Postal Mail
+  - id: loi_first
+    label: Letter of Inquiry (LOI) First
+  - id: phone_inquiry
+    label: Phone Inquiry First
+  - id: in_person
+    label: In-Person Submission
+  - id: fax
+    label: Fax
+  - id: partner_referral
+    label: Partner / Referral Required
+  - id: invitation_only
+    label: Invitation Only (no open application)
+  - id: other
+    label: Other

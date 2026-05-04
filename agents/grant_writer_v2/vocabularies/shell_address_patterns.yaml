@@ -1,0 +1,46 @@
+# Known shell / administrative address patterns.
+# Foundations using these addresses are real but use a third-party admin service.
+# This reduces L1 confidence (address match is unreliable) but does NOT disqualify.
+
+shell_address_patterns:
+  - id: foundation_source
+    label: Foundation Source
+    patterns:
+      - "501 silverside"
+      - "foundation source"
+      - "foundationsource"
+  - id: ncf
+    label: National Christian Foundation
+    patterns:
+      - "11625 rainwater"
+      - "national christian foundation"
+  - id: schwab_charitable
+    label: Schwab Charitable
+    patterns:
+      - "schwab charitable"
+      - "211 main street"  # Schwab San Francisco
+  - id: fidelity_charitable
+    label: Fidelity Charitable
+    patterns:
+      - "fidelity charitable"
+      - "100 summer street"  # Fidelity Boston
+  - id: vanguard_charitable
+    label: Vanguard Charitable
+    patterns:
+      - "vanguard charitable"
+      - "po box 7669"
+  - id: renaissance_admin
+    label: Renaissance Administration
+    patterns:
+      - "renaissance administration"
+      - "8910 purdue"
+  - id: donors_trust
+    label: DonorsTrust
+    patterns:
+      - "donors trust"
+      - "1800 diagonal"
+  - id: impact_assets
+    label: ImpactAssets
+    patterns:
+      - "impactassets"
+      - "1 alhambra plaza"
