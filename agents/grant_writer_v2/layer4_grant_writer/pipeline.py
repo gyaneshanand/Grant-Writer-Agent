@@ -40,7 +40,10 @@ async def run(foundation: FoundationInput) -> Layer4Output:
     try:
         # 1. Check prereq
         row = await sql_one(
-            "SELECT v2_layer2_rollup_verdict, v2_layer2_status, v2_mission FROM foundations WHERE ein = :ein",
+            """SELECT v2_layer2_rollup_verdict, v2_layer2_status,
+                      v2_mission, v2_about, v2_geography_served, v2_focus_areas,
+                      v2_foundation_type, v2_layer1_url
+               FROM foundations WHERE ein = :ein""",
             {"ein": ein},
         )
         if not row or not row["v2_layer2_status"]:
@@ -55,6 +58,19 @@ async def run(foundation: FoundationInput) -> Layer4Output:
             return output
 
         mission = row["v2_mission"] or ""
+        about = row["v2_about"] or ""
+        foundation_type = row["v2_foundation_type"] or ""
+        base_url = row["v2_layer1_url"] or ""
+
+        # Parse JSON fields from DB
+        try:
+            geography_served = json.loads(row["v2_geography_served"]) if row["v2_geography_served"] else ""
+        except Exception:
+            geography_served = row["v2_geography_served"] or ""
+        try:
+            focus_areas = json.loads(row["v2_focus_areas"]) if row["v2_focus_areas"] else []
+        except Exception:
+            focus_areas = []
 
         # 2. Load VALID program verdicts from DB
         verdict_rows = await sql_all(
@@ -99,7 +115,19 @@ async def run(foundation: FoundationInput) -> Layer4Output:
             except Exception as e:
                 logger.error(f"[L4] extraction error for {verdict.program_name}: {e}")
 
-        # 5. Consolidate
+        # 5. Consolidate — load contact info from L3 org profile if available
+        org_contact: dict = {}
+        try:
+            contact_row = await sql_one(
+                "SELECT v2_contact FROM foundations WHERE ein = :ein",
+                {"ein": ein},
+            )
+            if contact_row and contact_row["v2_contact"]:
+                raw = contact_row["v2_contact"]
+                org_contact = json.loads(raw) if isinstance(raw, str) else raw
+        except Exception as e:
+            logger.warning(f"[L4] could not load contact info for {ein}: {e}")
+
         cost_so_far = get_run_cost(run_id)
         consolidated = await consolidate(
             programs=records,
@@ -109,6 +137,11 @@ async def run(foundation: FoundationInput) -> Layer4Output:
             ein=ein,
             run_id=run_id,
             budget_usd=max(0.10, LAYER4_BUDGET_USD - cost_so_far),
+            about=about,
+            geography_served=geography_served,
+            focus_areas=focus_areas,
+            foundation_type=foundation_type,
+            contact=org_contact or None,
         )
 
         cost_usd = get_run_cost(run_id)

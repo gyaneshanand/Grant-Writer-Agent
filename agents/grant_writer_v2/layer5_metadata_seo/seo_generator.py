@@ -20,16 +20,20 @@ async def generate_seo(
     eligibility_summary: str,
     ein: str,
     run_id: str,
-    budget_usd: float = 0.02,
+    consolidated_description: str = "",
+    budget_usd: float = 0.05,
 ) -> dict[str, str]:
-    """Returns dict with 5 SEO fields. Falls back to truncated program_name on failure."""
+    """
+    Returns dict with 6 SEO fields including opportunity_teaser (~500 words).
+    Primary input is the consolidated_description from L4; structured fields supplement it.
+    Falls back to minimal values on failure.
+    """
     user_msg = SEO_USER.format(
-        org_name=org_name,
-        program_name=program_name,
         focus_areas=", ".join(focus_areas[:5]) or "General",
         grant_amount=grant_amount or "Not specified",
         deadline=deadline or "Not specified",
-        eligibility_summary=eligibility_summary[:300] if eligibility_summary else "Not specified",
+        eligibility_summary=eligibility_summary[:400] if eligibility_summary else "Not specified",
+        consolidated_description=consolidated_description[:6000] if consolidated_description else "Not specified",
     )
     try:
         resp = await chat(
@@ -42,7 +46,7 @@ async def generate_seo(
             layer="layer5",
             run_id=run_id,
             budget_usd=budget_usd,
-            max_tokens=400,
+            max_tokens=1200,  # ~500-word teaser + 5 short fields
             temperature=0.2,
             response_format={"type": "json_object"},
         )
@@ -52,7 +56,8 @@ async def generate_seo(
         return {
             "opportunity_title": program_name[:70],
             "h1_tag": program_name[:60],
-            "meta_title": f"{program_name[:45]} | {org_name[:12]}",
-            "meta_description": f"Learn about the {program_name} grant from {org_name}.",
-            "opportunity_title_for_subscriber": f"New Grant: {program_name[:130]}",
+            "meta_title": program_name[:60],
+            "meta_description": f"Grant opportunity for {', '.join(focus_areas[:2]) or 'nonprofits'}.",
+            "opportunity_teaser": "",
+            "opportunity_title_for_subscriber": f"Grant Opportunity: {program_name[:130]}",
         }

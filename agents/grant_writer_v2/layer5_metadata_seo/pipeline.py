@@ -48,6 +48,13 @@ async def run(foundation: FoundationInput) -> Layer5Output:
                                      cost_usd=0.0, duration_ms=output.processing_ms)
             return output
 
+        # Load consolidated description from L4 (primary input for SEO generation)
+        desc_row = await sql_one(
+            "SELECT v2_layer4_consolidated_description FROM foundations WHERE ein = :ein",
+            {"ein": ein},
+        )
+        consolidated_description = (desc_row["v2_layer4_consolidated_description"] or "") if desc_row else ""
+
         # Load programs
         programs = await sql_all(
             """SELECT program_id, program_name, eligible_focus_areas, grant_amount_freeform,
@@ -89,7 +96,7 @@ async def run(foundation: FoundationInput) -> Layer5Output:
 
             focus_areas = _safe(prog.get("eligible_focus_areas"))
 
-            # Generate SEO
+            # Generate SEO — primary input is the L4 consolidated description
             seo = await generate_seo(
                 program_name=prog["program_name"],
                 org_name=foundation.org_name,
@@ -99,7 +106,8 @@ async def run(foundation: FoundationInput) -> Layer5Output:
                 eligibility_summary=prog.get("eligibility_criteria") or "",
                 ein=ein,
                 run_id=run_id,
-                budget_usd=0.02,
+                consolidated_description=consolidated_description,
+                budget_usd=0.05,
             )
 
             # Generate slug
@@ -186,6 +194,7 @@ async def _persist_program(
               h1_tag                            = :h1_tag,
               meta_title                        = :meta_title,
               meta_description                  = :meta_description,
+              opportunity_teaser                = :opportunity_teaser,
               opportunity_title_for_subscriber  = :opportunity_title_for_subscriber,
               filter_focus_areas                = :filter_focus_areas,
               filter_applicant_types            = :filter_applicant_types,
@@ -208,7 +217,8 @@ async def _persist_program(
                 "opportunity_title": seo.get("opportunity_title", "")[:70],
                 "h1_tag": seo.get("h1_tag", "")[:60],
                 "meta_title": seo.get("meta_title", "")[:60],
-                "meta_description": seo.get("meta_description", "")[:160],
+                "meta_description": seo.get("meta_description", "")[:150],
+                "opportunity_teaser": seo.get("opportunity_teaser", ""),
                 "opportunity_title_for_subscriber": seo.get("opportunity_title_for_subscriber", "")[:150],
                 **filters,
                 "search_blob": search_blob[:65535],

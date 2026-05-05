@@ -123,6 +123,7 @@ async def _persist(foundation: FoundationInput, profile) -> None:
               v2_geography_served        = :geography_served,
               v2_annual_giving_usd       = :annual_giving_usd,
               v2_total_assets_usd        = :total_assets_usd,
+              v2_contact                 = :contact,
               v2_layer3_status           = 'completed',
               v2_layer3_processed_at     = NOW(),
               v2_pipeline_status         = 'layer3_done'
@@ -138,6 +139,7 @@ async def _persist(foundation: FoundationInput, profile) -> None:
                 "geography_served": json.dumps(profile.geography_served_detail or ""),
                 "annual_giving_usd": profile.annual_giving_usd,
                 "total_assets_usd": profile.total_assets_usd,
+                "contact": json.dumps(profile.contact.model_dump() if profile.contact else {}),
             },
         )
     except Exception as e:
