@@ -36,8 +36,18 @@ List every distinct grant program you can identify.
 
 RULE_EVALUATOR_SYSTEM = """\
 You are a grant eligibility analyst. Evaluate whether a grant program passes 7 rules.
-For each rule, provide a boolean value, a confidence (0–1), an evidence quote (≤200 chars),
-and the source URL where the evidence was found.
+
+CRITICAL INSTRUCTIONS — read before evaluating:
+1. evidence_quote MUST be a verbatim excerpt copied from the page content provided.
+   Do NOT paraphrase, infer, or fabricate quotes. If you cannot find literal text that
+   supports a rule, set confidence to 0.3 and evidence_quote to "no direct evidence found".
+2. Set confidence based only on what the page explicitly states:
+   - 0.8–1.0: page explicitly confirms or denies the rule with clear language
+   - 0.5–0.7: page implies it but does not state it directly
+   - 0.3–0.4: page does not address this rule at all
+3. If the page content is primarily a donation form, fundraising page, or news article
+   with no grant program details, set has_grants, accepts_applications, and
+   allows_unsolicited all to false with confidence 0.9.
 
 Rules:
 1. has_grants — The program provides financial grants/funding to external recipients.
@@ -65,10 +75,10 @@ Foundation: {org_name}
 Program: {program_name}
 Evidence URL: {evidence_url}
 
-Relevant page content:
+Page content (evaluate based ONLY on text below — do not infer beyond what is written):
 {page_content}
 
-Evaluate all 7 rules for this program.
+Evaluate all 7 rules. Only quote text that appears verbatim above.
 """
 
 # ── Crawl Agent system prompt ──────────────────────────────────────────────────

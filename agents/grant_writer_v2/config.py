@@ -24,7 +24,7 @@ class V2Settings(BaseSettings):
     V2_MODEL_LAYER1_RERANKER: str = os.getenv("V2_MODEL_LAYER1_RERANKER", "openai/gpt-4o-mini")
     V2_MODEL_LAYER2_AGENT: str = os.getenv("V2_MODEL_LAYER2_AGENT", "anthropic/claude-sonnet-4")
     V2_MODEL_LAYER2_PROGRAM_IDENTIFIER: str = os.getenv("V2_MODEL_LAYER2_PROGRAM_IDENTIFIER", "openai/gpt-4o")
-    V2_MODEL_LAYER2_RULE_EVALUATOR: str = os.getenv("V2_MODEL_LAYER2_RULE_EVALUATOR", "openai/gpt-4o-mini")
+    V2_MODEL_LAYER2_RULE_EVALUATOR: str = os.getenv("V2_MODEL_LAYER2_RULE_EVALUATOR", "openai/gpt-4.1-mini")
     V2_MODEL_LAYER3_EXTRACTOR: str = os.getenv("V2_MODEL_LAYER3_EXTRACTOR", "openai/gpt-4o-mini")
     V2_MODEL_LAYER4_PER_PROGRAM: str = os.getenv("V2_MODEL_LAYER4_PER_PROGRAM", "openai/gpt-4o")
     V2_MODEL_LAYER4_CONSOLIDATOR: str = os.getenv("V2_MODEL_LAYER4_CONSOLIDATOR", "openai/gpt-4o-mini")

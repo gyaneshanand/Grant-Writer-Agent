@@ -110,7 +110,8 @@ async def evaluate_program(
         rules = _default_rules()
 
     # Determine verdict
-    if rules.all_pass(confidence_threshold=0.6):
+    # all_pass threshold raised to 0.7 — requires explicit page evidence, not inference
+    if rules.all_pass(confidence_threshold=0.7):
         verdict = "VALID"
     elif rules.any_fail_hard(confidence_threshold=0.8):
         verdict = "INVALID"
