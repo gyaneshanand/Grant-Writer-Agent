@@ -1,12 +1,9 @@
 """
-Async HTTP client with retry logic and on-disk content cache.
+Async HTTP client with retry logic.
 Used by Layer 1 (SerpAPI) and Layer 2 (page fetching).
+Every fetch goes to the network — no on-disk caching, by design (accuracy > cost).
 """
 import asyncio
-import hashlib
-import json
-import os
-from pathlib import Path
 from typing import Optional
 
 import httpx
@@ -15,9 +12,6 @@ from agents.grant_writer_v2.config import v2_settings
 from agents.grant_writer_v2.core.logger import get_logger
 
 logger = get_logger("http")
-
-_CACHE_DIR = Path(v2_settings.CACHE_DIR)
-_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 _HEADERS = {
     "User-Agent": (
@@ -30,56 +24,23 @@ _HEADERS = {
 }
 
 
-def _cache_path(key: str) -> Path:
-    return _CACHE_DIR / f"{key}.json"
-
-
-def _cache_get(key: str) -> Optional[dict]:
-    p = _cache_path(key)
-    if p.exists():
-        try:
-            return json.loads(p.read_text())
-        except Exception:
-            pass
-    return None
-
-
-def _cache_set(key: str, data: dict) -> None:
-    try:
-        _cache_path(key).write_text(json.dumps(data))
-    except Exception as e:
-        logger.warning(f"Cache write failed for {key}: {e}")
-
-
-def url_cache_key(url: str) -> str:
-    return hashlib.sha256(url.encode()).hexdigest()[:32]
-
-
 async def fetch(
     url: str,
     *,
-    use_cache: bool = True,
     timeout: Optional[int] = None,
     headers: Optional[dict] = None,
 ) -> dict:
     """
     Fetch a URL. Returns dict with keys:
-      url, status_code, content_type, text, bytes_fetched, from_cache, error
+      url, status_code, content_type, text, bytes_fetched, error
+      (plus pdf_b64 for PDFs, _raw_bytes for the raw response body)
     """
-    key = url_cache_key(url)
-    if use_cache:
-        cached = _cache_get(key)
-        if cached:
-            cached["from_cache"] = True
-            return cached
-
     result = {
         "url": url,
         "status_code": 0,
         "content_type": "",
         "text": "",
         "bytes_fetched": 0,
-        "from_cache": False,
         "error": None,
     }
 
@@ -95,19 +56,16 @@ async def fetch(
                 result["content_type"] = resp.headers.get("content-type", "")
                 result["bytes_fetched"] = len(content)
 
-                # Decode text for HTML; keep raw bytes ref for PDFs
                 if "text" in result["content_type"] or "html" in result["content_type"]:
                     result["text"] = content.decode("utf-8", errors="replace")
                 elif "pdf" in result["content_type"]:
-                    # Store base64 for PDF bytes so it can be cached as JSON
                     import base64
                     result["text"] = ""
                     result["pdf_b64"] = base64.b64encode(content).decode()
+                    result["_raw_bytes"] = content
                 else:
                     result["text"] = content.decode("utf-8", errors="replace")
 
-                if use_cache and resp.status_code == 200:
-                    _cache_set(key, result)
                 return result
 
         except httpx.TimeoutException:
@@ -138,19 +96,21 @@ def _is_js_rendered(result: dict) -> bool:
     if href_count <= 5:
         return True
 
-    # Check stripped text ratio
+    # Check stripped text ratio — a page with >50KB raw but <2000 chars of readable
+    # text is a JS-rendered SPA shell. 300 chars was too low and missed sites like
+    # thejamesfoundation.org (124KB raw, 828 chars stripped nav + quotes).
     raw_len = len(text)
     if raw_len > 50_000:
         stripped = _re.sub(r'<(script|style)[^>]*>.*?</(script|style)>', ' ', text, flags=_re.DOTALL | _re.IGNORECASE)
         stripped = _re.sub(r'<[^>]+>', ' ', stripped)
         stripped = _re.sub(r'\s+', ' ', stripped).strip()
-        if len(stripped) < 300:
+        if len(stripped) < 2_000:
             return True
 
     return False
 
 
-async def fetch_via_jina(url: str, *, use_cache: bool = True) -> dict:
+async def fetch_via_jina(url: str) -> dict:
     """
     Fetch a URL via Jina Reader API (https://r.jina.ai/), which renders JS and
     returns clean markdown text. Used as fallback for JS-rendered sites.
@@ -159,17 +119,10 @@ async def fetch_via_jina(url: str, *, use_cache: bool = True) -> dict:
     api_key = _s.JINA_API_KEY
     if not api_key:
         return {"url": url, "status_code": 0, "text": "", "bytes_fetched": 0,
-                "content_type": "text/markdown", "from_cache": False,
+                "content_type": "text/markdown",
                 "error": "JINA_API_KEY not configured", "via_jina": True}
 
     jina_url = f"https://r.jina.ai/{url}"
-    cache_key = "jina_" + url_cache_key(url)
-
-    if use_cache:
-        cached = _cache_get(cache_key)
-        if cached:
-            cached["from_cache"] = True
-            return cached
 
     result = {
         "url": url,
@@ -177,7 +130,6 @@ async def fetch_via_jina(url: str, *, use_cache: bool = True) -> dict:
         "content_type": "text/markdown",
         "text": "",
         "bytes_fetched": 0,
-        "from_cache": False,
         "error": None,
         "via_jina": True,
     }
@@ -198,8 +150,6 @@ async def fetch_via_jina(url: str, *, use_cache: bool = True) -> dict:
                 text = resp.text
                 result["text"] = text
                 result["bytes_fetched"] = len(text.encode())
-                if use_cache:
-                    _cache_set(cache_key, result)
             else:
                 result["error"] = f"Jina returned {resp.status_code}"
     except Exception as e:

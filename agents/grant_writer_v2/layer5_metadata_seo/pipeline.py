@@ -37,7 +37,7 @@ async def run(foundation: FoundationInput) -> Layer5Output:
             "SELECT v2_layer4_status FROM foundations WHERE ein = :ein",
             {"ein": ein},
         )
-        if not row or row.get("v2_layer4_status") != "completed":
+        if not row or row["v2_layer4_status"] != "completed":
             output = Layer5Output(
                 ein=ein, status="error_no_layer4",
                 error="prerequisite_missing: layer4 has not completed for this EIN",
@@ -75,7 +75,8 @@ async def run(foundation: FoundationInput) -> Layer5Output:
         enriched_count = 0
 
         import json
-        for prog in programs:
+        for _prog in programs:
+            prog = dict(_prog)  # databases Record → plain dict
             def _safe(val):
                 if not val:
                     return []

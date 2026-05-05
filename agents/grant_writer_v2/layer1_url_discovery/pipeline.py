@@ -85,6 +85,33 @@ async def run(foundation: FoundationInput) -> Layer1Output:
 
     best_candidate, best_conf, best_signals = scored[0]
 
+    # Fallback when primary candidates are noise (all score below the rerank gray band).
+    # Common case: SerpAPI's primary query returns only aggregators and they get blocklisted,
+    # leaving 1–2 low-quality stragglers (radaris, etc.) that score < 0.35.
+    if best_conf < MIN_CONFIDENCE:
+        fallback_query = build_fallback_query(foundation.org_name, foundation.state)
+        logger.info(f"[L1] {ein} — best primary candidate conf {best_conf:.2f} below threshold, trying fallback: {fallback_query}")
+        try:
+            serp2 = await search(fallback_query)
+            fb_cands = classifier.extract_candidates(serp2)
+            fb_valid = [c for c in fb_cands if not c.blocklisted]
+            if fb_valid:
+                fb_scored = []
+                for c in fb_valid:
+                    cc, ss = verifier.score(c, foundation)
+                    c.verifier_score = cc
+                    c.verifier_signals = ss
+                    fb_scored.append((c, cc, ss))
+                fb_scored.sort(key=lambda x: x[1], reverse=True)
+                if fb_scored[0][1] > best_conf:
+                    candidates = candidates + fb_cands  # keep both audits
+                    valid = fb_valid
+                    scored = fb_scored
+                    best_candidate, best_conf, best_signals = scored[0]
+                    query = fallback_query
+        except Exception as e:
+            logger.warning(f"[L1] {ein} — fallback SerpAPI error: {e}")
+
     # 4. LLM reranker for gray band
     llm_used = False
     llm_reasoning = None
@@ -124,11 +151,17 @@ async def run(foundation: FoundationInput) -> Layer1Output:
     status = "accepted_kg" if best_candidate.snippet == "Knowledge Graph result" else \
              "accepted_llm" if llm_used else "accepted_verifier"
 
+    # Normalize final URL to root domain — L2 should crawl from homepage, not a deep page
+    # (SerpAPI sometimes returns /privacy-policy/, /contact/, etc. as top result)
+    from urllib.parse import urlparse
+    parsed_final = urlparse(best_candidate.url)
+    final_url = f"{parsed_final.scheme}://{parsed_final.netloc}/"
+
     kg = serp.get("knowledge_graph", {})
     output = Layer1Output(
         ein=ein,
         status=status,
-        url=best_candidate.url,
+        url=final_url,
         confidence=best_conf,
         method=status,
         evidence=best_candidate.snippet[:300],

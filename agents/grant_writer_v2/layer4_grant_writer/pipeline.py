@@ -43,7 +43,7 @@ async def run(foundation: FoundationInput) -> Layer4Output:
             "SELECT v2_layer2_rollup_verdict, v2_layer2_status, v2_mission FROM foundations WHERE ein = :ein",
             {"ein": ein},
         )
-        if not row or not row.get("v2_layer2_status"):
+        if not row or not row["v2_layer2_status"]:
             output = Layer4Output(
                 ein=ein, status="error_no_layer2",
                 error="prerequisite_missing: layer2 has not completed for this EIN",
@@ -54,7 +54,7 @@ async def run(foundation: FoundationInput) -> Layer4Output:
                                      cost_usd=0.0, duration_ms=output.processing_ms)
             return output
 
-        mission = row.get("v2_mission") or ""
+        mission = row["v2_mission"] or ""
 
         # 2. Load VALID program verdicts from DB
         verdict_rows = await sql_all(
@@ -135,13 +135,15 @@ def _ms(start: float) -> int:
     return int((time.monotonic() - start) * 1000)
 
 
-def _rows_to_verdicts(ein: str, rows: list[dict]) -> list[GrantProgramVerdict]:
+def _rows_to_verdicts(ein: str, rows) -> list[GrantProgramVerdict]:
     verdicts = []
-    for r in rows:
+    for _r in rows:
+        # databases returns Record objects — convert to plain dict for .get() access
+        r = dict(_r)
         rules = None
         if r.get("rules_json"):
             try:
-                rules_data = json.loads(r["rules_json"])
+                rules_data = json.loads(r["rules_json"]) if isinstance(r["rules_json"], str) else r["rules_json"]
                 default_rule = RuleEvaluation(value=False, confidence=0.0)
                 rules = SixRuleResult(
                     has_grants=RuleEvaluation(**rules_data.get("has_grants", {})) if rules_data.get("has_grants") else default_rule,

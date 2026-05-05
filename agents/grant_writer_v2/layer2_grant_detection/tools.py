@@ -107,14 +107,19 @@ def make_tools(state_ref: dict[str, Any]):
         text = result.get("text", "")
         bytes_len = result.get("bytes_fetched", len(text.encode()))
 
-        # Jina fallback: if primary fetch returned JS-rendered shell (< 5 hrefs), use Jina Reader
-        if _is_js_rendered(result) and v2_settings.JINA_API_KEY:
+        # Jina fallback: use Jina Reader if:
+        # 1. This page is JS-rendered (thin stripped content vs large raw HTML), OR
+        # 2. A previous page on this same site was already Jina-fetched — i.e. the whole
+        #    site is a JS SPA and all its pages need Jina (tracked via state_ref["site_is_js"])
+        site_is_js = state_ref.get("site_is_js", False)
+        if (site_is_js or _is_js_rendered(result)) and v2_settings.JINA_API_KEY:
             logger.info(f"[L2] JS-rendered page detected at {url}, falling back to Jina Reader")
             jina_result = await fetch_via_jina(url)
             if not jina_result.get("error") and jina_result.get("text"):
                 text = jina_result["text"]
                 bytes_len = jina_result.get("bytes_fetched", len(text.encode()))
                 content_type = "text/markdown"
+                state_ref["site_is_js"] = True  # mark entire site as JS-rendered
                 logger.info(f"[L2] Jina Reader returned {len(text)} chars for {url}")
             else:
                 logger.warning(f"[L2] Jina fallback failed for {url}: {jina_result.get('error')}")
@@ -195,8 +200,9 @@ def make_tools(state_ref: dict[str, Any]):
                         entry["content_type"] = "text/markdown"
                         break
                 state_ref["corpus"] = corpus
-                # Re-run link extraction on Jina markdown (uses markdown link syntax)
-                md_link_pattern = re.compile(r'\[([^\]]+)\]\((/[^\)]+)\)', re.IGNORECASE)
+                # Re-run link extraction on Jina markdown.
+                # Match both relative paths (/path) and absolute URLs (https://...).
+                md_link_pattern = re.compile(r'\[([^\]]+)\]\(((?:https?://|/)[^\)]+)\)', re.IGNORECASE)
                 md_links = md_link_pattern.findall(jina_text)
                 for label, href in md_links:
                     absolute = urljoin(effective_base, href)
@@ -249,7 +255,7 @@ def make_tools(state_ref: dict[str, Any]):
         if url in visited:
             return f"[ALREADY_FETCHED] {url}"
 
-        result = await http_fetch(url, use_cache=True)
+        result = await http_fetch(url)
 
         if result.get("error"):
             return f"[ERROR] {url}: {result['error']}"

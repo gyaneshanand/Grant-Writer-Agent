@@ -121,17 +121,28 @@ async def run(foundation: FoundationInput) -> Layer2Output:
         rollup_str, valid_count, total_count = aggregate(verdicts)
 
         pages = final_state.get("pages_fetched", 0)
+        # Corpus tells us what was actually crawled (vs. fetch_page error returns
+        # which don't add to pages_fetched).
+        corpus_pages = len(final_state.get("corpus", []))
+
         if not verdicts and pages == 0:
             status = "needs_review"
             stop_reason = "bot_protected"
             rollup_str = "UNKNOWN_BOT_PROTECTED"
-        elif not verdicts and pages < 3:
-            # Fetched too few pages to be confident — likely JS-rendered site
+        elif not verdicts and corpus_pages == 1 and pages == 1:
+            # Exactly one page in corpus AND no extra successful fetches → JS-rendered
+            # SPA shell that we couldn't get past, or a static one-page site with no
+            # grant content. Either way, mark for human review (not INVALID — we don't
+            # know whether the foundation gives grants because we couldn't see enough).
             status = "needs_review"
             stop_reason = "insufficient_crawl"
             rollup_str = "UNKNOWN_JS_RENDERED"
         elif not verdicts:
+            # Multiple pages were crawled but the program identifier found nothing —
+            # this is a real "no grant programs on the site" verdict.
             status = "rejected_no_programs"
+            stop_reason = stop_reason if stop_reason else "completed"
+            rollup_str = "INVALID"
         elif stop_reason not in ("completed", ""):
             status = "needs_review"
         else:
@@ -169,6 +180,15 @@ async def _persist(
 ) -> None:
     ein = foundation.ein
 
+    # The DB column is an ENUM(VALID, NEEDS_REVIEW, INVALID, ERROR).
+    # Map descriptive UNKNOWN_* rollups to NEEDS_REVIEW for storage —
+    # the descriptive value still rides on output.rollup_verdict in the API response
+    # and on output.stop_reason / v2_layer2_stop_reason for diagnostics.
+    _DB_ROLLUP_MAP = {"VALID", "NEEDS_REVIEW", "INVALID", "ERROR"}
+    rollup_for_db = output.rollup_verdict
+    if rollup_for_db and rollup_for_db not in _DB_ROLLUP_MAP:
+        rollup_for_db = "NEEDS_REVIEW"
+
     # Update foundations rollup columns
     try:
         await sql_exec(
@@ -187,7 +207,7 @@ async def _persist(
             {
                 "ein": ein,
                 "status": output.status,
-                "rollup": output.rollup_verdict,
+                "rollup": rollup_for_db,
                 "valid_count": output.valid_program_count,
                 "total_count": output.total_program_count,
                 "stop_reason": output.stop_reason,

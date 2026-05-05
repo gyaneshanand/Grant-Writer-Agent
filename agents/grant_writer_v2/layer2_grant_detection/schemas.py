@@ -33,6 +33,10 @@ class GraphState(TypedDict):
     stop_reason: str                # completed | max_iterations | max_pages | max_bytes | max_cost | error
     error: Optional[str]
 
+    # how-many nudges have been issued in this run (we re-prompt the agent up to N times
+    # when it stops with 0 tool calls but unvisited grant URLs are available).
+    nudge_count: int
+
 
 # ── Pipeline output ────────────────────────────────────────────────────────────
 

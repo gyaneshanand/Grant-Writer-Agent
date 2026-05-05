@@ -37,7 +37,7 @@ async def run(foundation: FoundationInput) -> Layer3Output:
             "SELECT v2_layer2_status, v2_layer1_url FROM foundations WHERE ein = :ein",
             {"ein": ein},
         )
-        if not row or not row.get("v2_layer2_status"):
+        if not row or not row["v2_layer2_status"]:
             output = Layer3Output(
                 ein=ein, status="error_no_layer2",
                 error="prerequisite_missing: layer2 has not completed for this EIN",
@@ -48,7 +48,7 @@ async def run(foundation: FoundationInput) -> Layer3Output:
                                      cost_usd=0.0, duration_ms=output.processing_ms)
             return output
 
-        base_url = row.get("v2_layer1_url", "")
+        base_url = row["v2_layer1_url"] or ""
 
         # 2. Load corpus
         corpus = load_corpus(ein)
@@ -134,8 +134,8 @@ async def _persist(foundation: FoundationInput, profile) -> None:
                 "mission": profile.mission,
                 "about": profile.about,
                 "foundation_type": profile.foundation_type,
-                "focus_areas": json.dumps(profile.focus_areas),
-                "geography_served": profile.geography_served_detail,
+                "focus_areas": json.dumps(profile.focus_areas or []),
+                "geography_served": json.dumps(profile.geography_served_detail or ""),
                 "annual_giving_usd": profile.annual_giving_usd,
                 "total_assets_usd": profile.total_assets_usd,
             },

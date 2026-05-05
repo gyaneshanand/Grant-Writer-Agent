@@ -18,17 +18,36 @@ logger = get_logger("layer3.extractor")
 
 MAX_CONTENT_CHARS = 40_000
 # Extra paths to try if corpus is thin
-ABOUT_PATHS = ["/about", "/about-us", "/mission", "/who-we-are", "/overview"]
+# Paths to try for org profile enrichment, in priority order.
+# Homepage is always tried first; about/mission paths follow.
+ENRICHMENT_PATHS = [
+    "",             # homepage (base_url itself)
+    "/about",
+    "/about-us",
+    "/mission",
+    "/who-we-are",
+    "/overview",
+    "/our-story",
+    "/history",
+]
+
+
+def _strip_html(html: str) -> str:
+    import re
+    s = re.sub(r'<(script|style)[^>]*>.*?</(script|style)>', ' ', html, flags=re.DOTALL | re.IGNORECASE)
+    s = re.sub(r'<[^>]+>', ' ', s)
+    return re.sub(r'\s+', ' ', s).strip()
 
 
 def _build_content(corpus: list[dict], base_url: str) -> tuple[str, list[str]]:
-    """Build text content from corpus entries. Returns (content, source_pages)."""
+    """Build stripped text content from corpus entries. Returns (content, source_pages)."""
     parts = []
     source_pages = []
     total = 0
     for page in corpus:
         url = page.get("url", "")
-        text = page.get("text", "")[:6000]
+        raw = page.get("text", "")
+        text = _strip_html(raw)[:8000]
         chunk = f"--- {url} ---\n{text}\n"
         if total + len(chunk) > MAX_CONTENT_CHARS:
             break
@@ -38,17 +57,25 @@ def _build_content(corpus: list[dict], base_url: str) -> tuple[str, list[str]]:
     return "\n".join(parts), source_pages
 
 
-async def _fetch_about_pages(base_url: str, visited_urls: set[str]) -> list[dict]:
-    """Try common about/mission paths and return fetched corpus entries."""
+async def _enrich_corpus(base_url: str, visited_urls: set[str]) -> list[dict]:
+    """
+    Fetch homepage + common about/mission paths not already in the L2 corpus.
+    Returns up to 3 additional pages so L3 has enough org profile content even
+    for single-page sites where L2 only crawled grant-specific pages.
+    """
     extra = []
-    for path in ABOUT_PATHS:
-        url = base_url.rstrip("/") + path
+    base = base_url.rstrip("/")
+    for path in ENRICHMENT_PATHS:
+        if len(extra) >= 3:
+            break
+        url = base + path if path else base + "/"
         if url in visited_urls:
             continue
         result = await fetch(url)
         if not result.get("error") and result.get("text"):
-            extra.append({"url": url, "text": result["text"], "source": "layer3_about_fetch"})
-            break  # one good about page is enough
+            logger.info(f"[L3] enriched corpus with {url} ({len(result['text'])} chars)")
+            extra.append({"url": url, "text": result["text"], "source": "layer3_enrich"})
+            visited_urls.add(url)
     return extra
 
 
@@ -62,10 +89,10 @@ async def extract(
     """Extract OrgProfile from corpus. Returns None on hard failure."""
     visited = {p.get("url", "") for p in corpus}
 
-    # Augment with about pages if corpus is thin
-    if len(corpus) < 3:
-        extra = await _fetch_about_pages(base_url, visited)
-        corpus = corpus + extra
+    # Always enrich — homepage + about pages may not have been crawled by L2
+    # (L2 focuses on grant pages; L3 needs org identity/mission content).
+    extra = await _enrich_corpus(base_url, visited)
+    corpus = corpus + extra
 
     content, source_pages = _build_content(corpus, base_url)
     if not content.strip():
@@ -92,7 +119,6 @@ async def extract(
             max_tokens=2000,
             temperature=0.0,
             response_format={"type": "json_object"},
-            prompt_version=PROMPT_VERSION,
         )
         raw = json.loads(resp.choices[0].message.content or "{}")
     except Exception as e:

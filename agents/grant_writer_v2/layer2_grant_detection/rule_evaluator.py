@@ -18,21 +18,89 @@ from agents.grant_writer_v2.schemas.grant_program import SixRuleResult, GrantPro
 logger = get_logger("layer2.rule_evaluator")
 
 MAX_PAGE_CONTENT_CHARS = 12_000
+# Total chars of multi-page content fed to the rule evaluator. Larger than single-page
+# limit because we concatenate evidence_url page + application/how-to-apply/grants pages.
+MAX_MULTIPAGE_CONTENT_CHARS = 24_000
 _RULE_KEYS = [
     "has_grants", "accepts_applications", "not_invitation_only",
     "not_donation_only", "allows_unsolicited", "geography_valid", "active_or_recurring",
 ]
 
+# Path keywords that indicate rule-evidence pages worth concatenating.
+_RULE_EVIDENCE_PATH_KEYWORDS = (
+    "apply", "how-to-apply", "application", "grant", "grants", "funding",
+    "eligib", "guidelines", "program", "programs", "rfp", "loi",
+)
+
+
+def _strip_html_for_eval(html: str) -> str:
+    """Strip HTML for the rule-evaluator prompt. Keeps it readable in the LLM context."""
+    import re
+    s = re.sub(r'<(script|style)[^>]*>.*?</(script|style)>', ' ', html, flags=re.DOTALL | re.IGNORECASE)
+    s = re.sub(r'<[^>]+>', ' ', s)
+    s = re.sub(r'\s+', ' ', s).strip()
+    return s
+
+
+def _build_page_content(evidence_url: str, corpus: list[dict]) -> str:
+    """
+    Build the content string fed to the rule evaluator.
+
+    Concatenate the evidence_url page first (most relevant), then any other crawled pages
+    whose path looks like an apply/grants/funding/eligibility page. This ensures the LLM
+    sees the actual application instructions, eligibility text, etc. — not just the
+    homepage where the program was first identified.
+    """
+    if not corpus:
+        return ""
+
+    from urllib.parse import urlparse
+
+    seen_urls: set[str] = set()
+    sections: list[str] = []
+    remaining = MAX_MULTIPAGE_CONTENT_CHARS
+
+    def _add(page: dict, budget: int) -> int:
+        url = page.get("url", "")
+        if not url or url in seen_urls or budget <= 0:
+            return budget
+        text = _strip_html_for_eval(page.get("text", ""))
+        if not text:
+            return budget
+        chunk = text[:budget]
+        sections.append(f"--- PAGE: {url} ---\n{chunk}")
+        seen_urls.add(url)
+        return budget - len(chunk)
+
+    # 1. evidence_url page (first priority)
+    if evidence_url:
+        for p in corpus:
+            if p.get("url") == evidence_url:
+                remaining = _add(p, remaining)
+                break
+
+    # 2. other pages whose path looks rule-relevant
+    for p in corpus:
+        url = p.get("url", "")
+        if url in seen_urls or not url:
+            continue
+        path_lower = urlparse(url).path.lower()
+        if any(kw in path_lower for kw in _RULE_EVIDENCE_PATH_KEYWORDS):
+            remaining = _add(p, remaining)
+            if remaining <= 0:
+                break
+
+    # 3. fallback — if nothing was added (no evidence_url match, no apply-like pages),
+    # use the first page in the corpus
+    if not sections:
+        remaining = _add(corpus[0], MAX_MULTIPAGE_CONTENT_CHARS)
+
+    return "\n\n".join(sections)
+
 
 def _find_page_content(evidence_url: str, corpus: list[dict]) -> str:
-    """Find the most relevant page text for a given evidence URL."""
-    for page in corpus:
-        if page.get("url", "") == evidence_url:
-            return page.get("text", "")[:MAX_PAGE_CONTENT_CHARS]
-    # Fall back to first page if evidence URL not found
-    if corpus:
-        return corpus[0].get("text", "")[:MAX_PAGE_CONTENT_CHARS]
-    return ""
+    """Backward-compatible wrapper — now multi-page aware."""
+    return _build_page_content(evidence_url, corpus)
 
 
 def _parse_rule(raw: dict) -> RuleEvaluation:

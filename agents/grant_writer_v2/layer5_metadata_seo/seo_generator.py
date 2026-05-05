@@ -45,7 +45,6 @@ async def generate_seo(
             max_tokens=400,
             temperature=0.2,
             response_format={"type": "json_object"},
-            prompt_version=PROMPT_VERSION,
         )
         return json.loads(resp.choices[0].message.content or "{}")
     except Exception as e:

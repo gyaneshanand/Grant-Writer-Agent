@@ -6,19 +6,27 @@ PROMPT_VERSION = "layer2_v1"
 
 PROGRAM_IDENTIFIER_SYSTEM = """\
 You are a grant research analyst. Given crawled content from a foundation's website,
-identify each distinct grant program the foundation runs.
+identify each distinct grant program or funding opportunity the foundation offers.
 
-A "grant program" is a named, recurring initiative through which the foundation
-provides funding to external applicants. Each program may have its own eligibility,
-deadlines, and award amounts.
+A "grant program" includes:
+- A named grant program (e.g. "Community Impact Grant")
+- A scholarship or fellowship program (e.g. "Smith Scholarship")
+- A general grant program with no specific name — if the foundation clearly makes
+  grants but has no separately named programs, create ONE entry using the foundation's
+  name + "Grant Program" (e.g. "James Foundation Grant Program")
+- Multiple focus areas described as separate funding tracks
+
+Do NOT return an empty list if the foundation clearly makes grants. If the content
+shows grant eligibility, application instructions, deadlines, or funding priorities,
+at minimum create a single general program entry.
 
 Return a JSON object with a single key "programs" containing an array of objects.
 Each object must have:
-  - "program_name": str  — the official name of the program
+  - "program_name": str  — the official name, or "[Foundation Name] Grant Program" if unnamed
   - "evidence_url": str  — the URL where this program was found
-  - "evidence_quote": str  — a verbatim quote (≤200 chars) from the page confirming this is a program
+  - "evidence_quote": str  — a verbatim quote (≤200 chars) from the page confirming grants
 
-Return {"programs": []} if no grant programs are found.
+Return {"programs": []} ONLY if the site has no evidence of grant-making whatsoever.
 Return only the JSON object, no prose.
 """
 
@@ -29,7 +37,8 @@ EIN: {ein}
 Crawled pages (most relevant first):
 {corpus_text}
 
-List every distinct grant program you can identify.
+List every distinct grant program or funding opportunity. If the foundation clearly
+makes grants but has no named programs, create one entry for their general grant program.
 """
 
 # ── Rule Evaluator ─────────────────────────────────────────────────────────────
@@ -51,12 +60,24 @@ CRITICAL INSTRUCTIONS — read before evaluating:
 
 Rules:
 1. has_grants — The program provides financial grants/funding to external recipients.
-2. accepts_applications — The program accepts applications (not grants solely at the foundation's discretion).
-3. not_invitation_only — The program is NOT invitation-only or nomination-only.
-4. not_donation_only — The program is NOT just accepting donations (it gives out grants).
-5. allows_unsolicited — The program accepts unsolicited applications from the general eligible pool.
-6. geography_valid — The program funds work in the US or has international scope (not exclusively foreign-country-only).
-7. active_or_recurring — The program is currently active or recurring (not a one-time past event or closed program).
+   This INCLUDES scholarships, fellowships, awards, prizes, research funding, and any
+   other form of monetary award given to external individuals or organizations.
+   Set value=true if the program gives money to external recipients in any form.
+2. accepts_applications — The program accepts applications, submissions, or nominations
+   (i.e. it is not awarded solely at the foundation's internal discretion).
+3. not_invitation_only — The program is NOT exclusively invitation-only or
+   nomination-only. (Programs open to public application = true; programs only
+   awarded to invited candidates = false.)
+4. not_donation_only — The program is NOT a fundraising/donation-collection page
+   (i.e., it gives out money, it does not just collect money).
+5. allows_unsolicited — The program accepts unsolicited applications from the general
+   eligible pool. Scholarships open to qualifying students = true. Fellowships open
+   to qualifying applicants = true.
+6. geography_valid — The program funds work in the US or has international scope
+   (not exclusively foreign-country-only).
+7. active_or_recurring — The program is currently active or recurring (not a one-time
+   past event or permanently closed program). Annual deadlines, recurring cycles,
+   "applications accepted by [date]" = true.
 
 Return JSON with this exact shape:
 {
@@ -94,9 +115,18 @@ ALL content related to its grant programs. You have three tools:
 REQUIRED strategy — follow this sequence every time:
 1. fetch_page(base_url) — always start with the homepage
 2. find_links() — ALWAYS call find_links() after every fetch_page to discover more pages
-3. For each grant-relevant link found: fetch_page(link_url), then find_links again
-4. If any PDF links are found on grant pages: extract_pdf(pdf_url)
-5. Continue until you've fetched all grant-related pages or hit your page limit
+3. For EVERY URL returned by find_links: call fetch_page(that_url). Do NOT skip any.
+   You MUST issue a fetch_page tool call for each link before stopping.
+   If find_links returned 3 URLs, your next response MUST contain at least one
+   fetch_page tool call (you can do them one at a time across iterations).
+4. After fetching a new page, call find_links() again to discover further pages.
+5. If any PDF links are found on grant pages: extract_pdf(pdf_url)
+6. Continue until you've fetched ALL grant-related pages or hit your page limit.
+
+DO NOT produce a text-only response (no tool calls) until you have fetched every URL
+that find_links has returned across all iterations. A summary or conclusion before
+fetching the application/eligibility/how-to-apply pages is wrong and will cause the
+foundation to be incorrectly marked invalid.
 
 CRITICAL — if find_links() returns [NO_GRANT_LINKS_FOUND] or finds no useful links:
 You MUST try these paths directly before stopping (replace base_url with the foundation domain):

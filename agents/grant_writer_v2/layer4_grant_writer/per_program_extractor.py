@@ -19,13 +19,25 @@ logger = get_logger("layer4.per_program")
 MAX_PAGE_CONTENT_CHARS = 15_000
 
 
+def _strip_html(html: str) -> str:
+    import re
+    s = re.sub(r'<(script|style)[^>]*>.*?</(script|style)>', ' ', html, flags=re.DOTALL | re.IGNORECASE)
+    s = re.sub(r'<[^>]+>', ' ', s)
+    return re.sub(r'\s+', ' ', s).strip()
+
+
 def _find_page(evidence_url: str, corpus: list[dict]) -> str:
+    """Return stripped readable text for the evidence URL, falling back to first 2 corpus pages."""
     for page in corpus:
         if page.get("url", "") == evidence_url:
-            return page.get("text", "")[:MAX_PAGE_CONTENT_CHARS]
-    # Fallback: concatenate first 2 pages
-    texts = [p.get("text", "")[:5000] for p in corpus[:2]]
-    return "\n---\n".join(texts)
+            return _strip_html(page.get("text", ""))[:MAX_PAGE_CONTENT_CHARS]
+    # Fallback: concatenate first 2 pages stripped
+    parts = []
+    for page in corpus[:3]:
+        url = page.get("url", "")
+        text = _strip_html(page.get("text", ""))[:5000]
+        parts.append(f"--- {url} ---\n{text}")
+    return "\n\n".join(parts)
 
 
 async def extract_program(
@@ -60,7 +72,6 @@ async def extract_program(
             max_tokens=3000,
             temperature=0.0,
             response_format={"type": "json_object"},
-            prompt_version=PROMPT_VERSION,
         )
         raw = json.loads(resp.choices[0].message.content or "{}")
     except Exception as e:
@@ -135,7 +146,6 @@ async def extract_program(
         evidence_quotes=raw.get("evidence_quotes") or {},
         extraction_method="llm",
         extraction_model=resp.model or "unknown",
-        extraction_prompt_version=PROMPT_VERSION,
         extraction_timestamp=datetime.utcnow(),
     )
     record.completeness_score = record.compute_completeness()

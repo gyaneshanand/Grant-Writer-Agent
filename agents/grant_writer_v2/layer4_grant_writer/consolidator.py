@@ -54,7 +54,6 @@ async def consolidate(
             budget_usd=budget_usd,
             max_tokens=2000,
             temperature=0.1,
-            prompt_version=PROMPT_VERSION,
         )
         return resp.choices[0].message.content or ""
     except Exception as e:

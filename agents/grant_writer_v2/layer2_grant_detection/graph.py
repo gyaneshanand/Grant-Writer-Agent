@@ -16,7 +16,7 @@ from typing import Any
 
 from langgraph.graph import StateGraph, START, END
 from langgraph.prebuilt import ToolNode
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 
 from agents.grant_writer_v2.config import v2_settings
 from agents.grant_writer_v2.core.llm import get_chat_model, BudgetExceeded, get_run_cost
@@ -29,6 +29,22 @@ from agents.grant_writer_v2.layer2_grant_detection.rule_evaluator import evaluat
 from agents.grant_writer_v2.layer2_grant_detection.verdict_aggregator import aggregate
 
 logger = get_logger("layer2.graph")
+
+
+def _unvisited_links_from_history(messages, visited_urls) -> list[str]:
+    """Scan ToolMessages from find_links calls; return URLs not yet in visited_urls."""
+    visited = set(visited_urls or [])
+    seen: list[str] = []
+    seen_set: set[str] = set()
+    for m in messages:
+        if isinstance(m, ToolMessage) and getattr(m, "name", "") == "find_links":
+            content = m.content or ""
+            for line in content.splitlines():
+                line = line.strip()
+                if line.startswith("http") and line not in visited and line not in seen_set:
+                    seen.append(line)
+                    seen_set.add(line)
+    return seen
 
 
 def _over_cap(state: GraphState) -> bool:
@@ -108,6 +124,41 @@ def build_graph(state_ref: dict[str, Any]):
 
         tool_calls = getattr(response, "tool_calls", []) or []
         logger.info(f"[L2] {state['ein']} — iteration {iterations}: agent made {len(tool_calls)} tool call(s): {[t.get('name') for t in tool_calls]}")
+
+        # Nudge: if the agent stopped issuing tool calls but find_links returned URLs
+        # the agent never fetched, inject one follow-up message and re-invoke.
+        # Cap to MAX_NUDGES per run so we don't loop forever; multiple nudges are allowed
+        # because each new page revealed by find_links exposes more candidate URLs.
+        MAX_NUDGES = 3
+        nudge_count = state.get("nudge_count", 0)
+        if not tool_calls and nudge_count < MAX_NUDGES:
+            unvisited = _unvisited_links_from_history(messages, state_ref.get("visited_urls", []))
+            if unvisited:
+                logger.info(f"[L2] {state['ein']} — agent stopped early (nudge #{nudge_count + 1}); {len(unvisited)} unvisited grant URLs")
+                nudge_text = (
+                    "You stopped without fetching these grant-relevant URLs that find_links returned:\n"
+                    + "\n".join(f"  - {u}" for u in unvisited[:8])
+                    + "\n\nIssue fetch_page tool calls for at least the first 3 of these now. "
+                    "Do not respond with text — only tool calls."
+                )
+                nudged_messages = list(messages) + [response, HumanMessage(content=nudge_text)]
+                try:
+                    response = await llm.ainvoke(nudged_messages)
+                    tool_calls = getattr(response, "tool_calls", []) or []
+                    logger.info(f"[L2] {state['ein']} — post-nudge: agent made {len(tool_calls)} tool call(s): {[t.get('name') for t in tool_calls]}")
+                except Exception as e:
+                    logger.warning(f"[L2] {state['ein']} — nudge LLM error: {e}")
+                return {
+                    "messages": [response],
+                    "iterations": iterations,
+                    "cost_usd": get_run_cost(state.get("run_id", "")),
+                    "nudge_count": nudge_count + 1,
+                    "pages_fetched": state_ref.get("pages_fetched", state.get("pages_fetched", 0)),
+                    "pdfs_processed": state_ref.get("pdfs_processed", state.get("pdfs_processed", 0)),
+                    "bytes_fetched": state_ref.get("bytes_fetched", state.get("bytes_fetched", 0)),
+                    "visited_urls": state_ref.get("visited_urls", state.get("visited_urls", [])),
+                    "corpus": state_ref.get("corpus", state.get("corpus", [])),
+                }
 
         return {
             "messages": [response],
