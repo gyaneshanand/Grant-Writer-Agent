@@ -125,6 +125,11 @@ async def run(foundation: FoundationInput) -> Layer2Output:
             status = "needs_review"
             stop_reason = "bot_protected"
             rollup_str = "UNKNOWN_BOT_PROTECTED"
+        elif not verdicts and pages < 3:
+            # Fetched too few pages to be confident — likely JS-rendered site
+            status = "needs_review"
+            stop_reason = "insufficient_crawl"
+            rollup_str = "UNKNOWN_JS_RENDERED"
         elif not verdicts:
             status = "rejected_no_programs"
         elif stop_reason not in ("completed", ""):

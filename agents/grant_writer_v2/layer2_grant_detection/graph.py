@@ -86,8 +86,9 @@ def build_graph(state_ref: dict[str, Any]):
 
         messages = state.get("messages", [])
         if not messages:
+            system_prompt = CRAWL_AGENT_SYSTEM.replace("{base_url}", state["base_url"])
             messages = [
-                SystemMessage(content=CRAWL_AGENT_SYSTEM),
+                SystemMessage(content=system_prompt),
                 HumanMessage(content=(
                     f"Research the grant programs at: {state['base_url']}\n"
                     f"Foundation: {state['org_name']}"

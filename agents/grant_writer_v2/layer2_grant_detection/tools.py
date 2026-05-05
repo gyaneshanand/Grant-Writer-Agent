@@ -20,9 +20,19 @@ MAX_CHARS_PER_PAGE = 30_000
 
 # Tags that suggest grant-related content
 GRANT_LINK_KEYWORDS = {
-    "grant", "grants", "funding", "fund", "apply", "application",
+    "grant", "grants", "funding", "apply", "application",
     "program", "programs", "initiative", "award", "awards",
     "opportunity", "opportunities", "eligib", "rfp", "loi",
+    "grantmaking", "for-nonprofits",
+}
+
+# Path segments that indicate non-grant content — filtered out even if URL contains a keyword
+NON_GRANT_PATH_SEGMENTS = {
+    "news", "blog", "article", "articles", "ideas", "press", "media",
+    "story", "stories", "event", "events", "annual-report", "newsletter",
+    "staff", "team", "board", "leadership", "career", "careers", "job", "jobs",
+    "donate", "donation", "give", "contact", "about-us", "history",
+    "strategic-plan", "report", "reports",
 }
 
 
@@ -148,11 +158,36 @@ def make_tools(state_ref: dict[str, Any]):
             path_lower = urlparse(absolute).path.lower()
             href_lower = href.lower()
             combined = path_lower + " " + href_lower
+            # Skip URLs whose path contains a non-grant segment (news, blog, articles, etc.)
+            path_segments = set(path_lower.strip("/").split("/"))
+            if path_segments & NON_GRANT_PATH_SEGMENTS:
+                continue
             if any(kw in combined for kw in GRANT_LINK_KEYWORDS):
                 seen.add(absolute)
                 results.append(absolute)
 
-        return "\n".join(results) if results else "[NO_GRANT_LINKS_FOUND]"
+        if results:
+            return "\n".join(results)
+
+        # No grant links found in static HTML (common on JS-heavy sites).
+        # Suggest standard grant subpaths the agent should try directly.
+        base = effective_base.rstrip("/")
+        visited_set = set(state_ref.get("visited_urls", []))
+        fallback_paths = [
+            "/grants/", "/work/our-grants/", "/funding/", "/apply/",
+            "/programs/", "/grantmaking/", "/grant-opportunities/",
+            "/for-nonprofits/", "/initiatives/", "/our-work/",
+        ]
+        suggestions = [
+            f"{base}{p}" for p in fallback_paths
+            if f"{base}{p}" not in visited_set
+        ]
+        if suggestions:
+            return (
+                "[NO_GRANT_LINKS_FOUND_IN_HTML] This site likely uses JavaScript navigation. "
+                "Try these paths directly:\n" + "\n".join(suggestions[:6])
+            )
+        return "[NO_GRANT_LINKS_FOUND]"
 
     @tool
     async def extract_pdf(url: str) -> str:

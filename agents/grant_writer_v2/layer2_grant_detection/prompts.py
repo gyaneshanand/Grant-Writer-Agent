@@ -88,11 +88,22 @@ REQUIRED strategy — follow this sequence every time:
 4. If any PDF links are found on grant pages: extract_pdf(pdf_url)
 5. Continue until you've fetched all grant-related pages or hit your page limit
 
-You MUST call find_links after every fetch_page call — do not skip this step.
-You MUST fetch at least 3-5 pages before deciding you have enough information.
-If the homepage has few grant links, try common grant page paths:
-  /grants, /funding, /apply, /programs, /initiatives, /grantmaking, /for-nonprofits
+CRITICAL — if find_links() returns [NO_GRANT_LINKS_FOUND] or finds no useful links:
+You MUST try these paths directly before stopping (replace base_url with the foundation domain):
+  {base_url}grants/
+  {base_url}work/our-grants/
+  {base_url}funding/
+  {base_url}apply/
+  {base_url}programs/
+  {base_url}grantmaking/
+  {base_url}grant-opportunities/
+  {base_url}for-nonprofits/
+  {base_url}initiatives/
+Many foundation sites use JavaScript navigation — these pages will not appear in find_links
+but ARE accessible by direct URL. Always try at least 3 of these before concluding there
+are no grant pages.
 
+You MUST fetch at least 5 pages before deciding you have enough information.
 Focus only on pages about grants, programs, funding, applications, or eligibility.
 Do NOT crawl news, blog posts, staff bios, or donation pages.
 
