@@ -9,7 +9,7 @@ from urllib.parse import urljoin, urlparse
 
 from langchain_core.tools import tool
 
-from agents.grant_writer_v2.core.http import fetch, fetch as http_fetch
+from agents.grant_writer_v2.core.http import fetch, fetch as http_fetch, fetch_via_jina, _is_js_rendered
 from agents.grant_writer_v2.core.logger import get_logger
 from agents.grant_writer_v2.config import v2_settings
 
@@ -107,6 +107,18 @@ def make_tools(state_ref: dict[str, Any]):
         text = result.get("text", "")
         bytes_len = result.get("bytes_fetched", len(text.encode()))
 
+        # Jina fallback: if primary fetch returned JS-rendered shell (< 5 hrefs), use Jina Reader
+        if _is_js_rendered(result) and v2_settings.JINA_API_KEY:
+            logger.info(f"[L2] JS-rendered page detected at {url}, falling back to Jina Reader")
+            jina_result = await fetch_via_jina(url)
+            if not jina_result.get("error") and jina_result.get("text"):
+                text = jina_result["text"]
+                bytes_len = jina_result.get("bytes_fetched", len(text.encode()))
+                content_type = "text/markdown"
+                logger.info(f"[L2] Jina Reader returned {len(text)} chars for {url}")
+            else:
+                logger.warning(f"[L2] Jina fallback failed for {url}: {jina_result.get('error')}")
+
         state_ref["pages_fetched"] = state_ref.get("pages_fetched", 0) + 1
         state_ref["bytes_fetched"] = state_ref.get("bytes_fetched", 0) + bytes_len
         visited.append(url)
@@ -121,7 +133,7 @@ def make_tools(state_ref: dict[str, Any]):
         return clean[:MAX_CHARS_PER_PAGE]
 
     @tool
-    def find_links(page_url: str = "") -> str:
+    async def find_links(page_url: str = "") -> str:
         """Extract grant-relevant links from the most recently fetched page (or a specific page URL if provided).
         Returns newline-separated absolute URLs of grant-relevant pages to visit next."""
         effective_base = state_ref.get("base_url", "")
@@ -169,8 +181,42 @@ def make_tools(state_ref: dict[str, Any]):
         if results:
             return "\n".join(results)
 
-        # No grant links found in static HTML (common on JS-heavy sites).
-        # Suggest standard grant subpaths the agent should try directly.
+        # No grant links in static HTML — try Jina Reader to get JS-rendered links
+        last_url = corpus[-1].get("url", "") if not page_url else page_url
+        if last_url and v2_settings.JINA_API_KEY:
+            logger.info(f"[L2] find_links: no static grant links at {last_url}, trying Jina Reader")
+            jina_result = await fetch_via_jina(last_url)
+            if not jina_result.get("error") and jina_result.get("text"):
+                jina_text = jina_result["text"]
+                # Update the corpus entry with Jina-rendered content
+                for entry in corpus:
+                    if entry.get("url") == last_url:
+                        entry["text"] = jina_text
+                        entry["content_type"] = "text/markdown"
+                        break
+                state_ref["corpus"] = corpus
+                # Re-run link extraction on Jina markdown (uses markdown link syntax)
+                md_link_pattern = re.compile(r'\[([^\]]+)\]\((/[^\)]+)\)', re.IGNORECASE)
+                md_links = md_link_pattern.findall(jina_text)
+                for label, href in md_links:
+                    absolute = urljoin(effective_base, href)
+                    if absolute in seen or absolute in visited:
+                        continue
+                    if not _is_same_domain(absolute, effective_base):
+                        continue
+                    path_lower = urlparse(absolute).path.lower()
+                    combined = path_lower + " " + label.lower()
+                    path_segments = set(path_lower.strip("/").split("/"))
+                    if path_segments & NON_GRANT_PATH_SEGMENTS:
+                        continue
+                    if any(kw in combined for kw in GRANT_LINK_KEYWORDS):
+                        seen.add(absolute)
+                        results.append(absolute)
+                if results:
+                    logger.info(f"[L2] Jina found {len(results)} grant links at {last_url}")
+                    return "\n".join(results)
+
+        # Still nothing — suggest standard grant subpaths for the agent to try directly
         base = effective_base.rstrip("/")
         visited_set = set(state_ref.get("visited_urls", []))
         fallback_paths = [

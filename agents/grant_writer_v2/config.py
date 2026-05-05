@@ -30,6 +30,9 @@ class V2Settings(BaseSettings):
     V2_MODEL_LAYER4_CONSOLIDATOR: str = os.getenv("V2_MODEL_LAYER4_CONSOLIDATOR", "openai/gpt-4o-mini")
     V2_MODEL_LAYER5_SEO: str = os.getenv("V2_MODEL_LAYER5_SEO", "openai/gpt-4o-mini")
 
+    # Jina Reader (JS-rendering fallback)
+    JINA_API_KEY: str = os.getenv("JINA_API_KEY", "")
+
     # HTTP client
     HTTP_TIMEOUT_SECONDS: int = int(os.getenv("V2_HTTP_TIMEOUT", "30"))
     HTTP_MAX_RETRIES: int = int(os.getenv("V2_HTTP_MAX_RETRIES", "3"))

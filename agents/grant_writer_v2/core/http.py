@@ -121,6 +121,93 @@ async def fetch(
     return result
 
 
+def _is_js_rendered(result: dict) -> bool:
+    """
+    Return True if the fetched page is likely a JS-rendered SPA shell with no real content.
+    Two signals, either is sufficient:
+    1. Very few hrefs (≤5) — classic SPA with no static links
+    2. Stripped readable text is tiny (<300 chars) relative to raw HTML (>50KB) —
+       massive JS bundle with an empty content area
+    """
+    import re as _re
+    text = result.get("text", "")
+    if not text:
+        return False
+
+    href_count = text.count("href=")
+    if href_count <= 5:
+        return True
+
+    # Check stripped text ratio
+    raw_len = len(text)
+    if raw_len > 50_000:
+        stripped = _re.sub(r'<(script|style)[^>]*>.*?</(script|style)>', ' ', text, flags=_re.DOTALL | _re.IGNORECASE)
+        stripped = _re.sub(r'<[^>]+>', ' ', stripped)
+        stripped = _re.sub(r'\s+', ' ', stripped).strip()
+        if len(stripped) < 300:
+            return True
+
+    return False
+
+
+async def fetch_via_jina(url: str, *, use_cache: bool = True) -> dict:
+    """
+    Fetch a URL via Jina Reader API (https://r.jina.ai/), which renders JS and
+    returns clean markdown text. Used as fallback for JS-rendered sites.
+    """
+    from agents.grant_writer_v2.config import v2_settings as _s
+    api_key = _s.JINA_API_KEY
+    if not api_key:
+        return {"url": url, "status_code": 0, "text": "", "bytes_fetched": 0,
+                "content_type": "text/markdown", "from_cache": False,
+                "error": "JINA_API_KEY not configured", "via_jina": True}
+
+    jina_url = f"https://r.jina.ai/{url}"
+    cache_key = "jina_" + url_cache_key(url)
+
+    if use_cache:
+        cached = _cache_get(cache_key)
+        if cached:
+            cached["from_cache"] = True
+            return cached
+
+    result = {
+        "url": url,
+        "status_code": 0,
+        "content_type": "text/markdown",
+        "text": "",
+        "bytes_fetched": 0,
+        "from_cache": False,
+        "error": None,
+        "via_jina": True,
+    }
+
+    try:
+        async with httpx.AsyncClient(follow_redirects=True, timeout=60) as client:
+            resp = await client.get(
+                jina_url,
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Accept": "text/plain",
+                    "X-Return-Format": "markdown",
+                    "X-No-Cache": "true",
+                },
+            )
+            result["status_code"] = resp.status_code
+            if resp.status_code == 200:
+                text = resp.text
+                result["text"] = text
+                result["bytes_fetched"] = len(text.encode())
+                if use_cache:
+                    _cache_set(cache_key, result)
+            else:
+                result["error"] = f"Jina returned {resp.status_code}"
+    except Exception as e:
+        result["error"] = f"Jina fetch error: {e}"
+
+    return result
+
+
 async def fetch_json(url: str, *, params: dict | None = None, headers: dict | None = None) -> dict:
     """Fetch a JSON endpoint (no caching — used for SerpAPI calls)."""
     _timeout = v2_settings.HTTP_TIMEOUT_SECONDS
