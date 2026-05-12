@@ -51,12 +51,16 @@ Return a JSON object with these fields (use null for unknown):
 PER_PROGRAM_USER = """\
 Foundation: {org_name}
 Program: {program_name}
-Evidence URL: {evidence_url}
+Primary URL: {evidence_url}
 
-Page content:
+Crawled page content (one or more pages, separated by '--- PAGE: <url> ---'
+markers — synthesize across all pages to extract complete program details):
 {page_content}
 
-Extract all available details for this grant program.
+Extract all available details for this grant program. Use information from any
+of the pages above. For each populated field, use values found in the content
+verbatim where possible. For source_pages, list the URLs you actually drew
+information from.
 """
 
 # ── Consolidator ──────────────────────────────────────────────────────────────

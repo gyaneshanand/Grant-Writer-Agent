@@ -3,11 +3,11 @@
 
 funding_buckets:
   - id: lt_5k
-    label: Under $5,000
-    max_usd: 4999
+    label: Up to $5,000
+    max_usd: 5000
   - id: 5k_25k
-    label: $5,000 – $25,000
-    min_usd: 5000
+    label: $5,001 – $25,000
+    min_usd: 5001
     max_usd: 25000
   - id: 25k_100k
     label: $25,000 – $100,000

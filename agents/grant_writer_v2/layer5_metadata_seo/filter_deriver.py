@@ -46,13 +46,26 @@ def derive_filters(program_row: dict) -> dict:
         elif any(g not in _US_STATE_CODES and g not in ("US", "PR", "GU", "VI", "AS", "MP") for g in upper):
             geo_scope = "international"
 
+    # is_currently_open: if explicitly False → closed; if True → open;
+    # if None/unknown but deadline_type is rolling/not_specified → treat as open (None = unknown)
+    raw_open = program_row.get("is_currently_open")
+    deadline_type = program_row.get("deadline_type") or "not_specified"
+    if raw_open is True:
+        filter_is_open = True
+    elif raw_open is False:
+        filter_is_open = False
+    elif deadline_type in ("rolling", "not_specified", "ongoing"):
+        filter_is_open = True
+    else:
+        filter_is_open = None
+
     return {
         "filter_focus_areas": json.dumps(focus_areas),
         "filter_applicant_types": json.dumps(applicant_types),
         "filter_geographies": json.dumps(geographies),
         "filter_funding_bucket": funding_bucket,
-        "filter_deadline_type": program_row.get("deadline_type") or "not_specified",
-        "filter_is_open": bool(program_row.get("is_currently_open")),
+        "filter_deadline_type": deadline_type,
+        "filter_is_open": filter_is_open,
         "filter_accepts_unsolicited": bool(program_row.get("accepts_unsolicited", True)),
         "filter_loi_required": bool(program_row.get("loi_required")),
         "filter_geo_scope": geo_scope,

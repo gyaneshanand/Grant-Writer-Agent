@@ -17,7 +17,7 @@ from agents.grant_writer_v2.core.llm import start_run, clear_run, get_run_cost
 from agents.grant_writer_v2.core.logger import get_logger
 from agents.grant_writer_v2.layer5_metadata_seo.duplicate_detector import build_search_blob, find_duplicate
 from agents.grant_writer_v2.layer5_metadata_seo.filter_deriver import derive_filters
-from agents.grant_writer_v2.layer5_metadata_seo.schemas import Layer5Output
+from agents.grant_writer_v2.layer5_metadata_seo.schemas import Layer5Output, ProgramSEOResult
 from agents.grant_writer_v2.layer5_metadata_seo.seo_generator import generate_seo
 from agents.grant_writer_v2.layer5_metadata_seo.slug_generator import generate_slug
 from agents.grant_writer_v2.schemas.common import FoundationInput
@@ -80,6 +80,7 @@ async def run(foundation: FoundationInput) -> Layer5Output:
         # Build existing blobs for dedup (across all programs for this EIN)
         enriched_blobs: list[dict] = []
         enriched_count = 0
+        program_results: list[ProgramSEOResult] = []
 
         import json
         for _prog in programs:
@@ -139,6 +140,29 @@ async def run(foundation: FoundationInput) -> Layer5Output:
             )
             enriched_count += 1
 
+            program_results.append(ProgramSEOResult(
+                program_id=prog["program_id"],
+                program_name=prog["program_name"],
+                slug=slug,
+                opportunity_title=seo.get("opportunity_title", "")[:70],
+                h1_tag=seo.get("h1_tag", "")[:60],
+                meta_title=seo.get("meta_title", "")[:60],
+                meta_description=seo.get("meta_description", "")[:150],
+                opportunity_teaser=seo.get("opportunity_teaser", ""),
+                opportunity_title_for_subscriber=seo.get("opportunity_title_for_subscriber", "")[:150],
+                filter_focus_areas=json.loads(filters["filter_focus_areas"]),
+                filter_applicant_types=json.loads(filters["filter_applicant_types"]),
+                filter_geographies=json.loads(filters["filter_geographies"]),
+                filter_funding_bucket=filters["filter_funding_bucket"],
+                filter_deadline_type=filters["filter_deadline_type"],
+                filter_is_open=filters["filter_is_open"],
+                filter_accepts_unsolicited=filters["filter_accepts_unsolicited"],
+                filter_loi_required=filters["filter_loi_required"],
+                filter_geo_scope=filters["filter_geo_scope"],
+                publish_status=publish_status,
+                duplicate_of_program_id=duplicate_of,
+            ))
+
         cost_usd = get_run_cost(run_id)
 
         # Mark pipeline done on foundations row
@@ -157,6 +181,7 @@ async def run(foundation: FoundationInput) -> Layer5Output:
         output = Layer5Output(
             ein=ein, status="completed",
             programs_enriched=enriched_count,
+            programs=program_results,
             cost_usd=cost_usd, processing_ms=_ms(start),
         )
         await write_pipeline_run(

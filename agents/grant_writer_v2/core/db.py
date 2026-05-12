@@ -2,6 +2,7 @@
 Async DB wrappers using the `databases` library (already in requirements.txt).
 Reuses the existing DATABASE_URL from the environment.
 """
+import asyncio
 from typing import Any, Optional
 import databases
 from agents.grant_writer_v2.config import v2_settings
@@ -10,6 +11,7 @@ from agents.grant_writer_v2.core.logger import get_logger
 logger = get_logger("db")
 
 _db: Optional[databases.Database] = None
+_connect_lock = asyncio.Lock()
 
 
 def get_db() -> databases.Database:
@@ -20,9 +22,10 @@ def get_db() -> databases.Database:
 
 
 async def connect():
-    db = get_db()
-    if not db.is_connected:
-        await db.connect()
+    async with _connect_lock:
+        db = get_db()
+        if not db.is_connected:
+            await db.connect()
 
 
 async def disconnect():
@@ -35,7 +38,9 @@ async def _ensure_connected() -> databases.Database:
     """Return a connected Database instance, connecting lazily if needed."""
     db = get_db()
     if not db.is_connected:
-        await db.connect()
+        async with _connect_lock:
+            if not db.is_connected:
+                await db.connect()
     return db
 
 
