@@ -83,3 +83,4 @@ graphify-out/
 !agents/chatbot/data/chroma_db/**/*.bin
 !agents/chatbot/data/chroma_db/**/*.pickle
 !scripts/init_chatbot.sql
+!agents/grant_writer_v2/db/migrations/*.sql
