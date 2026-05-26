@@ -68,6 +68,7 @@ agents/grant_writer_v2/.cache/
 # Generated files
 *.md.backup
 *_backup.*
+graphify-out/
 
 # API Keys and Secrets (extra safety)
 *api_key*
