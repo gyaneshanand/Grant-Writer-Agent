@@ -136,10 +136,26 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
-        log_level="info"
-    )
+
+    host = os.getenv("APP_HOST", "0.0.0.0")
+    port = int(os.getenv("APP_PORT", "8000"))
+    reload = os.getenv("APP_RELOAD", "true").lower() in ("1", "true", "yes")
+    workers = int(os.getenv("WORKERS", "1"))
+
+    if reload:
+        uvicorn.run(
+            "main:app",
+            host=host,
+            port=port,
+            reload=True,
+            log_level="info",
+        )
+    else:
+        uvicorn.run(
+            "main:app",
+            host=host,
+            port=port,
+            workers=max(1, workers),
+            timeout_keep_alive=int(os.getenv("GUNICORN_TIMEOUT", "360")),
+            log_level="info",
+        )

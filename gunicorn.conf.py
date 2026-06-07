@@ -9,15 +9,16 @@ bind = "0.0.0.0:8000"
 backlog = 2048
 
 # Worker processes
-# Rule: (2 x CPU cores) + 1
-workers = int(os.getenv("WORKERS", multiprocessing.cpu_count() * 2 + 1))
+# Rule: (2 x CPU cores) + 1 — override via WORKERS in .env for bulk pipeline runs
+_default_workers = min(32, multiprocessing.cpu_count() * 2 + 1)
+workers = int(os.getenv("WORKERS", _default_workers))
 worker_class = "uvicorn.workers.UvicornWorker"
 worker_connections = 1000
 max_requests = 1000
 max_requests_jitter = 50
 
-# Timeouts
-timeout = 120
+# Timeouts (layer 1+ can run several minutes per foundation)
+timeout = int(os.getenv("GUNICORN_TIMEOUT", "360"))
 keepalive = 5
 graceful_timeout = 30
 
