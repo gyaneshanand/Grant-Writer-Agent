@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
-from langchain_community.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
+from agents.llm_factory import create_pipeline_llm
 from pydantic import BaseModel
 import re
 import json
@@ -133,9 +133,7 @@ def extract_grant_info(page_text):
     if not openai_api_key:
         raise ValueError("OPENAI_API_KEY not found in environment variables. Please set it in .env file.")
     
-    llm = ChatOpenAI(temperature=0.3, 
-                     model_name="gpt-4o-mini", 
-                     openai_api_key=openai_api_key)
+    llm = create_pipeline_llm(temperature=0.3, openai_api_key=openai_api_key)
     print("🔗 Connected to OpenAI API")
     
     prompt = ChatPromptTemplate.from_template("""
@@ -182,7 +180,7 @@ def extract_grant_info(page_text):
     """)
     
     print(f"📝 Processing text of length: {len(page_text)} characters")
-    result = llm.predict(prompt.format(text=page_text))
+    result = llm.invoke(prompt.format(text=page_text)).content
     print("✅ Received response from LLM")
     print(f"📤 Raw LLM response: {result[:200]}...")
     

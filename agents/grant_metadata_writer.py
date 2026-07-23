@@ -1,10 +1,11 @@
-from langchain_community.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from pydantic import BaseModel
 import json
 from typing import Dict, Any
 import os
 from dotenv import load_dotenv
+
+from agents.llm_factory import create_pipeline_llm
 
 # Load environment variables
 load_dotenv()
@@ -33,11 +34,7 @@ class GrantMetadataWriter:
             if not openai_api_key:
                 raise ValueError("OPENAI_API_KEY not found in environment variables. Please set it in .env file.")
         
-        self.llm = ChatOpenAI(
-            temperature=0.3,
-            model_name="gpt-4o-mini",
-            openai_api_key=openai_api_key
-        )
+        self.llm = create_pipeline_llm(temperature=0.3, openai_api_key=openai_api_key)
 
     def generate_all_metadata_single_call(self, grant_data: str) -> Dict[str, str]:
         """
@@ -88,7 +85,7 @@ class GrantMetadataWriter:
         
         try:
             print("🤖 Making single OpenAI API call for all metadata...")
-            result = self.llm.predict(prompt.format(grant_data=grant_data))
+            result = self.llm.invoke(prompt.format(grant_data=grant_data)).content
             print("✅ Received response from OpenAI")
             print(f"📤 Raw response length: {len(result)} characters")
             

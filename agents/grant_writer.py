@@ -1,10 +1,11 @@
-from langchain_community.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 import json
 from datetime import datetime
 from typing import List, Dict, Any
 import os
 from dotenv import load_dotenv
+
+from agents.llm_factory import create_pipeline_llm
 
 # Load environment variables
 load_dotenv()
@@ -21,11 +22,7 @@ class GrantWriter:
             if not openai_api_key:
                 raise ValueError("OPENAI_API_KEY not found in environment variables. Please set it in .env file.")
         
-        self.llm = ChatOpenAI(
-            temperature=0.1, 
-            model_name="gpt-4o-mini", 
-            openai_api_key=openai_api_key
-        )
+        self.llm = create_pipeline_llm(temperature=0.1, openai_api_key=openai_api_key)
         
     def is_deadline_expired(self, deadline_str: str) -> bool:
         """
@@ -132,7 +129,7 @@ class GrantWriter:
         
         try:
             formatted_data = json.dumps(grants_data, indent=2)
-            result = self.llm.predict(prompt.format(grants_data=formatted_data, org_context=org_context))
+            result = self.llm.invoke(prompt.format(grants_data=formatted_data, org_context=org_context)).content
             return result.strip()
         except Exception as e:
             print(f"❌ Error generating consolidated description: {e}")
