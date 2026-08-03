@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from langchain.prompts import ChatPromptTemplate
 from agents.llm_factory import create_pipeline_llm
 from pydantic import BaseModel
@@ -11,6 +12,11 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
+
+# Speed knobs. The pipeline's purpose is scrape -> extract -> store; each page
+# costs one LLM call, so the page cap is the single biggest latency lever.
+MAX_GRANT_PAGES = int(os.getenv("MAX_GRANT_PAGES", 10))
+PAGE_WORKERS = int(os.getenv("PIPELINE_PAGE_WORKERS", 8))
 
 # Step 1: Schema
 class Grant(BaseModel):
@@ -32,7 +38,7 @@ class Grant(BaseModel):
 # Step 2: Scrape pages
 def scrape_site(url):
     print(f"🔍 Starting to scrape site: {url}")
-    r = requests.get(url)
+    r = requests.get(url, timeout=15)
     print(f"✅ Successfully fetched main page, status code: {r.status_code}")
     soup = BeautifulSoup(r.text, "html.parser")
     links = [a['href'] for a in soup.find_all('a', href=True)]
@@ -54,7 +60,7 @@ def scrape_site(url):
     # remove duplicates
     grant_links = list(set(grant_links))
 
-    # Restrict to max 20 links to avoid overload
+    # Restrict page count to keep latency bounded — every page costs one LLM call.
     # Smart selection to prioritize likely grant pages like "grants", "apply", "funding". Always include main URL.
     prioritized_links = []
     keywords = ["grant", "apply", "fund", "fellowship", "opportunity", "scholarship", "award", "funding"]
@@ -62,7 +68,7 @@ def scrape_site(url):
         for gl in grant_links:
             if kw in gl.lower() and gl not in prioritized_links:
                 prioritized_links.append(gl)
-    grant_links = prioritized_links[:20]
+    grant_links = prioritized_links[:MAX_GRANT_PAGES]
 
     # Always include the main URL
     if url not in grant_links:
@@ -219,48 +225,59 @@ def extract_grant_info(page_text):
             print(f"❌ Fallback creation failed: {fallback_error}")
             return None
 
+def _process_page(p):
+    """Fetch one page and run LLM extraction. Returns a grant dict or None.
+
+    Runs inside the thread pool — both the HTTP fetch and the LLM call are
+    I/O-bound, so threads overlap them across pages.
+    """
+    try:
+        if not p.startswith('http'):
+            print(f"⚠️ Skipping invalid URL: {p}")
+            return None
+
+        html_content, extracted_text = get_html_content_and_extract_text(p)
+
+        if not extracted_text:
+            print(f"❌ Failed to extract content from: {p}")
+            return None
+
+        grant = extract_grant_info(extracted_text)
+
+        if grant is None:
+            print(f"⏭️ No grant information found on {p} - skipping")
+            return None
+
+        grant.grant_url = p  # Add the URL to the grant data
+        print(f"🎯 Grant extracted: {grant.grant_name}")
+
+        if "closed" in grant.proposal_deadline.lower():
+            print(f"❌ Skipped closed grant (deadline: {grant.proposal_deadline})")
+            return None
+
+        print(f"✅ Added grant to results (deadline: {grant.proposal_deadline})")
+        return grant.model_dump()
+
+    except Exception as e:
+        print(f"❌ Error processing {p}: {str(e)}")
+        return None
+
+
 # Step 4: Run pipeline
 def run_pipeline(url):
     print(f"🚀 Starting pipeline for URL: {url}")
     pages = scrape_site(url)
-    print(f"📊 Processing {len(pages)} pages for grant information...")
-    
-    grants = []
-    for i, p in enumerate(pages, 1):
-        print(f"\n📄 Processing page {i}/{len(pages)}: {p}")
-        try:
-            # Skip if URL is not properly formed
-            if not p.startswith('http'):
-                print(f"⚠️ Skipping invalid URL: {p}")
-                continue
-            
-            # Use the new HTML extraction function
-            html_content, extracted_text = get_html_content_and_extract_text(p)
-            
-            if not extracted_text:
-                print(f"❌ Failed to extract content from: {p}")
-                continue
-            
-            grant = extract_grant_info(extracted_text)
-            
-            # Skip if no grant information was found
-            if grant is None:
-                print(f"⏭️ No grant information found on this page - skipping")
-                continue
+    print(f"📊 Processing {len(pages)} pages for grant information ({PAGE_WORKERS} workers)...")
 
-            grant.grant_url = p  # Add the URL to the grant data
-                
-            print(f"🎯 Grant extracted: {grant.grant_name}")
-            
-            if "closed" not in grant.proposal_deadline.lower():
-                grants.append(grant.model_dump())
-                print(f"✅ Added grant to results (deadline: {grant.proposal_deadline})")
-            else:
-                print(f"❌ Skipped closed grant (deadline: {grant.proposal_deadline})")
-                
-        except Exception as e:
-            print(f"❌ Error processing {p}: {str(e)}")
-            
+    # Pages are independent: fetch + extract them concurrently. Sequential
+    # processing was the pipeline's dominant cost — one LLM call per page,
+    # one page at a time. Results keep page order for deterministic output.
+    grants = []
+    with ThreadPoolExecutor(max_workers=PAGE_WORKERS) as pool:
+        results = list(pool.map(_process_page, pages))
+
+    grants = [g for g in results if g is not None]
+
     print(f"\n🎉 Pipeline completed! Found {len(grants)} active grants")
     # PRINT GRANTS IN JSON FORMAT
     print("\n📋 Grants in JSON format:")

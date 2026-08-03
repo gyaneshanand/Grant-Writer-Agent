@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
+from concurrent.futures import ThreadPoolExecutor
 from langchain.prompts import ChatPromptTemplate
 from agents.llm_factory import create_pipeline_llm
 from pydantic import BaseModel
@@ -11,6 +12,8 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
+
+ORG_PAGE_WORKERS = int(os.getenv("PIPELINE_PAGE_WORKERS", 8))
 
 # Step 1: Schema
 class Organization(BaseModel):
@@ -28,7 +31,7 @@ class Organization(BaseModel):
 # Step 2: Scrape pages
 def scrape_site(url):
     print(f"🔍 Starting to scrape site: {url}")
-    r = requests.get(url)
+    r = requests.get(url, timeout=15)
     print(f"✅ Successfully fetched main page, status code: {r.status_code}")
     soup = BeautifulSoup(r.text, "html.parser")
     links = [a['href'] for a in soup.find_all('a', href=True)]
@@ -192,34 +195,39 @@ def extract_organization_info(page_texts):
             print(f"❌ Fallback creation failed: {fallback_error}")
             return Organization()
 
+def _fetch_page_text(p):
+    """Fetch one page and return its extracted text, or None. Thread-pool worker."""
+    try:
+        if not p.startswith('http'):
+            print(f"⚠️ Skipping invalid URL: {p}")
+            return None
+
+        html_content, extracted_text = get_html_content_and_extract_text(p)
+
+        if not extracted_text:
+            print(f"❌ Failed to extract content from: {p}")
+            return None
+
+        print(f"✅ Successfully extracted text from {p}")
+        return extracted_text
+
+    except Exception as e:
+        print(f"❌ Error processing {p}: {str(e)}")
+        return None
+
+
 # Step 4: Run pipeline
 def run_pipeline(foundation_url):
     print(f"🚀 Starting pipeline for Foundation URL: {foundation_url}")
     pages = scrape_site(foundation_url)
-    print(f"📊 Processing {len(pages)} pages for organization information...")
-    
-    page_texts = []
-    for i, p in enumerate(pages, 1):
-        print(f"\n📄 Processing page {i}/{len(pages)}: {p}")
-        try:
-            # Skip if URL is not properly formed
-            if not p.startswith('http'):
-                print(f"⚠️ Skipping invalid URL: {p}")
-                continue
-            
-            # Use the HTML extraction function
-            html_content, extracted_text = get_html_content_and_extract_text(p)
-            
-            if not extracted_text:
-                print(f"❌ Failed to extract content from: {p}")
-                continue
-            
-            page_texts.append(extracted_text)
-            print(f"✅ Successfully extracted text from page {i}")
-                
-        except Exception as e:
-            print(f"❌ Error processing {p}: {str(e)}")
-    
+    print(f"📊 Processing {len(pages)} pages for organization information ({ORG_PAGE_WORKERS} workers)...")
+
+    # Pages are independent — fetch them concurrently, keep page order.
+    with ThreadPoolExecutor(max_workers=ORG_PAGE_WORKERS) as pool:
+        results = list(pool.map(_fetch_page_text, pages))
+
+    page_texts = [t for t in results if t]
+
     if not page_texts:
         print("❌ No page content was successfully extracted")
         return None

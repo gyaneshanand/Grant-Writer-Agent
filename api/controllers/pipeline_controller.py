@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import APIRouter, HTTPException
 from typing import List
 from ..models.schemas import (
@@ -38,19 +40,25 @@ async def run_complete_pipeline(request: PipelineRequest):
         HTTPException: If any pipeline step fails
     """
     try:
-        # Step 1: Collect grant data
-        grants_data = grant_data_service.collect_grants(
+        # Steps 1 + 2 are independent (both need only the URL), so they run
+        # concurrently. Each was a full scrape-plus-LLM pass over the same
+        # site; running them back to back doubled the scraping wall-clock.
+        grants_task = asyncio.to_thread(
+            grant_data_service.collect_grants,
             foundation_url=str(request.foundation_url),
-            max_grants=request.max_grants
+            max_grants=request.max_grants,
         )
-        
-        # Step 2: Collect organization data (optional)
-        org_data = None
+
         if request.include_org_data:
-            org_data = org_data_service.collect_organization_data(
-                foundation_url=str(request.foundation_url)
+            org_task = asyncio.to_thread(
+                org_data_service.collect_organization_data,
+                foundation_url=str(request.foundation_url),
             )
-        
+            grants_data, org_data = await asyncio.gather(grants_task, org_task)
+        else:
+            grants_data = await grants_task
+            org_data = None
+
         # Step 3: Generate consolidated description
         consolidated_result = grant_writer_service.generate_consolidated_description(
             grants_data=grants_data,
