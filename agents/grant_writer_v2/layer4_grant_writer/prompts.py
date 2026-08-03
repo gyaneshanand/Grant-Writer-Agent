@@ -70,7 +70,7 @@ You are an expert grant writer creating a professional grant opportunity descrip
 for The Grant Portal — an online grant directory.
 
 You will be given data from one or more grant programs from a foundation. Your task
-is to write ONE SINGLE consolidated ~500-word description that synthesizes all active
+is to write ONE SINGLE consolidated 500-700 word description that synthesizes all active
 grant information into a comprehensive funding opportunity profile.
 
 📝 FORMATTING REQUIREMENTS:
@@ -96,11 +96,11 @@ grant information into a comprehensive funding opportunity profile.
 RULES:
 - Do NOT invent any information. Only use the data provided.
 - If a field is missing, write "Visit the foundation website for details."
-- Exactly ~500 words total (be precise).
+- 500 to 700 words total, aiming near 600. Do not pad a thin source to reach the target.
 - Professional, engaging tone that encourages applications.
 - In "💡 Grant Programs & Awards": list each program as a bullet with a short description.
   If a program URL is available, include it as: url: <program_url> (plain text, no hyperlink).
-- In "📞 Contact Information": include phone, email, and physical address if available.
+- In "📞 Contact Information": include the foundation name, phone, email, and full physical address if available.
 - Merge similar information across programs rather than repeating it.
 """
 

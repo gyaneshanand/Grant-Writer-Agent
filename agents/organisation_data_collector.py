@@ -129,11 +129,12 @@ def extract_organization_info(page_texts):
     2. Mission - organization's mission statement, focus areas, funding priorities and interests. What kind of grants do they provide?
     3. Background - historical background, when it was founded, key milestones
     4. About - comprehensive about section describing what the organization does, their programs, initiatives
-    5. Contact Information:
-       - Phone number(s)
-       - Email address(es) 
-       - Physical address
-       - Other contact info (social media, website forms, etc.)
+    5. Contact Information — this must be COMPLETE, not partial. Search every provided page (especially contact/reach-us pages) and extract:
+       - Every phone number published on the site, exactly as written
+       - Every email address published on the site
+       - The full physical/mailing address: street, suite, city, state, zip code
+       - Other contact info (social media, website forms, fax, contact person names/titles, etc.)
+       Never leave a contact field as "Not specified" if the information appears anywhere in the provided pages.
 
     Include as much detail as possible in each field. Be comprehensive and thorough.
     Avoid making up information if not available on the pages.

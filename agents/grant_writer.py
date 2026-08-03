@@ -59,7 +59,7 @@ class GrantWriter:
     
     def generate_consolidated_grant_description(self, grants_data: List[Dict[str, Any]], org_data: Dict[str, Any] = None) -> str:
         """
-        Generate a single consolidated 500-word grant opportunity description from multiple grants data
+        Generate a single consolidated 500-700 word grant opportunity description from multiple grants data
         Optionally includes organization information for better context
         
         Args:
@@ -85,7 +85,7 @@ class GrantWriter:
         prompt = ChatPromptTemplate.from_template("""
         You are an expert grant writer who creates clean, professional, and comprehensive grant opportunity descriptions for The Grant Portal - an online grant directory.
 
-        You have been provided with data from multiple grant opportunities from a foundation. Your task is to create ONE SINGLE consolidated 500-word professional opportunity description that synthesizes and combines all the ACTIVE grant information into a comprehensive funding opportunity description.
+        You have been provided with data from multiple grant opportunities from a foundation. Your task is to create ONE SINGLE consolidated professional opportunity description of 500 to 700 words (aim near 600) that synthesizes and combines all the ACTIVE grant information into a comprehensive funding opportunity description.
 
         📝 FORMATTING REQUIREMENTS:
         - Add appropriate icons (📊, 💰, 🎯, 📅, etc.) beside all section titles. make them as h3
@@ -106,7 +106,7 @@ class GrantWriter:
         8. 📅 Proposal Deadlines / Grant Cycles - Include all relevant deadlines and cycles for grant proposals
         9. 🔁 Grant Frequency / Reapplication Rules - Describe if grants are awarded annually or not.
         10. 💡 Grant Programs & Awards - Bulleted List of short description of each grant provided by the foundation along with the URLs in the format url: <grant_url> - No hyperlink. The format should be url: <grant_url> only
-        11. 📞 Contact Information - Include contact information with telephone number, email address and physical address.
+        11. 📞 Contact Information - Include the foundation name, telephone number, email address and full physical address.
                                                   
         Do not make up any information. Only use the data provided.
         
@@ -116,7 +116,7 @@ class GrantWriter:
         - Create a unified narrative that flows naturally
         - Highlight the diverse range of funding available
         - Make it clear this represents multiple funding opportunities
-        - Exactly 500 words (be precise)
+        - 500 to 700 words, aiming near 600. Do not pad a thin source to reach the target
         - Professional, engaging tone that encourages applications
         - If some information is missing or not specified, mention that to check on the foundation website
         {org_context}

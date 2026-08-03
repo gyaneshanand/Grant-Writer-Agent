@@ -37,10 +37,13 @@ Field-specific rules:
 4. meta_description (≤150 chars): Vague search result snippet, DIFFERENT from meta_title.
    Include grant intent, who is eligible, and geographic scope if known.
 
-5. opportunity_teaser (~500 words): Descriptive, engaging, comprehensive plain-text summary.
+5. opportunity_teaser (170-240 words, ideally ~200; never more than 300): Descriptive, engaging plain-text summary.
    - NO icons, NO bullet points, NO URLs, NO headers
    - Include: geographic scope, who is eligible (nonprofits/businesses/individuals),
-     intended use of funds, dollar amounts if known, grant benefits and interests
+     intended use of funds, grant benefits and interests
+   - NEVER state a dollar amount, award size, range, match ratio, percentage or deadline
+     date — amounts and deadlines are displayed separately on the page. No vague money
+     language as a substitute ("up to", "generous", "substantial")
    - Do NOT say "new grant opportunity"
    - Do NOT mention foundation name, grant name, program names, people names, or addresses
 
