@@ -4,6 +4,7 @@ Used by Layer 1 (SerpAPI) and Layer 2 (page fetching).
 Every fetch goes to the network — no on-disk caching, by design (accuracy > cost).
 """
 import asyncio
+import os
 from typing import Optional
 
 import httpx
@@ -13,12 +14,11 @@ from agents.grant_writer_v2.core.logger import get_logger
 
 logger = get_logger("http")
 
+# Honest crawler identity. A spoofed browser UA over a non-browser TLS
+# fingerprint gets flagged by WAFs (connection drops / 403), while sites that
+# whitelist declared crawlers never see one to allow.
 _HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/124.0.0.0 Safari/537.36"
-    ),
+    "User-Agent": os.getenv("BOT_USER_AGENT", "TheGrantPortalBot/1.0 (+https://www.thegrantportal.com)"),
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "en-US,en;q=0.9",
 }

@@ -18,6 +18,14 @@ load_dotenv()
 MAX_GRANT_PAGES = int(os.getenv("MAX_GRANT_PAGES", 10))
 PAGE_WORKERS = int(os.getenv("PIPELINE_PAGE_WORKERS", 8))
 
+# Honest crawler identity. Spoofed browser UAs trip WAF TLS-fingerprint checks,
+# and the python-requests default UA is blocked outright by some hosts (403).
+REQUEST_HEADERS = {
+    "User-Agent": os.getenv("BOT_USER_AGENT", "TheGrantPortalBot/1.0 (+https://www.thegrantportal.com)"),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.5",
+}
+
 # Step 1: Schema
 class Grant(BaseModel):
     grant_name: str = "Not specified"
@@ -38,7 +46,7 @@ class Grant(BaseModel):
 # Step 2: Scrape pages
 def scrape_site(url):
     print(f"🔍 Starting to scrape site: {url}")
-    r = requests.get(url, timeout=15)
+    r = requests.get(url, timeout=15, headers=REQUEST_HEADERS)
     print(f"✅ Successfully fetched main page, status code: {r.status_code}")
     soup = BeautifulSoup(r.text, "html.parser")
     links = [a['href'] for a in soup.find_all('a', href=True)]
@@ -100,7 +108,7 @@ def get_html_content_and_extract_text(url):
     print(f"🌐 Fetching content from: {url}")
     
     try:
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, timeout=10, headers=REQUEST_HEADERS)
         print(f"✅ Response status: {response.status_code}")
         
         if response.status_code != 200:
