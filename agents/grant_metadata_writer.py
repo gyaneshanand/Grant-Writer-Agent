@@ -1,5 +1,6 @@
 from langchain.prompts import ChatPromptTemplate
 from pydantic import BaseModel
+import hashlib
 import json
 from typing import Dict, Any
 import os
@@ -9,6 +10,115 @@ from agents.llm_factory import create_pipeline_llm
 
 # Load environment variables
 load_dotenv()
+
+# Teaser style rotation. Thousands of independent API calls cannot coordinate,
+# so "vary the tone" instructions achieve nothing — a style is picked
+# deterministically from the grant data hash and prescribed outright. Mirrors
+# the taxonomy in TGP's GrantContentGeneratorService so both generation paths
+# ("Fetch All New Content" here, "Regenerate All Content" in the CMS) draw from
+# the same pool of shapes.
+TEASER_OPENING_MOVES = [
+    "The people or communities who ultimately benefit, as the grammatical subject of the sentence.",
+    "The place those people live or work, then the people themselves.",
+    "The unmet need, gap or pressure the funding addresses, stated plainly.",
+    "The consequence of that need going unaddressed, then the response the funding makes possible.",
+    "The eligible applicant type together with where it operates.",
+    "The day-to-day work eligible organizations do, naming the entity type only at the end of the sentence.",
+    "The funding mechanism: the way the money reaches the recipient and behaves once it arrives.",
+    "What a recipient is able to do once the award arrives, in concrete terms.",
+    "Two or three concrete things the money pays for, in one sentence.",
+    "The single most distinctive fundable activity, alone, in a short sentence.",
+    "The field of practice described as daily work rather than as a funding topic.",
+    "The field described through its practitioners: the roles and professions doing the work.",
+    "The stage of work funded: launch, expansion, capacity, capital, continuation or recovery.",
+    "The geographic scope first, then what the funding does there.",
+    "A sector and a place paired in one clause, then the support offered.",
+    "One clause on who this funding is not for, then the audience it actually serves.",
+    "The outcome or change the funded work is meant to produce.",
+    "The recurring or ongoing nature of the support, without any dates.",
+    "A broad field, then the narrow slice of it this funding covers.",
+    "A gerund phrase naming the funded activity, for example a sentence opening on rebuilding, training, staffing or preserving.",
+    "A sketch of a typical qualifying applicant and the situation it is in.",
+    "The resource applicants typically lack, then how this funding fills that gap.",
+    "What sets this support apart from the usual funding available in the same field.",
+    "The scale of work supported, from the smallest effort to the largest the facts allow.",
+]
+
+# E = eligibility and exclusions, G = geography, U = use of funds and
+# priorities, M = mechanism and what makes this unusual.
+TEASER_ORDER_PATTERNS = [
+    "eligibility, then geography, then use of funds, then mechanism",
+    "geography, then use of funds, then eligibility, then mechanism",
+    "use of funds, then mechanism, then eligibility, then geography",
+    "mechanism, then eligibility, then use of funds, then geography",
+    "use of funds, then geography, then mechanism, then eligibility",
+    "eligibility, then use of funds, then geography, then mechanism",
+    "geography, then eligibility, then mechanism, then use of funds",
+    "mechanism, then use of funds, then geography, then eligibility",
+    "use of funds, then eligibility, then mechanism, then geography",
+    "geography, then mechanism, then use of funds, then eligibility",
+]
+
+TEASER_VOICES = [
+    'Plain administrative. Third person only. Sentences average 16 to 22 words. No metaphor, no imagery. Refer to the source of funds as "the program".',
+    'Practitioner to practitioner. Third person, but you may write "organizations like yours" exactly once. Include one sentence about how this money is typically used in day to day operations. Refer to the source of funds as "the grantmaker".',
+    'Explanatory. Include one sentence that explains what the funded work involves in practice, built only from the eligibility, interest and use-of-funds facts. Never speculate about the funder\'s reasoning or motives. At least two sentences must exceed 25 words. Refer to the source of funds as "the funder".',
+    'Direct address. Use "your organization" or "your business" between two and four times, but never in the first sentence. Refer to the source of funds as "this funding source".',
+    'Field narrative. Write about the field and the people served rather than about money. No second person anywhere. Refer to the source of funds as "the sponsoring body".',
+    'Briefing. Every sentence 20 words or fewer. At least ten sentences in total. No sentence may contain more than one subordinate clause. Refer to the source of funds as "the program".',
+]
+
+TEASER_TRANSITIONS = [
+    "as a plain statement of who may apply, in its own sentence",
+    "folded into a sentence about the use of funds, as a clause rather than a separate sentence",
+    "as a profile sketch of the kind of organization or person that qualifies",
+    "as a contrast inside one sentence: who qualifies and who does not",
+    "through location: eligibility expressed while naming where applicants must be based",
+    "through the mechanism: eligibility expressed while explaining how recipients receive or use the funds",
+]
+
+TEASER_CLOSINGS = [
+    "state the recurring or ongoing nature of the support, without dates",
+    "state the one fact about this funding that is true of very few other grants",
+    "name, in one quiet clause, who would be better served looking elsewhere",
+    "name what an applicant should already have in place, drawn strictly from the eligibility facts",
+    "restate the geographic reach in different words than earlier in the summary",
+    "name what the field or the community stands to gain when this work is funded",
+    "describe the best-fit applicant in one sentence",
+    "state how the funds sit in a recipient's budget, such as project cost, operating support or capital purchase, when the facts support it",
+]
+
+
+def build_teaser_style_directive(grant_data: str) -> str:
+    """
+    Deterministic per-grant style prescription for the Opportunity Teaser.
+    Same grant data always yields the same style, different grants spread
+    across 24 x 10 x 6 x 6 x 8 combinations.
+    """
+    def pick(salt: str, options: list) -> str:
+        digest = hashlib.md5((salt + "|" + grant_data).encode("utf-8", "ignore")).hexdigest()
+        return options[int(digest, 16) % len(options)]
+
+    opening = pick("open", TEASER_OPENING_MOVES)
+    order = pick("order", TEASER_ORDER_PATTERNS)
+    voice = pick("voice", TEASER_VOICES)
+    transition = pick("transition", TEASER_TRANSITIONS)
+    closing = pick("close", TEASER_CLOSINGS)
+
+    return f"""TEASER COMPOSITION DIRECTIVE (applies to the Opportunity Teaser only, follow all five exactly):
+- OPENING: build the first sentence from this fact class and construction, and from nothing else: {opening}
+- ORDER: after the opening sentence, cover the blocks in this order of first mention: {order}. Two blocks may share a sentence where that reads naturally.
+- VOICE: {voice}
+- ELIGIBILITY TRANSITION: introduce who may apply {transition}.
+- CLOSING: the final sentence must {closing}, and must not summarize what was already said.
+
+TEASER ANTI-REPETITION RULES:
+- The first word of the teaser may not be This, These, The, Funding, Funds, Grant, Grants, Eligible, Nonprofit, Nonprofits, Organizations, Support or Applicants.
+- The word "opportunity" may not appear in the first sentence.
+- Banned stems, never as the opening and at most once anywhere: "This funding opportunity", "This grant", "This program", "This opportunity", "The funding opportunity", "The grant opportunity", "The scholarship opportunity", "The program supports", "Funding is available", "Support is available", "Grant funding is", "Eligible applicants", "Designed to", "Aimed at", "Intended to", "The purpose of", "In today's", "Are you", "Whether you".
+- No two sentences in the teaser may begin with the same word.
+- The phrase "funding opportunity" at most once. The word "impact" at most once. The word "support" at most twice.
+- Banned phrases anywhere: "empowering communities", "unlocking potential", "catalyst for change", "make a lasting impact", "wide range of", "a variety of", "long-term sustainability", "take your organization to the next level", "committed to making a difference", "plays a vital role", "seeks to bridge the gap"."""
 
 class GrantMetadata(BaseModel):
     opportunity_title: str
@@ -66,6 +176,8 @@ class GrantMetadataWriter:
 
         5. **Opportunity Teaser** (170 to 240 words, ideally about 200; NEVER exceed 300 words, HARD LIMIT): Write a descriptive, engaging and easy to understand summary with description of grant opportunity. Make the response vague. Do NOT show icons. Do NOT show bullets. Do not include any content source URLs. Provide information such as grants for which states or regions, grants for nonprofits or businesses or individuals. Provide information to describe the intent of use for the funds. Never state a dollar amount, award size, range, match ratio, percentage or deadline date — amounts and deadlines are displayed separately on the page. Do not use vague money language as a substitute ("up to", "as much as", "generous", "substantial award"). Write about the grant opportunity benefits, interests, identify if nonprofit organizations or small businesses or individuals are eligible and locations where available. Do not mention contact information or foundation name or grant name. Make description vague. Do not say it is a 'new grant' opportunity. Remember to EXCLUDE the foundation's name, grant's name or any specific program names, people's names, addresses, or URLs in the summary. No names. No addresses. No URLs. No dollar amounts. No deadlines. We do not want to reveal the foundation and grant identity to users.
 
+        {teaser_style}
+
         6. **Opportunity Title for Subscriber** (approximately 140 characters): Clean title for grant opportunity; includes the Grant name, grant intent, grant amount that describes who the grant helps and specific causes. Do not mention grant source. SEO friendly. Make sure Opportunity Title for Subscriber is not more than 150 characters.
 
         Here is the grant data to use:
@@ -85,7 +197,8 @@ class GrantMetadataWriter:
         
         try:
             print("🤖 Making single OpenAI API call for all metadata...")
-            result = self.llm.invoke(prompt.format(grant_data=grant_data)).content
+            teaser_style = build_teaser_style_directive(grant_data)
+            result = self.llm.invoke(prompt.format(grant_data=grant_data, teaser_style=teaser_style)).content
             print("✅ Received response from OpenAI")
             print(f"📤 Raw response length: {len(result)} characters")
             
