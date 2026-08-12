@@ -2,7 +2,9 @@ from bs4 import BeautifulSoup
 import requests
 from concurrent.futures import ThreadPoolExecutor
 from langchain.prompts import ChatPromptTemplate
+from urllib.parse import urljoin
 from agents.llm_factory import create_pipeline_llm
+from agents.grant_data_collector import _extract_contact_signals
 from pydantic import BaseModel
 import re
 import json
@@ -50,11 +52,12 @@ def scrape_site(url):
     for l in links:
         if any(x in l.lower() for x in ["home", "about", "faq", "contact", "reach", "mission", "vision", "history", "background", "team", "staff", "board", "leadership", "who-we-are", "our-story", "get-in-touch", "reach-us", "contact-us", "about-us", "mission", "our-vision", "what-we-do", "help", "support"]):
             original_link = l
-            # Fix relative URLs
-            if l.startswith('/'):
-                l = url.rstrip('/') + l
-            elif not l.startswith('http'):
-                l = url.rstrip('/') + '/' + l
+            # Resolve relative URLs against the page URL (string concatenation
+            # built broken paths whenever the base URL had a path segment).
+            # Fragments stripped — anchors are the same page.
+            l = urljoin(url, l).split('#')[0]
+            if not l.startswith('http'):
+                continue  # mailto:, tel:, javascript: etc.
             org_links.append(l)
             print(f"🎯 Found potential organization link: {original_link} -> {l}")
 
@@ -105,7 +108,15 @@ def get_html_content_and_extract_text(url):
         else:
             print("⚠️ Trafilatura extraction failed, falling back to raw HTML")
             extracted_text = html_content
-            
+
+        # Re-attach contact details that live only in mailto:/tel: hrefs (and
+        # Cloudflare-obfuscated emails), which text extraction otherwise drops —
+        # this is where the org's real email addresses usually are.
+        contact_signals = _extract_contact_signals(html_content)
+        if contact_signals and contact_signals not in extracted_text:
+            print(f"📇 Harvested contact signals from markup: {contact_signals[:120]}")
+            extracted_text = f"{extracted_text}\n\n{contact_signals}"
+
         return html_content, extracted_text
         
     except requests.exceptions.Timeout:
@@ -140,14 +151,14 @@ def extract_organization_info(page_texts):
     2. Mission - organization's mission statement, focus areas, funding priorities and interests. What kind of grants do they provide?
     3. Background - historical background, when it was founded, key milestones
     4. About - comprehensive about section describing what the organization does, their programs, initiatives
-    5. Contact Information — this must be COMPLETE, not partial. Search every provided page (especially contact/reach-us pages) and extract:
-       - Every phone number published on the site, exactly as written
-       - Every email address published on the site
-       - The full physical/mailing address: street, suite, city, state, zip code
-       - Other contact info (social media, website forms, fax, contact person names/titles, etc.)
-       Never leave a contact field as "Not specified" if the information appears anywhere in the provided pages.
+    5. Contact Information — this is shown to paying subscribers as the organization's contact card, so it must be clean and act-on-able, never a staff directory. Search every provided page (especially contact pages and "Email addresses found on this page" / "Telephone numbers found on this page" lines) and select:
+       - phone: EXACTLY ONE phone number — the organization's main line. Never list per-person phone numbers, staff names with extensions, or more than one number.
+       - email: EXACTLY ONE email address — the most relevant for grant applicants (a grants/program/inquiries address beats a general office inbox; a general inbox beats a personal one; if only personal staff emails exist, pick the one belonging to grants/program staff).
+       - address: the full physical/mailing address: street, suite, city, state, zip code.
+       - other_info: at most the website and fax if published; otherwise an empty object. No social media lists, no staff rosters.
+       If a value genuinely appears nowhere in the provided pages, use an empty string "" for that field. NEVER write sentences into contact fields — no explanations, no "not specified", no "emails are behind a link", no descriptions of what the site says. A contact field contains a value or is empty.
 
-    Include as much detail as possible in each field. Be comprehensive and thorough.
+    Include as much detail as possible in fields 1-4. Be comprehensive and thorough.
     Avoid making up information if not available on the pages.
     If multiple pages contain similar information, consolidate and provide the most complete version.
 
@@ -224,6 +235,38 @@ def _fetch_page_text(p):
         return None
 
 
+_PLACEHOLDER_VALUES = {"not specified", "n/a", "none", "unknown", "not available", ""}
+_EMAIL_VALUE_RE = re.compile(r"[A-Za-z0-9][\w.+-]*@[A-Za-z0-9][\w-]*(?:\.[A-Za-z]{2,})+")
+_PHONE_VALUE_RE = re.compile(r"\+?\(?\d[\d\s().\-]{6,}\d")
+
+
+def _sanitize_contact(contact: dict) -> dict:
+    """Deterministic guard on the contact card shown to subscribers.
+
+    Whatever the model wrote, the output is: at most one email (a real address,
+    not a sentence), at most one phone number, a placeholder-free address.
+    The model prompt asks for exactly this — this enforces it.
+    """
+    contact = dict(contact or {})
+
+    email_raw = str(contact.get("email") or "")
+    emails = _EMAIL_VALUE_RE.findall(email_raw)
+    contact["email"] = emails[0] if emails else ""
+
+    phone_raw = str(contact.get("phone") or "")
+    phones = _PHONE_VALUE_RE.findall(phone_raw)
+    contact["phone"] = phones[0].strip() if phones else ""
+
+    address = str(contact.get("address") or "").strip()
+    contact["address"] = "" if address.lower() in _PLACEHOLDER_VALUES else address
+
+    other = contact.get("other_info")
+    if isinstance(other, str) and other.strip().lower() in _PLACEHOLDER_VALUES:
+        contact["other_info"] = {}
+
+    return contact
+
+
 # Step 4: Run pipeline
 def run_pipeline(foundation_url):
     print(f"🚀 Starting pipeline for Foundation URL: {foundation_url}")
@@ -245,6 +288,7 @@ def run_pipeline(foundation_url):
     
     if organization:
         org_data = organization.model_dump()
+        org_data["contact"] = _sanitize_contact(org_data.get("contact"))
         print(f"\n🎉 Pipeline completed! Organization information extracted")
         print("\n📋 Organization data in JSON format:")
         print(json.dumps(org_data, indent=4))

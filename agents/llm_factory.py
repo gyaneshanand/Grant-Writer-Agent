@@ -23,11 +23,20 @@ DEFAULT_REQUEST_TIMEOUT = 90  # seconds per LLM call
 DEFAULT_MAX_RETRIES = 1
 
 
-def create_pipeline_llm(temperature: float, openai_api_key: str = None) -> ChatOpenAI:
+def create_pipeline_llm(
+    temperature: float,
+    openai_api_key: str = None,
+    reasoning_effort: str = None,
+) -> ChatOpenAI:
     """Build the pipeline LLM with GPT-5.x-safe parameters.
 
     GPT-5.x chat completions reject any temperature other than the default (1),
     so the caller's temperature is only honored for older models.
+
+    reasoning_effort lets a caller override the pipeline default. Extraction runs
+    at the cheap PIPELINE_REASONING_EFFORT ("low") for latency; the two synthesis
+    calls (consolidated description + teaser/metadata) pass a higher effort since
+    they are low-volume and quality-critical.
     """
     model = os.getenv("PIPELINE_MODEL", DEFAULT_PIPELINE_MODEL)
     if openai_api_key is None:
@@ -44,7 +53,7 @@ def create_pipeline_llm(temperature: float, openai_api_key: str = None) -> ChatO
     }
 
     if "gpt-5" in model:
-        kwargs["reasoning_effort"] = os.getenv(
+        kwargs["reasoning_effort"] = reasoning_effort or os.getenv(
             "PIPELINE_REASONING_EFFORT", DEFAULT_REASONING_EFFORT
         )
 

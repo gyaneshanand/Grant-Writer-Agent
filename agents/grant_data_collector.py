@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from urllib.parse import urljoin, urlparse
 from langchain.prompts import ChatPromptTemplate
 from agents.llm_factory import create_pipeline_llm
 from pydantic import BaseModel
@@ -17,6 +18,10 @@ load_dotenv()
 # costs one LLM call, so the page cap is the single biggest latency lever.
 MAX_GRANT_PAGES = int(os.getenv("MAX_GRANT_PAGES", 10))
 PAGE_WORKERS = int(os.getenv("PIPELINE_PAGE_WORKERS", 8))
+# Second crawl wave: program sub-pages linked from wave-1 pages, not the
+# homepage (e.g. /capacity-building-grant-program/ linked from /grantmaking/).
+# These carry the specific award caps and deadlines. 0 disables the wave.
+WAVE2_PAGES = int(os.getenv("PIPELINE_WAVE2_PAGES", 8))
 
 # Honest crawler identity. Spoofed browser UAs trip WAF TLS-fingerprint checks,
 # and the python-requests default UA is blocked outright by some hosts (403).
@@ -25,6 +30,202 @@ REQUEST_HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "en-US,en;q=0.5",
 }
+
+# Keywords that mark a link as grant-related. Shared by static (BeautifulSoup)
+# and Jina (markdown) link discovery so both paths select the same pages.
+GRANT_LINK_KEYWORDS = [
+    "grant", "apply", "fund", "fellowship", "opportunity", "scholarship",
+    "award", "funding", "faq", "eligibility", "criteria", "how-to-apply",
+    "guidelines", "about", "programs", "opportunities",
+    # foundation program pages that don't say "grant" in the URL
+    # (e.g. /strategic-restructuring-initiative/, /management-assistance/)
+    "initiative", "assistance", "support", "contact",
+    # staff/team pages carry the email addresses that contact pages only link to
+    "staff", "team",
+]
+
+# Per-page cap on the raw text handed to the writers. Gives them the real page
+# instead of only the 13-field extraction, while keeping the prompt bounded.
+PAGE_TEXT_CHARS = int(os.getenv("PIPELINE_PAGE_TEXT_CHARS", 12000))
+
+# Jina Reader (JS-render fallback). Same key/env the v2 pipeline uses. When set,
+# JS-rendered SPA pages that static fetching can't read are recovered as markdown.
+JINA_API_KEY = os.getenv("JINA_API_KEY", "")
+JINA_TIMEOUT = int(os.getenv("JINA_TIMEOUT", 60))
+
+
+def _strip_html_to_text(html: str) -> str:
+    """Crude readable-text estimate: drop script/style blocks and tags."""
+    stripped = re.sub(r'<(script|style)[^>]*>.*?</(script|style)>', ' ', html,
+                      flags=re.DOTALL | re.IGNORECASE)
+    stripped = re.sub(r'<[^>]+>', ' ', stripped)
+    return re.sub(r'\s+', ' ', stripped).strip()
+
+
+def _is_js_rendered(html: str, extracted_text=None) -> bool:
+    """Heuristic: does this page look like a JS-rendered SPA shell whose real
+    content never arrived in the static HTML? Only consulted when the static
+    extraction is already thin, to avoid spending a Jina call on real pages."""
+    if not html:
+        return False
+    # When the caller has no trafilatura text (link-discovery path), estimate
+    # readable text from the raw HTML — otherwise every large static page would
+    # be misclassified as an SPA and burn a Jina call.
+    text_len = len(extracted_text) if extracted_text is not None else len(_strip_html_to_text(html))
+    # Enough readable text already — treat it as a real, fully-static page.
+    if text_len >= 1000:
+        return False
+    # Thin/empty extraction — decide whether the raw HTML is an SPA shell.
+    if html.count("href=") <= 5:  # classic SPA: almost no static anchors
+        return True
+    if len(html) > 50_000:  # big JS bundle, little readable text
+        return True
+    return False
+
+
+def fetch_via_jina(url: str):
+    """Fetch a URL through Jina Reader (r.jina.ai), which renders JS and returns
+    clean markdown. Returns the text, or None on any failure. Kept sync so it
+    runs inside this pipeline's existing thread pool."""
+    if not JINA_API_KEY:
+        return None
+    try:
+        resp = requests.get(
+            f"https://r.jina.ai/{url}",
+            timeout=JINA_TIMEOUT,
+            headers={
+                "Authorization": f"Bearer {JINA_API_KEY}",
+                "Accept": "text/plain",
+                "X-Return-Format": "markdown",
+                "X-No-Cache": "true",
+            },
+        )
+        if resp.status_code == 200 and resp.text.strip():
+            return resp.text
+        print(f"⚠️ Jina Reader returned {resp.status_code} for {url}")
+    except Exception as e:
+        print(f"❌ Jina Reader error for {url}: {e}")
+    return None
+
+
+_EMAIL_RE = re.compile(r"[A-Za-z0-9][\w.+-]*@[A-Za-z0-9][\w-]*(?:\.[A-Za-z]{2,})+")
+_IMAGE_SUFFIXES = (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp")
+# Cloudflare email obfuscation: emails are XOR-encoded hex in data-cfemail
+# attributes / email-protection#... links and only decoded by client-side JS,
+# so a plain fetch never sees them as text.
+_CFEMAIL_RE = re.compile(r'(?:data-cfemail="|/cdn-cgi/l/email-protection#)([a-fA-F0-9]{8,})')
+
+
+def _decode_cfemail(hexstr: str):
+    """Decode a Cloudflare-obfuscated email (first byte = XOR key)."""
+    try:
+        data = bytes.fromhex(hexstr)
+        return bytes(b ^ data[0] for b in data[1:]).decode("utf-8")
+    except Exception:
+        return None
+
+
+# Placeholder emails baked into site templates and form builders — never real.
+_JUNK_EMAIL_PARTS = (
+    "example.", "@domain.", "@email.", "@yourdomain", "@test.", "@sentry",
+    "user@", "name@", "someone@", "email@", "your@", "@2x",
+)
+
+
+def _extract_contact_signals(html: str) -> str:
+    """Harvest emails, phone numbers and addresses from raw HTML.
+
+    Contact details usually live where text extraction never looks: mailto:/tel:
+    hrefs, Cloudflare-obfuscated spans, and JSON-LD/site metadata blocks inside
+    <script> tags (Squarespace, Wix and WordPress all publish the org's address
+    and phone there). Harvest them and append them to the page text as plain
+    facts so the writers always see them.
+    """
+    if not html:
+        return ""
+    emails = {
+        e.rstrip(".")
+        for e in _EMAIL_RE.findall(html)
+        if not e.lower().endswith(_IMAGE_SUFFIXES)
+        and not any(j in e.lower() for j in _JUNK_EMAIL_PARTS)
+    }
+    # Cloudflare-obfuscated emails (JS-decoded in a real browser, invisible to a
+    # plain fetch) — decode them server-side.
+    for hexstr in _CFEMAIL_RE.findall(html):
+        decoded = _decode_cfemail(hexstr)
+        if decoded and _EMAIL_RE.fullmatch(decoded) and not any(j in decoded.lower() for j in _JUNK_EMAIL_PARTS):
+            emails.add(decoded)
+
+    phones = set(re.findall(r'href=["\']tel:([+\d][\d\s().-]{6,})["\']', html, re.IGNORECASE))
+    # Structured-data phone: "telephone":"(203) 493-1088"
+    for m in re.findall(r'"telephone"\s*:\s*"([^"]{7,25})"', html):
+        if re.search(r"\d{3}", m):
+            phones.add(m)
+
+    # Structured-data postal address: "address":"P.O. Box 7266\nWilton, Ct. 06897..."
+    addresses = set()
+    for m in re.findall(r'"address"\s*:\s*"([^"]{10,200})"', html):
+        cleaned = m.replace("\\n", ", ").strip()
+        if re.search(r"\d", cleaned):  # real addresses carry a number
+            addresses.add(cleaned)
+
+    parts = []
+    if emails:
+        parts.append("Email addresses found on this page: " + ", ".join(sorted(emails)))
+    if phones:
+        parts.append("Telephone numbers found on this page: " + ", ".join(sorted(p.strip() for p in phones)))
+    if addresses:
+        parts.append("Mailing/physical address found in this page's metadata: " + " | ".join(sorted(addresses)))
+    return "\n".join(parts)
+
+
+def _mine_grant_links(html: str, page_url: str):
+    """Keyword-matched, same-domain links from a fetched page's HTML.
+
+    Feeds the second crawl wave: program detail pages are usually linked from a
+    grantmaking overview page rather than the homepage, and they hold the award
+    caps and deadlines the homepage never mentions.
+    """
+    if not html:
+        return []
+    base_host = urlparse(page_url).netloc.lower().removeprefix("www.")
+    try:
+        soup = BeautifulSoup(html, "html.parser")
+    except Exception:
+        return []
+    out, seen = [], set()
+    for a in soup.find_all("a", href=True):
+        l = urljoin(page_url, a["href"]).split("#")[0]
+        if not l.startswith("http") or l in seen:
+            continue
+        host = urlparse(l).netloc.lower().removeprefix("www.")
+        if host != base_host and not host.endswith("." + base_host):
+            continue
+        if any(k in l.lower() for k in GRANT_LINK_KEYWORDS):
+            seen.add(l)
+            out.append(l)
+    return out
+
+
+def _extract_grant_links_from_markdown(markdown: str, base_url: str = None):
+    """Pull absolute grant-related links out of Jina markdown output.
+
+    Restricted to the foundation's own host (subdomains allowed) — Jina links are
+    all absolute, so without this filter keyword-matching links to social media
+    or other foundations would enter the crawl.
+    """
+    base_host = urlparse(base_url).netloc.lower().removeprefix("www.") if base_url else None
+    links = re.findall(r'\]\((https?://[^)\s]+)\)', markdown or "")
+    seen, out = set(), []
+    for l in links:
+        if base_host:
+            host = urlparse(l).netloc.lower().removeprefix("www.")
+            if host != base_host and not host.endswith("." + base_host):
+                continue
+        if any(k in l.lower() for k in GRANT_LINK_KEYWORDS) and l not in seen:
+            seen.add(l)
+            out.append(l)
+    return out
 
 # Step 1: Schema
 class Grant(BaseModel):
@@ -55,13 +256,16 @@ def scrape_site(url):
     # Filter and fix relative URLs
     grant_links = []
     for l in links:
-        if any(x in l.lower() for x in ["grant", "apply", "fund", "fellowship", "opportunity", "scholarship", "award", "funding", "faq", "eligibility", "criteria", "how-to-apply", "guidelines", "about", "programs", "opportunities"]):
+        if any(x in l.lower() for x in GRANT_LINK_KEYWORDS):
             original_link = l
-            # Fix relative URLs
-            if l.startswith('/'):
-                l = url.rstrip('/') + l
-            elif not l.startswith('http'):
-                l = url.rstrip('/') + '/' + l
+            # Resolve relative URLs against the page URL. String concatenation
+            # here built broken paths whenever the base URL had a path segment
+            # (e.g. /how-to-apply + /grants -> /how-to-apply/grants -> 404).
+            # Fragments are stripped: "#scholarships-grants" is the same page,
+            # and anchor "links" were burning crawl slots on duplicate fetches.
+            l = urljoin(url, l).split('#')[0]
+            if not l.startswith('http') or not l.rstrip('/'):
+                continue  # mailto:, tel:, javascript:, bare-fragment etc.
             grant_links.append(l)
             print(f"🎯 Found potential grant link: {original_link} -> {l}")
 
@@ -76,7 +280,30 @@ def scrape_site(url):
         for gl in grant_links:
             if kw in gl.lower() and gl not in prioritized_links:
                 prioritized_links.append(gl)
+    # Remaining keyword-matched links (about, contact, initiative, assistance,
+    # eligibility, faq...) fill the leftover slots. These were silently dropped
+    # before, which lost program pages (e.g. /strategic-restructuring-initiative/)
+    # and the contact page that carries the foundation's email and phone.
+    for gl in grant_links:
+        if gl not in prioritized_links:
+            prioritized_links.append(gl)
     grant_links = prioritized_links[:MAX_GRANT_PAGES]
+
+    # SPA fallback: if static HTML yielded almost no grant links, or the page
+    # looks JS-rendered, ask Jina Reader for the rendered page and mine its
+    # markdown links. Without this, single-page-app foundation sites collapse to
+    # just the main URL and the whole pipeline sees one near-empty page.
+    if JINA_API_KEY and (len(grant_links) <= 1 or _is_js_rendered(r.text, None)):
+        print(f"🔁 Sparse/JS-rendered links at {url}, trying Jina Reader for link discovery...")
+        jina_md = fetch_via_jina(url)
+        if jina_md:
+            added = 0
+            for jl in _extract_grant_links_from_markdown(jina_md, base_url=url):
+                if jl not in grant_links:
+                    grant_links.append(jl)
+                    added += 1
+            grant_links = grant_links[:MAX_GRANT_PAGES]
+            print(f"✨ Jina link discovery added {added} links, total now {len(grant_links)}")
 
     # Always include the main URL
     if url not in grant_links:
@@ -121,13 +348,33 @@ def get_html_content_and_extract_text(url):
         # Extract main article text using trafilatura
         print("🔧 Extracting main article text with trafilatura...")
         extracted_text = trafilatura.extract(html_content)
-        
+
         if extracted_text:
             print(f"✨ Extracted clean text length: {len(extracted_text)} characters")
         else:
-            print("⚠️ Trafilatura extraction failed, falling back to raw HTML")
+            print("⚠️ Trafilatura extraction returned nothing")
+
+        # JS-render fallback: an SPA shell yields little/no trafilatura text.
+        # Jina Reader renders the page server-side and returns clean markdown.
+        if JINA_API_KEY and _is_js_rendered(html_content, extracted_text):
+            print(f"🔁 JS-rendered page detected at {url}, falling back to Jina Reader...")
+            jina_text = fetch_via_jina(url)
+            if jina_text and len(jina_text) > len(extracted_text or ""):
+                print(f"✨ Jina Reader returned {len(jina_text)} chars (was {len(extracted_text or '')})")
+                extracted_text = jina_text
+
+        # Last resort so downstream never receives None.
+        if not extracted_text:
+            print("⚠️ No clean text available, falling back to raw HTML")
             extracted_text = html_content
-            
+
+        # Re-attach contact details that live only in mailto:/tel: hrefs, which
+        # text extraction otherwise drops.
+        contact_signals = _extract_contact_signals(html_content)
+        if contact_signals and contact_signals not in extracted_text:
+            print(f"📇 Harvested contact signals from markup: {contact_signals[:120]}")
+            extracted_text = f"{extracted_text}\n\n{contact_signals}"
+
         return html_content, extracted_text
         
     except requests.exceptions.Timeout:
@@ -155,6 +402,8 @@ def extract_grant_info(page_text):
 
     Extract the following fields about ACTIVE grants only from this page. Please think and reason that this is a actual grant/scholarship opportunity.
 
+    ACTIVE means any of: currently accepting applications; awarded annually or on a recurring cycle; or a future/announced application window (e.g. "applications will open February 1"). A grant whose next window has not opened yet IS active — include it. Only exclude a grant when it is permanently closed, discontinued, by invitation only, or all of its deadlines are in the past with no recurrence.
+
     1. Grant Name - the grant or funding opportunity name if available elase try to create a suitable name based on the content if not explicitly mentioned.
     2. Funding priorities and interests
     3. Types of grant
@@ -163,7 +412,7 @@ def extract_grant_info(page_text):
     6. Eligible funding locations
     7. Range of grant amount
     8. Specific grant funding amount
-    9. Proposal deadline
+    9. Proposal deadline - capture the FULL application window as written on the page: opening date, due date and time, and each cycle's dates when there are several
     10. Annual or recurring
     11. Contact info (telephone, email, physical address)
     12. Organization information about the grant provider. Include the organization’s name, about us, organization’s mission or focus, background information, types of grants if available.
@@ -211,8 +460,11 @@ def extract_grant_info(page_text):
         grant = Grant.model_validate_json(result)
         print("✅ Successfully parsed grant information")
         
-        # Check if this is a valid grant (has meaningful content)
-        if not grant.grant_name or grant.grant_name == "Not specified" or grant.grant_name.strip() == "":
+        # Check if this is a valid grant (has meaningful content). The model
+        # sometimes "names" a non-grant page instead of returning empty
+        # ("No active grant opportunity identified") — treat those as no-grant.
+        name = (grant.grant_name or "").strip()
+        if not name or name.lower().startswith(("not specified", "no active", "no grant", "none", "unknown", "n/a")):
             print("⚠️ No valid grant information found on this page - skipping")
             return None
             
@@ -234,41 +486,58 @@ def extract_grant_info(page_text):
             return None
 
 def _process_page(p):
-    """Fetch one page and run LLM extraction. Returns a grant dict or None.
+    """Fetch one page and run LLM extraction.
+
+    Returns {"grant": dict|None, "contact": str, "links": [str]} — contact
+    signals and sub-links are kept even when the page yields no grant, so a
+    contact page's email or an overview page's program links are never lost.
 
     Runs inside the thread pool — both the HTTP fetch and the LLM call are
     I/O-bound, so threads overlap them across pages.
     """
+    result = {"grant": None, "contact": "", "links": []}
     try:
         if not p.startswith('http'):
             print(f"⚠️ Skipping invalid URL: {p}")
-            return None
+            return result
 
         html_content, extracted_text = get_html_content_and_extract_text(p)
+        result["contact"] = _extract_contact_signals(html_content or "")
+        result["links"] = _mine_grant_links(html_content or "", p)
 
         if not extracted_text:
             print(f"❌ Failed to extract content from: {p}")
-            return None
+            return result
 
         grant = extract_grant_info(extracted_text)
 
         if grant is None:
             print(f"⏭️ No grant information found on {p} - skipping")
-            return None
+            return result
 
         grant.grant_url = p  # Add the URL to the grant data
         print(f"🎯 Grant extracted: {grant.grant_name}")
 
         if "closed" in grant.proposal_deadline.lower():
             print(f"❌ Skipped closed grant (deadline: {grant.proposal_deadline})")
-            return None
+            return result
 
+        grant_dict = grant.model_dump()
+        # Carry the real page text so the writers work from the source, not just
+        # the 13-field extraction. Stripped from the API response later; capped so
+        # the downstream writer prompts stay bounded.
+        grant_dict["source_page_text"] = (extracted_text or "")[:PAGE_TEXT_CHARS]
         print(f"✅ Added grant to results (deadline: {grant.proposal_deadline})")
-        return grant.model_dump()
+        result["grant"] = grant_dict
+        return result
 
     except Exception as e:
         print(f"❌ Error processing {p}: {str(e)}")
-        return None
+        return result
+
+
+def _norm_url(u: str) -> str:
+    return u.rstrip("/").lower()
 
 
 # Step 4: Run pipeline
@@ -280,11 +549,40 @@ def run_pipeline(url):
     # Pages are independent: fetch + extract them concurrently. Sequential
     # processing was the pipeline's dominant cost — one LLM call per page,
     # one page at a time. Results keep page order for deterministic output.
-    grants = []
     with ThreadPoolExecutor(max_workers=PAGE_WORKERS) as pool:
         results = list(pool.map(_process_page, pages))
 
-    grants = [g for g in results if g is not None]
+        # Wave 2: program sub-pages discovered on wave-1 pages. Detail pages
+        # (award caps, deadlines) usually hang off an overview page, one level
+        # below anything the homepage links directly.
+        seen = {_norm_url(p) for p in pages}
+        wave2 = []
+        for r in results:
+            for l in r["links"]:
+                if _norm_url(l) not in seen and len(wave2) < WAVE2_PAGES:
+                    seen.add(_norm_url(l))
+                    wave2.append(l)
+        if wave2:
+            print(f"🌊 Wave 2: processing {len(wave2)} sub-pages: {wave2}")
+            results += list(pool.map(_process_page, wave2))
+
+    grants = [r["grant"] for r in results if r["grant"]]
+
+    # Site-wide contact details: pages that yield no grant (contact/about pages)
+    # still carry the foundation's email and phone. Merge every page's harvested
+    # signals and append them to each grant's source text so the description
+    # writer always has real contact facts to work with.
+    contact_lines = []
+    for r in results:
+        for line in (r["contact"] or "").splitlines():
+            if line and line not in contact_lines:
+                contact_lines.append(line)
+    if contact_lines and grants:
+        contact_block = "CONTACT DETAILS COLLECTED ACROSS THIS FOUNDATION'S WEBSITE:\n" + "\n".join(contact_lines)
+        print(f"📇 Site-wide contact block: {contact_block[:200]}")
+        for g in grants:
+            if contact_block not in g.get("source_page_text", ""):
+                g["source_page_text"] = f"{g.get('source_page_text', '')}\n\n{contact_block}"
 
     print(f"\n🎉 Pipeline completed! Found {len(grants)} active grants")
     # PRINT GRANTS IN JSON FORMAT

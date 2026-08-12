@@ -10,6 +10,9 @@ pydantic-settings==2.5.2
 # Environment configuration
 python-dotenv==1.0.0
 
+# Deadline expiry parsing (grant_writer.filter_active_grants)
+python-dateutil>=2.8.0
+
 # LangChain ecosystem - pinned compatible versions
 langchain==0.3.25
 langchain-core==0.3.66
