@@ -251,6 +251,10 @@ class Grant(BaseModel):
     grant_amount_range: str = "Not specified"
     grant_amount: str = "Not specified"
     proposal_deadline: str = "Not specified"
+    # Full application window as prose (open/close dates, times, cycles,
+    # cutoffs). proposal_deadline stays a single machine-parseable date —
+    # TGP runs Carbon::parse() on it for the deadline column.
+    deadline_details: str = "Not specified"
     recurrence: str = "Not specified"
     contact_info: dict = {"email": "Not specified", "phone": "Not specified", "address": "Not specified"}
     organization_info: str = "Not specified"
@@ -429,9 +433,10 @@ def extract_grant_info(page_text):
     4. Eligibility criteria - include every stated requirement: GPA minimums, citizenship, gender, age, enrollment status, residency, accreditation requirements
     5. Eligible applicants ( nonprofits / individuals / small businesses). Identify if nonprofit organizations or small businesses or individuals are eligible for the grant.
     6. Eligible funding locations
-    7. Range of grant amount
-    8. Specific grant funding amount
-    9. Proposal deadline - capture the FULL application window as written on the page: opening date, due date and time, and each cycle's dates when there are several
+    7. Range of grant amount - format STRICTLY as "$MIN - $MAX" with a hyphen (e.g. "$750 - $10,000"); this string is machine-parsed. If only a single amount or cap exists, leave this as "Not specified" and use field 8.
+    8. Specific grant funding amount - a single dollar figure as written (e.g. "$5,000" or "$80,000"); machine-parsed. If the page states only a range, leave "Not specified".
+    9. Proposal deadline - the SINGLE next upcoming due date, machine-parseable: "Month DD, YYYY" (e.g. "September 30, 2026"), or "Month DD" when the page gives a recurring date without a year. Never write sentences here. If no dated deadline exists, "Not specified".
+    9b. Deadline details - the FULL application window as written on the page: opening date, due date and time, every cycle's dates, and any cutoff conditions (e.g. "closes after the first 250 applications"). Sentences allowed here.
     10. Annual or recurring
     11. Contact info (telephone, email, physical address)
     12. Organization information about the grant provider. Include the organization’s name, about us, organization’s mission or focus, background information, types of grants if available.
@@ -451,8 +456,9 @@ def extract_grant_info(page_text):
         "eligible_applicants": ["string1", "string2"],
         "eligible_locations": "string",
         "grant_amount_range": "string",
-        "grant_amount": "string", 
+        "grant_amount": "string",
         "proposal_deadline": "string",
+        "deadline_details": "string",
         "recurrence": "string",
         "contact_info": {{"email": "string", "phone": "string", "address": "string"}},
         "organization_info": "string",

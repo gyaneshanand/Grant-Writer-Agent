@@ -32,3 +32,22 @@ class MetadataWriterService:
             return writer.generate_all_metadata_single_call(consolidated_description, source_text=source_text)
         except Exception as e:
             raise Exception(f"Failed to generate metadata: {str(e)}")
+
+    def generate_metadata_lite(self, grant_data: str) -> Dict[str, Any]:
+        """SEO fields + subscriber title only — no teaser, no description.
+
+        Used when PIPELINE_GENERATE_DESCRIPTIONS is off: the client writes
+        subscriber-facing prose manually and only wants the mechanical fields.
+        """
+        try:
+            api_key = settings.OPENAI_API_KEY
+            if not api_key:
+                import os
+                api_key = os.getenv("OPENAI_API_KEY")
+                if not api_key:
+                    raise Exception("OpenAI API key not found. Please set the OPENAI_API_KEY environment variable.")
+
+            writer = GrantMetadataWriter(api_key)
+            return writer.generate_metadata_without_subscriber_content(grant_data)
+        except Exception as e:
+            raise Exception(f"Failed to generate metadata: {str(e)}")

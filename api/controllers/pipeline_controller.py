@@ -1,5 +1,6 @@
 import asyncio
 import os
+import re
 import time
 
 from fastapi import APIRouter, HTTPException
@@ -14,7 +15,9 @@ from ..services.grant_writer_service import GrantWriterService
 from ..services.metadata_writer_service import MetadataWriterService
 from urllib.parse import urlparse
 
-from agents.grant_writer import is_deadline_expired, is_invitation_only
+import json
+
+from agents.grant_writer import is_deadline_expired, is_invitation_only, _prune_unspecified
 from agents.grant_data_collector import CONTACT_BLOCK_HEADER
 from agents.organisation_data_collector import backfill_contact
 
@@ -106,6 +109,23 @@ async def run_complete_pipeline(request: PipelineRequest):
                 allow_email_upgrade=True,
             )
 
+        # TGP machine-parses grants_data[0] for its amount and deadline columns
+        # (FoundationGrantCreationService::parseGrantsData), so put the richest
+        # grant first: active before inactive, then has-amount, then dated
+        # deadline, then the most substantial summary.
+        def _grant_order_key(g):
+            if not isinstance(g, dict):
+                return (True, True, True, 0)
+            amount_text = f"{g.get('grant_amount', '')} {g.get('grant_amount_range', '')}"
+            deadline = str(g.get("proposal_deadline") or "")
+            active = not is_deadline_expired(deadline) and not is_invitation_only(g)
+            has_amount = bool(re.search(r"\d", amount_text))
+            has_dated_deadline = bool(re.search(r"\d", deadline))
+            return (not active, not has_amount, not has_dated_deadline,
+                    -len(str(g.get("grant_summary") or "")))
+
+        grants_data.sort(key=_grant_order_key)
+
         # No grants -> stop here. Running the writers on empty data makes the
         # teaser hallucinate generic filler, which must never reach subscribers.
         active_exists = any(
@@ -149,17 +169,42 @@ async def run_complete_pipeline(request: PipelineRequest):
             corpus_chunks.append(contact_block)
         source_corpus = "\n\n".join(corpus_chunks)[:corpus_cap]
 
-        # Step 3: Generate consolidated description
-        consolidated_result = grant_writer_service.generate_consolidated_description(
-            grants_data=grants_data,
-            org_data=org_data
-        )
+        # Client decision (2026-08-14): subscriber-facing prose (consolidated
+        # description + teaser) is written manually by the client's team, so
+        # generation defaults OFF. Flip PIPELINE_GENERATE_DESCRIPTIONS=true to
+        # restore full generation — the API response shape is identical either
+        # way (empty strings where content was not generated).
+        generate_descriptions = os.getenv(
+            "PIPELINE_GENERATE_DESCRIPTIONS", "false"
+        ).strip().lower() in ("1", "true", "yes", "on")
 
-        # Step 4: Generate metadata (teaser grounded in the raw source corpus)
-        metadata = metadata_writer_service.generate_metadata(
-            consolidated_description=consolidated_result,
-            source_text=source_corpus,
-        )
+        if generate_descriptions:
+            # Step 3: Generate consolidated description
+            consolidated_result = grant_writer_service.generate_consolidated_description(
+                grants_data=grants_data,
+                org_data=org_data
+            )
+
+            # Step 4: Generate metadata (teaser grounded in the raw source corpus)
+            metadata = metadata_writer_service.generate_metadata(
+                consolidated_description=consolidated_result,
+                source_text=source_corpus,
+            )
+        else:
+            consolidated_result = ""
+            # SEO fields + subscriber title derive from the extracted grant
+            # fields (there is no description to derive from).
+            digest_grants = []
+            for g in grants_data:
+                if not isinstance(g, dict):
+                    continue
+                if is_deadline_expired(g.get("proposal_deadline", "")) or is_invitation_only(g):
+                    continue
+                digest_grants.append(
+                    _prune_unspecified({k: v for k, v in g.items() if k != "source_page_text"}) or {}
+                )
+            grants_digest = json.dumps(digest_grants, indent=2)[:12000]
+            metadata = metadata_writer_service.generate_metadata_lite(grant_data=grants_digest)
 
         # Keep source_page_text internal: strip it so the API payload stays lean
         # and TGP sees the same grant shape as before this change.

@@ -195,20 +195,28 @@ class GrantMetadataWriter:
         }}
         """
 
-    # SEO mechanicals: short, formulaic, derived entirely from the already-
-    # synthesized description — the cheap extraction tier handles these.
+    # SEO mechanicals on the cheap tier. Field specs are distilled from TGP's
+    # admin-approved templates (GrantContentGeneratorService::promptCatalog) so
+    # pipeline output matches what the client's per-field regenerate buttons
+    # produce — keep the two in sync when the client edits their templates.
     _SEO_PROMPT = """
-        You are an SEO specialist. Generate 4 metadata fields for a grant opportunity based on the provided grant data. Follow the character limits exactly.
+        You are a senior SEO copywriter for The Grant Portal, a grant discovery platform. Generate 4 metadata fields for a grant opportunity from the provided grant data. Every field must be accurate to the data — never invent amounts, locations or eligibility.
 
         NEVER write "not specified", "not provided", "no information", "not available", "unknown" or any equivalent phrase in ANY field. Build every field only from facts that exist; write around anything absent.
 
-        1. **Opportunity Title** (around 60 characters): Clean title for grant opportunity; make it vague; include grant intent, grant amount that describes who the grant helps and specific causes. Do not mention grant sources. SEO friendly. Make sure Opportunity Title is not more than 70 characters
+        HARD RULES FOR ALL FIELDS:
+        - NO foundation names, program names or proprietary identifiers
+        - NO URLs, no years, no time-specific words ("new", "latest", "limited time")
+        - NO ALL CAPS, exclamation marks, quotation marks, brackets or hype words ("best", "top", "amazing")
+        - Natural professional language, no keyword stuffing; every field grammatically complete
 
-        2. **H1 Tag** (around 50 characters): Clean H1 tag for grant opportunity; make it vague; include grant intent, grant amount that describes who the grant helps and specific causes. Do not mention grant sources. SEO friendly. Make sure H1 Tag is not more than 60 characters.
+        1. **Opportunity Title** (maximum 70 characters, strict): search-optimized page title. Lead with the most compelling element — funding type, amount or beneficiary. Include the funding purpose and eligible applicant type; avoid geographic references. Strong shapes: "[Funding Amount] Grants for [Beneficiary Group]", "[Interest] Funding Available for [Eligible Entity]". Never generic like "Grant Opportunity Available".
 
-        3. **Meta Title** (around 50 characters): Clean Meta Title for grant opportunity; make it vague; include grant intent, grant amount that describes who the grant helps and specific causes. Do not mention grant sources. SEO friendly. Make sure Meta Title is not more than 60 characters.
+        2. **H1 Tag** (maximum 60 characters, strict): primary search keyword first, then a funding-focus or eligibility qualifier; no geographic references; reads as one natural phrase.
 
-        4. **Meta Description** (approximately 140 characters): Clean Meta Description that is DIFFERENT from the Meta Title for grant opportunity; make it vague; include grant intent, grant amount that describes who the grant helps and specific causes. Do not mention grant sources. SEO friendly. Make sure Meta Description is not more than 150 characters.
+        3. **Meta Title** (maximum 60 characters, strict): compelling keyword-rich phrase with the primary keyword in the first 30 characters; include amounts or eligibility when available; power words like "Funding", "Grants", "Available", "Support"; must differ from the Opportunity Title.
+
+        4. **Meta Description** (120 to 160 characters, strict, complete sentences): the search-results pitch. Hook first, 2-3 search terms woven naturally, concrete details (amounts, eligibility — geography IS allowed in this field), end with an implicit call to action such as "Learn more about this opportunity." Must not duplicate the Meta Title.
 
         Here is the grant data to use:
 
@@ -284,13 +292,32 @@ class GrantMetadataWriter:
         print("⚠️ Retry still violates rules — keeping the better attempt")
         return retry_fields if len(self._subscriber_field_violations(retry_fields)) < len(violations) else fields
 
-    def _generate_seo_fields(self, grant_data: str) -> Dict[str, str]:
-        """4 SEO fields on the cheap tier; the description is their only input."""
+    # Extra field block + JSON key used when subscriber content generation is
+    # disabled and the subscriber title must ride along in the cheap SEO call.
+    # Spec follows TGP's v2 subscriber-title template: max 70 chars, NO names
+    # (the older 140-char name-included spec is retired).
+    _SUBSCRIBER_TITLE_FIELD = """
+        5. **Opportunity Title for Subscriber** (maximum 70 characters, strict): headline for subscriber email alerts and dashboards — more engaging and benefit-driven than the public title, explicit about who should apply and the amount when available. Strong shapes: "[Amount Range] in Funding for [Specific Beneficiary]", "Support for [Activity] - Up to [Amount]". All hard rules above apply — especially NO foundation or program names and no time-pressure phrases.
+        """
+
+    def _generate_seo_fields(self, grant_data: str, include_subscriber_title: bool = False) -> Dict[str, str]:
+        """SEO fields on the cheap tier; grant_data is their only input."""
         seo_llm = create_pipeline_llm(
             temperature=0.3,
             model=os.getenv("PIPELINE_EXTRACT_MODEL", DEFAULT_EXTRACT_MODEL),
         )
-        prompt = ChatPromptTemplate.from_template(self._SEO_PROMPT)
+        template = self._SEO_PROMPT
+        if include_subscriber_title:
+            template = template.replace(
+                "Generate 4 metadata fields", "Generate 5 metadata fields"
+            ).replace(
+                '            "meta_description": "string"\n',
+                '            "meta_description": "string",\n            "opportunity_title_for_subscriber": "string"\n',
+            ).replace(
+                "        Here is the grant data to use:",
+                self._SUBSCRIBER_TITLE_FIELD + "\n        Here is the grant data to use:",
+            )
+        prompt = ChatPromptTemplate.from_template(template)
         response = seo_llm.invoke(prompt.format(grant_data=grant_data))
         log_llm_usage("metadata-seo", response)
         return self._parse_json_response(response.content)
@@ -321,20 +348,7 @@ class GrantMetadataWriter:
                 subscriber_future = pool.submit(self._generate_subscriber_fields, grant_data, source_text)
                 seo_future = pool.submit(self._generate_seo_fields, grant_data)
                 metadata = {**seo_future.result(), **subscriber_future.result()}
-
-            required_fields = [
-                "opportunity_title", "h1_tag", "meta_title",
-                "meta_description", "opportunity_teaser", "opportunity_title_for_subscriber"
-            ]
-
-            for field in required_fields:
-                if field not in metadata:
-                    raise ValueError(f"Missing required field: {field}")
-
-            print("✅ All metadata fields generated successfully!")
-            print(f"📊 Fields generated: {', '.join(metadata.keys())}")
-
-            return metadata
+            return self._validate_metadata(metadata)
 
         except json.JSONDecodeError as e:
             print(f"❌ JSON parsing error: {str(e)}")
@@ -342,6 +356,40 @@ class GrantMetadataWriter:
         except Exception as e:
             print(f"❌ Error generating metadata: {str(e)}")
             return {}
+
+    def generate_metadata_without_subscriber_content(self, grant_data: str) -> Dict[str, str]:
+        """SEO fields + subscriber title in one cheap call; teaser and the
+        consolidated description are intentionally NOT generated (client
+        writes subscriber-facing prose manually). Teaser is returned as an
+        empty string so the API shape and TGP field mapping stay unchanged.
+        """
+        print("🚀 Starting Grant Metadata Generation (subscriber content disabled)...")
+        try:
+            metadata = self._generate_seo_fields(grant_data, include_subscriber_title=True)
+            metadata["opportunity_teaser"] = ""
+            return self._validate_metadata(metadata)
+        except json.JSONDecodeError as e:
+            print(f"❌ JSON parsing error: {str(e)}")
+            return {}
+        except Exception as e:
+            print(f"❌ Error generating metadata: {str(e)}")
+            return {}
+
+    @staticmethod
+    def _validate_metadata(metadata: Dict[str, str]) -> Dict[str, str]:
+        required_fields = [
+            "opportunity_title", "h1_tag", "meta_title",
+            "meta_description", "opportunity_teaser", "opportunity_title_for_subscriber"
+        ]
+
+        for field in required_fields:
+            if field not in metadata:
+                raise ValueError(f"Missing required field: {field}")
+
+        print("✅ All metadata fields generated successfully!")
+        print(f"📊 Fields generated: {', '.join(metadata.keys())}")
+
+        return metadata
 
     def process_grant_opportunity_metadata(self, grant_description: str) -> Dict[str, str]:
         """
