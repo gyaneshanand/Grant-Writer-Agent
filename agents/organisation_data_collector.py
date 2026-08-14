@@ -2,8 +2,8 @@ from bs4 import BeautifulSoup
 import requests
 from concurrent.futures import ThreadPoolExecutor
 from langchain.prompts import ChatPromptTemplate
-from urllib.parse import urljoin
-from agents.llm_factory import create_pipeline_llm
+from urllib.parse import urljoin, urlparse
+from agents.llm_factory import create_pipeline_llm, log_llm_usage, DEFAULT_EXTRACT_MODEL
 from agents.grant_data_collector import _extract_contact_signals
 from pydantic import BaseModel
 import re
@@ -136,7 +136,12 @@ def extract_organization_info(page_texts):
     if not openai_api_key:
         raise ValueError("OPENAI_API_KEY not found in environment variables. Please set it in .env file.")
     
-    llm = create_pipeline_llm(temperature=0.3, openai_api_key=openai_api_key)
+    # Org extraction is field-pulling like grant extraction — cheap tier.
+    llm = create_pipeline_llm(
+        temperature=0.3,
+        openai_api_key=openai_api_key,
+        model=os.getenv("PIPELINE_EXTRACT_MODEL", DEFAULT_EXTRACT_MODEL),
+    )
     print("🔗 Connected to OpenAI API")
     
     # Combine all page texts for comprehensive analysis
@@ -180,7 +185,9 @@ def extract_organization_info(page_texts):
     """)
     
     print(f"📝 Processing combined text of length: {len(combined_text)} characters")
-    result = llm.invoke(prompt.format(text=combined_text)).content
+    response = llm.invoke(prompt.format(text=combined_text))
+    log_llm_usage("org-extract", response)
+    result = response.content
     print("✅ Received response from LLM")
     print(f"📤 Raw LLM response: {result[:200]}...")
     
@@ -239,6 +246,131 @@ _PLACEHOLDER_VALUES = {"not specified", "n/a", "none", "unknown", "not available
 _EMAIL_VALUE_RE = re.compile(r"[A-Za-z0-9][\w.+-]*@[A-Za-z0-9][\w-]*(?:\.[A-Za-z]{2,})+")
 _PHONE_VALUE_RE = re.compile(r"\+?\(?\d[\d\s().\-]{6,}\d")
 
+# Harvested-fact lines that _extract_contact_signals appends to page text.
+_SIGNAL_LINE_RE = re.compile(
+    r"^(Email addresses|Telephone numbers|Mailing/physical address)[^:]*:\s*(.+)$",
+    re.MULTILINE,
+)
+# Application-platform / site-builder inboxes — never the foundation's own.
+_PLATFORM_EMAIL_DOMAINS = (
+    "grantinterface.com", "smartsimple.com", "submittable.com", "formstack.com",
+    "fluxx.io", "surveymonkey.com", "wufoo.com", "wixpress.com", "squarespace.com",
+)
+# Preference order for the applicant-facing inbox local part.
+_EMAIL_RANK_PREFIXES = (
+    "grants", "grant", "scholarship", "program", "apply", "application",
+    "foundation", "giving", "info", "inquiries", "contact", "office", "hello",
+)
+# Plain-text US phone (footers often carry no tel: link). Strict shape so EINs,
+# zips and dollar figures never match.
+_TEXT_PHONE_RE = re.compile(r"(?<!\d)(?:\(\d{3}\)\s?|\d{3}[-.])\d{3}[-.]\d{4}(?!\d)")
+# Plain-text US street address, anchored on ", ST 12345" so prose never matches.
+_TEXT_ADDRESS_RE = re.compile(
+    r"\b\d{1,6}\s+[A-Za-z0-9][A-Za-z0-9 .'-]{2,40},\s*[A-Za-z][A-Za-z .'-]{2,30},\s*[A-Z]{2}\s+\d{5}(?:-\d{4})?\b"
+)
+
+
+def _second_level(host_or_email_domain: str) -> str:
+    parts = host_or_email_domain.lower().removeprefix("www.").split(".")
+    return parts[-2] if len(parts) >= 2 else parts[0]
+
+
+def _domain_related(email: str, foundation_host: str) -> bool:
+    """cummings.com relates to cummingsfoundation.org; weyerhaeuser.com does not."""
+    if not foundation_host:
+        return True
+    e = _second_level(email.split("@")[-1])
+    f = _second_level(foundation_host)
+    return e in f or f in e
+
+
+def _email_rank(email: str, foundation_host: str):
+    local = email.split("@", 1)[0].lower()
+    prefix_rank = len(_EMAIL_RANK_PREFIXES)
+    for i, prefix in enumerate(_EMAIL_RANK_PREFIXES):
+        if local.startswith(prefix):
+            prefix_rank = i
+            break
+    return (prefix_rank, 0 if _domain_related(email, foundation_host) else 1, email.lower())
+
+
+def _email_prefix_rank(email: str) -> int:
+    local = email.split("@", 1)[0].lower()
+    for i, prefix in enumerate(_EMAIL_RANK_PREFIXES):
+        if local.startswith(prefix):
+            return i
+    return len(_EMAIL_RANK_PREFIXES)
+
+
+def backfill_contact(contact: dict, harvested_text: str, foundation_host: str = "",
+                     require_domain_match: bool = False,
+                     allow_email_upgrade: bool = False) -> dict:
+    """Fill EMPTY contact fields from deterministically harvested facts.
+
+    The extractor model sometimes returns "" even when its input carries real
+    signals — with several personal staff emails it cannot tell which one is
+    'the grants contact' and gives up (Cummings Foundation reproduced this on
+    every run). The model's own pick wins; this guarantees a floor: if a real
+    signal was harvested, the card is never blank.
+
+    require_domain_match hard-filters email candidates to domains related to
+    the foundation's — set when the text comes from grant pages, which can
+    include other organizations' sites.
+
+    allow_email_upgrade additionally replaces a non-empty email when a
+    candidate ranks STRICTLY better on the applicant-facing prefix ladder
+    (grants@ beats a personal pick) — the same rubric the extraction prompt
+    states. Equal ranks never swap.
+    """
+    contact = dict(contact or {})
+    if not harvested_text:
+        return contact
+
+    # Regex-extract values from the payloads (never naive splits): payloads may
+    # come from model-written fields and can carry placeholders or prose.
+    emails, phones, addresses = [], [], []
+    for kind, payload in _SIGNAL_LINE_RE.findall(harvested_text):
+        if kind.startswith("Email"):
+            emails.extend(_EMAIL_VALUE_RE.findall(payload))
+        elif kind.startswith("Telephone"):
+            phones.extend(p.strip() for p in _PHONE_VALUE_RE.findall(payload))
+        else:
+            addresses.extend(
+                a.strip() for a in payload.split(" | ")
+                if a.strip() and re.search(r"\d", a)
+                and a.strip().lower() not in _PLACEHOLDER_VALUES
+            )
+
+    current_email = str(contact.get("email") or "")
+    if not current_email or allow_email_upgrade:
+        candidates = {
+            e for e in emails
+            if e and e.split("@")[-1].lower() not in _PLATFORM_EMAIL_DOMAINS
+            and (not require_domain_match or _domain_related(e, foundation_host))
+        }
+        if candidates:
+            best = sorted(candidates, key=lambda e: _email_rank(e, foundation_host))[0]
+            if not current_email:
+                contact["email"] = best
+                print(f"📇 Contact backfill: email <- {best}")
+            elif _email_prefix_rank(best) < _email_prefix_rank(current_email):
+                contact["email"] = best
+                print(f"📇 Contact backfill: email upgraded {current_email} -> {best}")
+
+    if not contact.get("phone"):
+        found = [p for p in phones if p] or _TEXT_PHONE_RE.findall(harvested_text)
+        if found:
+            contact["phone"] = found[0].strip()
+            print(f"📇 Contact backfill: phone <- {contact['phone']}")
+
+    if not contact.get("address"):
+        found = addresses or _TEXT_ADDRESS_RE.findall(harvested_text)
+        if found:
+            contact["address"] = found[0].strip()
+            print(f"📇 Contact backfill: address <- {contact['address']}")
+
+    return contact
+
 
 def _sanitize_contact(contact: dict) -> dict:
     """Deterministic guard on the contact card shown to subscribers.
@@ -289,6 +421,13 @@ def run_pipeline(foundation_url):
     if organization:
         org_data = organization.model_dump()
         org_data["contact"] = _sanitize_contact(org_data.get("contact"))
+        # Model-empty fields get a deterministic floor from the pages' own
+        # harvested signals (mailto:/tel:/JSON-LD/plain-text phone).
+        org_data["contact"] = backfill_contact(
+            org_data["contact"],
+            "\n\n".join(page_texts),
+            foundation_host=urlparse(foundation_url).netloc,
+        )
         print(f"\n🎉 Pipeline completed! Organization information extracted")
         print("\n📋 Organization data in JSON format:")
         print(json.dumps(org_data, indent=4))

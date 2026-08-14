@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 from dateutil import parser as date_parser
 
-from agents.llm_factory import create_pipeline_llm
+from agents.llm_factory import create_pipeline_llm, log_llm_usage
 
 # Load environment variables
 load_dotenv()
@@ -107,12 +107,15 @@ class GrantWriter:
             if not openai_api_key:
                 raise ValueError("OPENAI_API_KEY not found in environment variables. Please set it in .env file.")
         
-        # Synthesis is the quality-critical, low-volume step — run it at a higher
-        # reasoning effort than the high-volume extraction pass.
+        # Synthesis is the quality-critical, low-volume step — higher reasoning
+        # effort than extraction, on the writer tier (PIPELINE_WRITER_MODEL;
+        # gpt-5.4 writes this structured content at ~1/3 the cost of gpt-5.5 —
+        # flip the env var to A/B them).
         self.llm = create_pipeline_llm(
             temperature=0.1,
             openai_api_key=openai_api_key,
             reasoning_effort=os.getenv("PIPELINE_WRITER_REASONING_EFFORT", "high"),
+            model=os.getenv("PIPELINE_WRITER_MODEL", "gpt-5.4"),
         )
         
     def is_deadline_expired(self, deadline_str: str) -> bool:
@@ -250,26 +253,43 @@ class GrantWriter:
         try:
             # Split the raw page text out of the structured fields: the JSON stays
             # the clean 13-field index, the page text goes in as the primary source.
+            # The site-wide contact block is appended to EVERY grant's page text
+            # upstream — keep a single copy at the end instead of one per grant.
+            from agents.grant_data_collector import CONTACT_BLOCK_HEADER
             clean_grants, source_chunks = [], []
+            contact_block = ""
             for g in grants_data:
                 g = dict(g)
                 page_text = g.pop("source_page_text", "")
+                if CONTACT_BLOCK_HEADER in page_text:
+                    page_text, _, tail = page_text.partition(CONTACT_BLOCK_HEADER)
+                    contact_block = CONTACT_BLOCK_HEADER + tail
+                    page_text = page_text.rstrip()
                 clean_grants.append(_prune_unspecified(g) or {})
                 if page_text:
                     source_chunks.append(
                         f"--- SOURCE PAGE: {g.get('grant_url', 'unknown')} ---\n{page_text}"
                     )
+            if contact_block:
+                source_chunks.append(contact_block)
             formatted_data = json.dumps(clean_grants, indent=2)
+            # Cap the concatenated source corpus — without this, a many-grant
+            # foundation makes the description prompt (and its bill) unbounded.
+            corpus_cap = int(os.getenv("PIPELINE_SOURCE_CORPUS_CHARS", 48000))
             source_pages = "\n\n".join(source_chunks) if source_chunks else "Not available."
-            result = self.llm.invoke(
+            if len(source_pages) > corpus_cap:
+                print(f"✂️ Source corpus truncated {len(source_pages)} -> {corpus_cap} chars")
+                source_pages = source_pages[:corpus_cap]
+            response = self.llm.invoke(
                 prompt.format(
                     grants_data=formatted_data,
                     org_context=org_context,
                     source_pages=source_pages,
                     current_date=datetime.now().strftime("%B %d, %Y"),
                 )
-            ).content
-            return result.strip()
+            )
+            log_llm_usage("description-writer", response)
+            return response.content.strip()
         except Exception as e:
             print(f"❌ Error generating consolidated description: {e}")
             return f"Error generating consolidated description from {len(grants_data)} grants"

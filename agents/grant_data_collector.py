@@ -1,9 +1,12 @@
 from bs4 import BeautifulSoup
 import requests
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import hashlib
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
 from urllib.parse import urljoin, urlparse
 from langchain.prompts import ChatPromptTemplate
-from agents.llm_factory import create_pipeline_llm
+from agents.llm_factory import create_pipeline_llm, log_llm_usage, DEFAULT_EXTRACT_MODEL
 from pydantic import BaseModel
 import re
 import json
@@ -47,6 +50,16 @@ GRANT_LINK_KEYWORDS = [
 # Per-page cap on the raw text handed to the writers. Gives them the real page
 # instead of only the 13-field extraction, while keeping the prompt bounded.
 PAGE_TEXT_CHARS = int(os.getenv("PIPELINE_PAGE_TEXT_CHARS", 12000))
+
+# Pages with less readable text than this skip the LLM extraction call entirely
+# (nav shells, cookie walls, stub pages). Their contact signals and sub-links
+# are still harvested — only the paid model call is skipped.
+MIN_PAGE_CHARS = int(os.getenv("PIPELINE_MIN_PAGE_CHARS", 500))
+
+# Cap on text sent into one extraction call. Jina can return 40k+ chars for
+# link-farm pages; a grant page's substance fits well inside this cap, and
+# input past it mostly bought tokens, not fields.
+EXTRACT_INPUT_CHARS = int(os.getenv("PIPELINE_EXTRACT_INPUT_CHARS", 20000))
 
 # Jina Reader (JS-render fallback). Same key/env the v2 pipeline uses. When set,
 # JS-rendered SPA pages that static fetching can't read are recovered as markdown.
@@ -394,9 +407,15 @@ def extract_grant_info(page_text):
     if not openai_api_key:
         raise ValueError("OPENAI_API_KEY not found in environment variables. Please set it in .env file.")
     
-    llm = create_pipeline_llm(temperature=0.3, openai_api_key=openai_api_key)
+    # Extraction is high-volume field-pulling — it runs on the cheap tier.
+    # The two writer calls stay on PIPELINE_MODEL.
+    llm = create_pipeline_llm(
+        temperature=0.3,
+        openai_api_key=openai_api_key,
+        model=os.getenv("PIPELINE_EXTRACT_MODEL", DEFAULT_EXTRACT_MODEL),
+    )
     print("🔗 Connected to OpenAI API")
-    
+
     prompt = ChatPromptTemplate.from_template("""
     You are an expert grant writer and researcher. You will help extract detailed information about grants from web page text.
 
@@ -407,7 +426,7 @@ def extract_grant_info(page_text):
     1. Grant Name - the grant or funding opportunity name if available elase try to create a suitable name based on the content if not explicitly mentioned.
     2. Funding priorities and interests
     3. Types of grant
-    4. Eligibility criteria
+    4. Eligibility criteria - include every stated requirement: GPA minimums, citizenship, gender, age, enrollment status, residency, accreditation requirements
     5. Eligible applicants ( nonprofits / individuals / small businesses). Identify if nonprofit organizations or small businesses or individuals are eligible for the grant.
     6. Eligible funding locations
     7. Range of grant amount
@@ -442,8 +461,13 @@ def extract_grant_info(page_text):
     }}
     """)
     
+    if len(page_text) > EXTRACT_INPUT_CHARS:
+        print(f"✂️ Extraction input truncated {len(page_text)} -> {EXTRACT_INPUT_CHARS} chars")
+        page_text = page_text[:EXTRACT_INPUT_CHARS]
     print(f"📝 Processing text of length: {len(page_text)} characters")
-    result = llm.invoke(prompt.format(text=page_text)).content
+    response = llm.invoke(prompt.format(text=page_text))
+    log_llm_usage("extract", response)
+    result = response.content
     print("✅ Received response from LLM")
     print(f"📤 Raw LLM response: {result[:200]}...")
     
@@ -485,12 +509,16 @@ def extract_grant_info(page_text):
             print(f"❌ Fallback creation failed: {fallback_error}")
             return None
 
-def _process_page(p):
+def _process_page(p, seen_text_hashes=None, hash_lock=None):
     """Fetch one page and run LLM extraction.
 
     Returns {"grant": dict|None, "contact": str, "links": [str]} — contact
     signals and sub-links are kept even when the page yields no grant, so a
     contact page's email or an overview page's program links are never lost.
+
+    seen_text_hashes/hash_lock (shared per run) dedupe by CONTENT: aliased URLs
+    (www vs bare, /index.html vs /) serve identical text, and each duplicate
+    extraction is a paid LLM call.
 
     Runs inside the thread pool — both the HTTP fetch and the LLM call are
     I/O-bound, so threads overlap them across pages.
@@ -508,6 +536,18 @@ def _process_page(p):
         if not extracted_text:
             print(f"❌ Failed to extract content from: {p}")
             return result
+
+        if len(extracted_text.strip()) < MIN_PAGE_CHARS:
+            print(f"⏭️ Page too thin ({len(extracted_text.strip())} chars) — skipping LLM extraction: {p}")
+            return result
+
+        if seen_text_hashes is not None:
+            text_hash = hashlib.sha1(extracted_text.strip().encode("utf-8", "ignore")).hexdigest()
+            with hash_lock:
+                if text_hash in seen_text_hashes:
+                    print(f"♻️ Identical content already extracted this run — skipping LLM call: {p}")
+                    return result
+                seen_text_hashes.add(text_hash)
 
         grant = extract_grant_info(extracted_text)
 
@@ -537,34 +577,54 @@ def _process_page(p):
 
 
 def _norm_url(u: str) -> str:
-    return u.rstrip("/").lower()
+    """Normalize for URL dedup: case, scheme, www. prefix, trailing slash."""
+    u = u.strip().lower().rstrip("/")
+    u = re.sub(r"^https?://", "", u)
+    return u.removeprefix("www.")
+
+
+CONTACT_BLOCK_HEADER = "CONTACT DETAILS COLLECTED ACROSS THIS FOUNDATION'S WEBSITE:"
 
 
 # Step 4: Run pipeline
 def run_pipeline(url):
     print(f"🚀 Starting pipeline for URL: {url}")
+    run_start = time.monotonic()
     pages = scrape_site(url)
     print(f"📊 Processing {len(pages)} pages for grant information ({PAGE_WORKERS} workers)...")
 
-    # Pages are independent: fetch + extract them concurrently. Sequential
-    # processing was the pipeline's dominant cost — one LLM call per page,
-    # one page at a time. Results keep page order for deterministic output.
-    with ThreadPoolExecutor(max_workers=PAGE_WORKERS) as pool:
-        results = list(pool.map(_process_page, pages))
+    root_host = urlparse(url).netloc.lower().removeprefix("www.")
+    seen_hashes, hash_lock = set(), threading.Lock()
+    seen_urls = {_norm_url(p) for p in pages}
+    results = []
+    wave2_count = 0
 
-        # Wave 2: program sub-pages discovered on wave-1 pages. Detail pages
-        # (award caps, deadlines) usually hang off an overview page, one level
-        # below anything the homepage links directly.
-        seen = {_norm_url(p) for p in pages}
-        wave2 = []
-        for r in results:
-            for l in r["links"]:
-                if _norm_url(l) not in seen and len(wave2) < WAVE2_PAGES:
-                    seen.add(_norm_url(l))
-                    wave2.append(l)
-        if wave2:
-            print(f"🌊 Wave 2: processing {len(wave2)} sub-pages: {wave2}")
-            results += list(pool.map(_process_page, wave2))
+    # Pages are independent: fetch + extract them concurrently. The waves also
+    # overlap — a wave-2 sub-page (program detail page found on a wave-1 page)
+    # is submitted the moment its parent completes instead of after the whole
+    # first wave, so wave 2 costs no extra wall-clock batch.
+    with ThreadPoolExecutor(max_workers=PAGE_WORKERS) as pool:
+        pending = {pool.submit(_process_page, p, seen_hashes, hash_lock) for p in pages}
+        while pending:
+            done, pending = wait(pending, return_when=FIRST_COMPLETED)
+            for fut in done:
+                r = fut.result()
+                results.append(r)
+                for l in r["links"]:
+                    if wave2_count >= WAVE2_PAGES:
+                        break
+                    # Wave 2 never leaves the foundation's own site: links mined
+                    # from an external wave-1 page (another org's site) would
+                    # otherwise pull in that org's unrelated pages.
+                    host = urlparse(l).netloc.lower().removeprefix("www.")
+                    if host != root_host and not host.endswith("." + root_host):
+                        continue
+                    if _norm_url(l) in seen_urls:
+                        continue
+                    seen_urls.add(_norm_url(l))
+                    wave2_count += 1
+                    print(f"🌊 Wave 2 ({wave2_count}/{WAVE2_PAGES}): {l}")
+                    pending.add(pool.submit(_process_page, l, seen_hashes, hash_lock))
 
     grants = [r["grant"] for r in results if r["grant"]]
 
@@ -578,12 +638,13 @@ def run_pipeline(url):
             if line and line not in contact_lines:
                 contact_lines.append(line)
     if contact_lines and grants:
-        contact_block = "CONTACT DETAILS COLLECTED ACROSS THIS FOUNDATION'S WEBSITE:\n" + "\n".join(contact_lines)
+        contact_block = CONTACT_BLOCK_HEADER + "\n" + "\n".join(contact_lines)
         print(f"📇 Site-wide contact block: {contact_block[:200]}")
         for g in grants:
             if contact_block not in g.get("source_page_text", ""):
                 g["source_page_text"] = f"{g.get('source_page_text', '')}\n\n{contact_block}"
 
+    print(f"⏱ Grant collection finished in {time.monotonic() - run_start:.1f}s ({len(results)} pages)")
     print(f"\n🎉 Pipeline completed! Found {len(grants)} active grants")
     # PRINT GRANTS IN JSON FORMAT
     print("\n📋 Grants in JSON format:")
