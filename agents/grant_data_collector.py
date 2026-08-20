@@ -380,10 +380,11 @@ def get_html_content_and_extract_text(url):
                 print(f"✨ Jina Reader returned {len(jina_text)} chars (was {len(extracted_text or '')})")
                 extracted_text = jina_text
 
-        # Last resort so downstream never receives None.
+        # Last resort so downstream never receives None. Tag-stripped, never
+        # raw HTML — markup noise wastes the extraction call's input budget.
         if not extracted_text:
-            print("⚠️ No clean text available, falling back to raw HTML")
-            extracted_text = html_content
+            print("⚠️ No clean text available, falling back to tag-stripped HTML")
+            extracted_text = _strip_html_to_text(html_content)
 
         # Re-attach contact details that live only in mailto:/tel: hrefs, which
         # text extraction otherwise drops.

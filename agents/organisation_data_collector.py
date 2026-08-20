@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from langchain.prompts import ChatPromptTemplate
 from urllib.parse import urljoin, urlparse
 from agents.llm_factory import create_pipeline_llm, log_llm_usage, DEFAULT_EXTRACT_MODEL
-from agents.grant_data_collector import _extract_contact_signals
+from agents.grant_data_collector import _extract_contact_signals, _strip_html_to_text
 from pydantic import BaseModel
 import re
 import json
@@ -106,8 +106,11 @@ def get_html_content_and_extract_text(url):
         if extracted_text:
             print(f"✨ Extracted clean text length: {len(extracted_text)} characters")
         else:
-            print("⚠️ Trafilatura extraction failed, falling back to raw HTML")
-            extracted_text = html_content
+            # Tag-stripped text, never raw HTML: a JS-heavy page's raw markup
+            # runs 100k+ chars of markup noise per page and once blew the org
+            # LLM call past OpenAI's 272k-token input limit (adamslegacyfoundation.org).
+            print("⚠️ Trafilatura extraction failed, falling back to tag-stripped HTML")
+            extracted_text = _strip_html_to_text(html_content)
 
         # Re-attach contact details that live only in mailto:/tel: hrefs (and
         # Cloudflare-obfuscated emails), which text extraction otherwise drops —
@@ -143,9 +146,23 @@ def extract_organization_info(page_texts):
         model=os.getenv("PIPELINE_EXTRACT_MODEL", DEFAULT_EXTRACT_MODEL),
     )
     print("🔗 Connected to OpenAI API")
-    
-    # Combine all page texts for comprehensive analysis
-    combined_text = "\n\n--- NEW PAGE ---\n\n".join(page_texts)
+
+    # Bound the LLM input: per-page and total caps. An uncapped join once hit
+    # 1.2M tokens (OpenAI rejects past 272k). Harvested contact-signal lines
+    # sit at the END of each page's text, so re-append them when truncation
+    # would drop them — the contact card depends on those lines.
+    page_cap = int(os.getenv("PIPELINE_ORG_PAGE_CHARS", 20000))
+    total_cap = int(os.getenv("PIPELINE_ORG_INPUT_CHARS", 60000))
+    capped_pages = []
+    for t in page_texts:
+        if len(t) > page_cap:
+            signal_lines = _SIGNAL_FULL_LINE_RE.findall(t)
+            t = t[:page_cap] + ("\n\n" + "\n".join(signal_lines) if signal_lines else "")
+        capped_pages.append(t)
+    combined_text = "\n\n--- NEW PAGE ---\n\n".join(capped_pages)
+    if len(combined_text) > total_cap:
+        print(f"✂️ Org input truncated {len(combined_text)} -> {total_cap} chars")
+        combined_text = combined_text[:total_cap]
     
     prompt = ChatPromptTemplate.from_template("""
     You are an expert researcher analyzing organization websites providing grants. Extract information about the organization from the provided web page text.
@@ -249,6 +266,11 @@ _PHONE_VALUE_RE = re.compile(r"\+?\(?\d[\d\s().\-]{6,}\d")
 # Harvested-fact lines that _extract_contact_signals appends to page text.
 _SIGNAL_LINE_RE = re.compile(
     r"^(Email addresses|Telephone numbers|Mailing/physical address)[^:]*:\s*(.+)$",
+    re.MULTILINE,
+)
+# Same lines, captured whole — used to carry them across input truncation.
+_SIGNAL_FULL_LINE_RE = re.compile(
+    r"^(?:Email addresses|Telephone numbers|Mailing/physical address)[^:]*:.*$",
     re.MULTILINE,
 )
 # Application-platform / site-builder inboxes — never the foundation's own.
